@@ -1,0 +1,80 @@
+apply plugin: 'java'
+apply plugin: 'pmd'
+apply plugin: 'jdepend'
+apply plugin: 'jacoco'
+
+pmd {
+    toolVersion = "6.14.0"
+    consoleOutput = true
+    sourceSets = [sourceSets.main]
+    ruleSetFiles = rootProject.files('buildSrc/pmd/pmd_checks.xml')
+}
+
+jdepend {
+    toolVersion = "2.9.1"
+    sourceSets = [sourceSets.main]
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = false
+        csv.enabled = false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+            )
+        })
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+
+        rule {
+            //element = 'METHOD'
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.9
+            }
+        }
+
+        rule {
+            //element = 'CLASS'
+            limit {
+                counter = 'CLASS'
+                value = 'COVEREDRATIO'
+                minimum = 0.9
+            }
+
+        }
+        rule {
+            //element = 'INSTRUCTION'
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.9
+            }
+        }
+        rule {
+            //element = 'BRANCH'
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.9
+            }
+        }
+    }
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification

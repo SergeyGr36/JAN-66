@@ -1,0 +1,46 @@
+buildscript {
+    apply from: "${rootProject.projectDir}/buildSrc/repositories.gradle"
+    repositories extRepositories
+    apply from: "${rootProject.projectDir}/buildSrc/buildscript-dependencies.gradle"
+    dependencies extDependencies
+}
+
+group 'com.ra.course'
+version '1.0-SNAPSHOT'
+
+configure(allprojects) { project ->
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: "net.saliman.properties"
+    apply plugin: 'nebula.optional-base'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'war'
+
+    apply from: "${rootProject.projectDir}/buildSrc/dependencies.gradle"
+    apply from: "${rootProject.projectDir}/buildSrc/analyze.gradle"
+    sourceCompatibility = 11
+
+    repositories extRepositories
+
+    test {
+        useJUnitPlatform {
+            excludeTags 'slow'
+            includeEngines 'junit-jupiter'
+        }
+        testLogging {
+            events 'PASSED', 'FAILED', 'SKIPPED'
+        }
+        failFast = false
+    }
+
+    dependencies {
+        testCompile testing.junit5Engine
+        testCompile testing.junit5Api
+        testCompile testing.junit5Params
+    }
+}
+
+wrapper {
+    version = '5.4.1'
+}
