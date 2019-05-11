@@ -7,9 +7,6 @@ public class SimpleCalculator {
     }
 
     public double sub(final int num, final int num1) {
-        if(num < 0 || num1 < 0) {
-            throw new IllegalArgumentException();
-        }
         return num - num1;
     }
 
