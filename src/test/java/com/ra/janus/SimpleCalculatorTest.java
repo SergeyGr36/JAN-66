@@ -10,4 +10,15 @@ public class SimpleCalculatorTest {
     public void testSum() {
         Assertions.assertEquals(simpleCalculator.sum(10, 10), 20);
     }
+
+    @Test
+    public void whenPassTwoNumbersThenSubtractionReturn() {
+        Assertions.assertEquals(simpleCalculator.sub(10, 10), 0);
+    }
+
+    @Test
+    public void whenPassAtLeastOneNegativeNumberThenExceptionThrown() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> simpleCalculator.sub(-10, 10));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> simpleCalculator.sub(10, -10));
+    }
 }

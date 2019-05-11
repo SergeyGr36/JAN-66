@@ -6,7 +6,10 @@ public class SimpleCalculator {
         return num + num1;
     }
 
-    public double div(final int num, final int num1) {
+    public double sub(final int num, final int num1) {
+        if(num < 0 || num1 < 0) {
+            throw new IllegalArgumentException();
+        }
         return num - num1;
     }
 
