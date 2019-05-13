@@ -46,5 +46,9 @@ wrapper {
 }
 
 project(':train-tickets') {
+    dependencies {
+        compile db.h2
+        compile db.mysql
+    }
     
 }
