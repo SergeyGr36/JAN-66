@@ -45,6 +45,8 @@ wrapper {
     version = '5.4.1'
 }
 
-project("hotel") {
-    
+project(":hotel") {
+    dependencies {
+        compile db.h2
+    }
 }
