@@ -2,7 +2,7 @@ package com.ra.janus.developersteam.dao;
 
 import java.util.List;
 
-public interface DataAccessObject<T> {
+public interface IBaseDAO<T> {
     List<T> getAll();
     T getById(long id);
     boolean update(T entity);
