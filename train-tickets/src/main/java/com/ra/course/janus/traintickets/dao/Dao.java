@@ -10,7 +10,7 @@ public interface Dao<T> {
 
     public T delete(Long id);
 
-    public T find(Long id);
+    public T findById(Long id);
 
     public List<T> findAll();
 
