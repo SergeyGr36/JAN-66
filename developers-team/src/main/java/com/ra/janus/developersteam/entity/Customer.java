@@ -2,11 +2,7 @@ package com.ra.janus.developersteam.entity;
 
 public class Customer {
     private long id;
-    private final String name;
-
-    public Customer(String name) {
-        this.name = name;
-    }
+    private String name;
 
     public long getId() {
         return id;
@@ -18,5 +14,9 @@ public class Customer {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
