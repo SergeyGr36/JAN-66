@@ -45,6 +45,6 @@ wrapper {
     version = '5.4.1'
 }
 
-project {
-    train-tickets
+project(':train-tickets') {
+    
 }
