@@ -1,5 +1,6 @@
-package com.ra.janus.developersteam.dao;
+package com.ra.janus.developersteam.dao.classes;
 
+import com.ra.janus.developersteam.dao.interfaces.ConnectionFactory;
 import org.h2.jdbcx.JdbcDataSource;
 
 import java.io.IOException;
@@ -8,12 +9,12 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Properties;
 
-public class ConnectionFactory {
-    private static ConnectionFactory connFactory;
+public class HTwoConnectionFactory implements ConnectionFactory {
+    private static HTwoConnectionFactory connFactory;
     private static JdbcDataSource dataSource;
     private static Properties dbProperties;
 
-    private ConnectionFactory() throws IOException {
+    private HTwoConnectionFactory() throws IOException {
         dbProperties = new Properties();
         loadProperties();
     }
@@ -30,10 +31,10 @@ public class ConnectionFactory {
      *
      * @return ConnectionFactory instance.
      */
-    public static ConnectionFactory getInstance() throws IOException {
-        synchronized (ConnectionFactory.class) {
+    public static HTwoConnectionFactory getInstance() throws IOException {
+        synchronized (HTwoConnectionFactory.class) {
             if (connFactory == null) {
-                connFactory = new ConnectionFactory();
+                connFactory = new HTwoConnectionFactory();
                 dataSource = new JdbcDataSource();
                 dataSource.setURL(dbProperties.getProperty("db.url"));
                 dataSource.setUser(dbProperties.getProperty("db.username"));
@@ -51,9 +52,5 @@ public class ConnectionFactory {
      */
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
-    }
-
-    public static JdbcDataSource getDataSource() {
-        return dataSource;
     }
 }
