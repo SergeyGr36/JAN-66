@@ -52,4 +52,8 @@ public class ConnectionFactory {
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
+
+    public static JdbcDataSource getDataSource() {
+        return dataSource;
+    }
 }
