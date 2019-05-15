@@ -5,8 +5,8 @@ import com.ra.janus.hotel.enums.StatusOrder;
 import com.ra.janus.hotel.exception.DaoException;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO implements IEntityDAO<Order> {
@@ -14,11 +14,12 @@ public class OrderDAO implements IEntityDAO<Order> {
     private final transient DataSource dataSource;
 
     private final static String SELECT_BY_ID = "select * from T_ORDER where ID = ?";
+    private final static String SELECT_ALL = "select * from T_ORDER";
     private final static String DELETE_BY_ID = "delete from T_ORDER where ID = ?";
     private final static String INSERT = "insert into T_ORDER (ID_CLIENT, ID_TYPE_ROOM, DATE_IN, DATE_OUT, STATUS, DATE_CREATE, DATE_UPDATE, ID_ROOM, ID) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private final static String UPDATE_BY_ID = "update T_ORDER set ID_CLIENT = ?, ID_TYPE_ROOM = ?, DATE_IN = ?, DATE_OUT = ?, STATUS = ?, DATE_CREATE = ?, DATE_UPDATE = ?, ID_ROOM = ? where ID = ?";
 
-    public OrderDAO(final DataSource dataSource) throws IOException, SQLException {
+    public OrderDAO(final DataSource dataSource) {
         this.dataSource = dataSource; //H2ConnectionFactory.getInstance().getDataSource();
     }
 
@@ -79,14 +80,19 @@ public class OrderDAO implements IEntityDAO<Order> {
     }
 
     @Override
-    public Order findByParam(final Object... params) throws DaoException {
-
-        return null;
-    }
-
-    @Override
-    public List<Order> findListByParam(final Object... params) throws DaoException {
-        return null;
+    public List<Order> findAll() throws DaoException {
+        final List<Order> orders = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
+            try (ResultSet resultSet = statement.executeQuery();){
+                while (resultSet.next()) {
+                    orders.add(orderOfResultSet(resultSet));
+                }
+            }
+            return orders;
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage(), e);
+        }
     }
 
     private Order orderOfResultSet(final ResultSet resultSet) throws SQLException {
@@ -112,6 +118,4 @@ public class OrderDAO implements IEntityDAO<Order> {
         //statement.setLong(8, order.getRoom().getId());
         statement.setLong(9, order.getId());
     }
-
-
 }
