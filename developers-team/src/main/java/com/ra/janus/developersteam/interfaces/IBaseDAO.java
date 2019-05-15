@@ -1,4 +1,4 @@
-package com.ra.janus.developersteam.dao.interfaces;
+package com.ra.janus.developersteam.interfaces;
 
 import java.util.List;
 
