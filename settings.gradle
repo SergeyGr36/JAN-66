@@ -1,1 +1,2 @@
 rootProject.name = 'janus'
+include 'faculty'

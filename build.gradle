@@ -44,3 +44,9 @@ configure(allprojects) { project ->
 wrapper {
     version = '5.4.1'
 }
+
+project(':faculty') {
+    dependencies {
+        compile db.mysql
+    }
+}
