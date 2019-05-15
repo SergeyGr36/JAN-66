@@ -9,13 +9,12 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Properties;
 
-public class HTwoConnectionFactory implements ConnectionFactory {
+public final class HTwoConnectionFactory implements ConnectionFactory {
     private static HTwoConnectionFactory connFactory;
     private static JdbcDataSource dataSource;
-    private static Properties dbProperties;
+    private static Properties dbProperties = new Properties();
 
     private HTwoConnectionFactory() throws IOException {
-        dbProperties = new Properties();
         loadProperties();
     }
     
