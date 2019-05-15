@@ -1,4 +1,4 @@
-package com.ra.janus.developersteam.dao.classes;
+package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.dao.interfaces.ConnectionFactory;
 import org.h2.jdbcx.JdbcDataSource;
