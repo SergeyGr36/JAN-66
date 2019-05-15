@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'pmd'
 apply plugin: 'jdepend'
 apply plugin: 'jacoco'
+apply plugin: "com.github.spotbugs"
 
 pmd {
     toolVersion = "6.14.0"
