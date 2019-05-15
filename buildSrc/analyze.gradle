@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'pmd'
 apply plugin: 'jdepend'
 apply plugin: 'jacoco'
+apply plugin: "com.github.spotbugs"
 
 pmd {
     toolVersion = "6.14.0"
@@ -25,7 +26,7 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**', '**/interfaces/**']
             )
         })
     }
