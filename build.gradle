@@ -45,6 +45,11 @@ wrapper {
     version = '5.4.1'
 }
 
-project {
-    train-tickets
+project(':train-tickets') {
+    dependencies {
+        compile db.h2
+        runtime db.h2
+        compile db.mysql
+    }
+    
 }
