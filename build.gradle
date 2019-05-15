@@ -49,4 +49,7 @@ project(":hotel") {
     dependencies {
         compile db.h2
     }
+    spotbugsMain {
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+    }
 }

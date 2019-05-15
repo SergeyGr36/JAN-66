@@ -2,10 +2,13 @@ package com.ra.janus.hotel.entity;
 
 import com.ra.janus.hotel.enums.StatusOrder;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.sql.Date;
 import java.util.Objects;
 
-public class Order {
+public class Order implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private long id;
     private Client client;
@@ -23,11 +26,11 @@ public class Order {
         this.id = id;
         this.client = client;
         this.typeRoom = typeRoom;
-        this.dateIn = dateIn;
-        this.dateOut = dateOut;
+        this.dateIn = dateIn != null ? (Date) dateIn.clone() : null;
+        this.dateOut = dateOut != null ? (Date) dateOut.clone() : null;
         this.status = status;
-        this.dateCreate = dateCreate;
-        this.dateUpdate = dateUpdate;
+        this.dateCreate = dateCreate != null ? (Date) dateCreate.clone() : null;
+        this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
         this.room = room;
     }
 
@@ -56,19 +59,19 @@ public class Order {
     }
 
     public Date getDateIn() {
-        return dateIn;
+        return dateIn != null ? new Date(dateIn.getTime()) : null;
     }
 
     public void setDateIn(Date dateIn) {
-        this.dateIn = dateIn;
+        this.dateIn = dateIn != null ? (Date) dateIn.clone() : null;
     }
 
     public Date getDateOut() {
-        return dateOut;
+        return dateOut != null ? new Date(dateOut.getTime()) : null;
     }
 
     public void setDateOut(Date dateOut) {
-        this.dateOut = dateOut;
+        this.dateOut = dateOut != null ? (Date) dateOut.clone() : null;
     }
 
     public StatusOrder getStatus() {
@@ -80,19 +83,19 @@ public class Order {
     }
 
     public Date getDateCreate() {
-        return dateCreate;
+        return dateCreate != null ? new Date(dateCreate.getTime()) : null;
     }
 
     public void setDateCreate(Date dateCreate) {
-        this.dateCreate = dateCreate;
+        this.dateCreate = dateCreate != null ? (Date) dateCreate.clone() : null;
     }
 
     public Date getDateUpdate() {
-        return dateUpdate;
+        return dateUpdate != null ? new Date(dateUpdate.getTime()) : null;
     }
 
     public void setDateUpdate(Date dateUpdate) {
-        this.dateUpdate = dateUpdate;
+        this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
     }
 
     public Room getRoom() {

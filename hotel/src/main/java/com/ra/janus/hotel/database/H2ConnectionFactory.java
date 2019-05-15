@@ -15,7 +15,6 @@ public final class H2ConnectionFactory {
 
     private H2ConnectionFactory() throws IOException {
         loadProperties();
-        createDateSource();
     }
 
     public DataSource getDataSource() {
@@ -24,9 +23,9 @@ public final class H2ConnectionFactory {
 
     public static H2ConnectionFactory getInstance() throws SQLException, IOException {
         synchronized (H2ConnectionFactory.class) {
-
             if (factory == null) {
                 factory = new H2ConnectionFactory();
+                createDateSource();
             }
             return factory;
         }
@@ -36,13 +35,11 @@ public final class H2ConnectionFactory {
         connectProperties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("connect.properties"));
     }
 
-    private void createDateSource() {
-        if (dataSource == null) {
+    private static void createDateSource() {
             dataSource = new JdbcDataSource();
             dataSource.setURL(connectProperties.getProperty("db.url"));
             dataSource.setUser(connectProperties.getProperty("db.user"));
             dataSource.setPassword(connectProperties.getProperty("db.pass"));
-       }
     }
 
 }

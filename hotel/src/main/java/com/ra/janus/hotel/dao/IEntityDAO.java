@@ -10,6 +10,5 @@ public interface IEntityDAO<T> {
     T update(T t) throws DaoException;
     void delete (long id) throws DaoException;
     T findById(long id) throws DaoException;
-    T findByParam(Object...params) throws DaoException;
-    List<T> findListByParam(Object...params) throws DaoException;
+    List<T> findAll() throws DaoException;
 }
