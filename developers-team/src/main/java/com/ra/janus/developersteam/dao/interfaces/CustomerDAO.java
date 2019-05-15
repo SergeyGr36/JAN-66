@@ -6,8 +6,12 @@ import java.util.List;
 
 public interface CustomerDAO {
     List<Customer> readAll();
+
     Customer read(long id);
+
     boolean update(Customer entity);
+
     boolean delete(long id);
+
     Customer create(Customer entity);
 }
