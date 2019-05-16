@@ -23,7 +23,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     @Override
-    public Customer create(final Customer customer) {
+    public long create(final Customer customer) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
@@ -33,7 +33,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
                     final long id = generatedKeys.getLong(1);
                     customer.setId(id);
 
-                    return customer;
+                    return id;
                 } else {
                     throw new IllegalStateException("Couldn't retrieve generated id for customer " + customer);
                 }
