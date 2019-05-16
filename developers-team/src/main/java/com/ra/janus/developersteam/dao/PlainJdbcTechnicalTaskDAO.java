@@ -1,7 +1,8 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.CustomerDAO;
+import com.ra.janus.developersteam.dao.interfaces.TechnicalTaskDAO;
 import com.ra.janus.developersteam.entity.Customer;
+import com.ra.janus.developersteam.entity.TechnicalTask;
 import com.ra.janus.developersteam.exception.DAOException;
 
 import javax.sql.DataSource;
@@ -9,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlainJdbcCustomerDAO implements CustomerDAO {
+public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private static final String INSERT_SQL = "INSERT INTO CUSTOMERS (NAME, ADDRESS, PHONE) VALUES (?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE CUSTOMERS SET NAME=?,ADDRESS=?,PHONE=? WHERE ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM CUSTOMERS";
@@ -18,12 +19,12 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
     transient private final DataSource dataSource;
 
-    public PlainJdbcCustomerDAO(final DataSource dataSource) {
+    public PlainJdbcTechnicalTaskDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public long create(final Customer customer) {
+    public long create(final TechnicalTask customer) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
