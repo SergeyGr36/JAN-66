@@ -1,9 +1,10 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.ConnectionFactory;
 import com.ra.janus.developersteam.dao.interfaces.CustomerDAO;
 import com.ra.janus.developersteam.entity.Customer;
+import com.ra.janus.developersteam.exception.DAOException;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,83 +16,99 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     private static final String SELECT_ONE_SQL = "SELECT * FROM CUSTOMERS WHERE ID = ?";
     private static final String DELETE_SQL = "DELETE FROM CUSTOMERS WHERE ID=?";
 
-    private final ConnectionFactory connectionFactory;
+    transient private final DataSource dataSource;
 
-    public PlainJdbcCustomerDAO(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    public PlainJdbcCustomerDAO(final DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
-    public Customer create(Customer customer) {
-        try (Connection conn = connectionFactory.getConnection();
+    public Customer create(final Customer customer) {
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
             ps.executeUpdate();
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                long id = generatedKeys.getLong(1);
-                customer.setId(id);
-                return customer;
-            } else {
-                throw new IllegalStateException("Couldn't retreive generated id for customer " + customer);
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong(1);
+                    customer.setId(id);
+
+                    return customer;
+                } else {
+                    throw new IllegalStateException("Couldn't retrieve generated id for customer " + customer);
+                }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
     @Override
-    public Customer read(long id) {
-        try (Connection conn = connectionFactory.getConnection();
+    public Customer read(final long id) {
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
-            Customer customer = null;
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    customer = toCustomer(rs);
+                    return toCustomer(rs);
                 }
             }
-            return customer;
+            return null;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
     @Override
     public List<Customer> readAll() {
-        try (Connection conn = connectionFactory.getConnection();
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
 
-            List<Customer> customers = new ArrayList<>();
+            final List<Customer> customers = new ArrayList<>();
             while (rs.next()) {
                 customers.add(toCustomer(rs));
             }
             return customers;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
     @Override
-    public boolean update(Customer entity) {
-        return false;
+    public boolean update(final Customer customer) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
+            prepareStatement(ps, customer);
+            final int rowCount = ps.executeUpdate();
+            return rowCount != 0;
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
     }
 
     @Override
-    public boolean delete(long id) {
-        return false;
+    public boolean delete(final long id) {
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
+            ps.setLong(1, id);
+            final int rowCount = ps.executeUpdate();
+            return rowCount != 0;
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
     }
 
-    private Customer toCustomer(ResultSet rs) throws SQLException {
+    private Customer toCustomer(final ResultSet rs) throws SQLException {
         return new Customer(rs.getLong("ID"),
                 rs.getString("NAME"),
                 rs.getString("ADDRESS"),
                 rs.getString("PHONE"));
     }
 
-    private void prepareStatement(PreparedStatement ps, Customer customer) throws SQLException {
+    private void prepareStatement(final PreparedStatement ps, final Customer customer) throws SQLException {
         ps.setString(1, customer.getName());
         ps.setString(2, customer.getAddress());
         ps.setString(3, customer.getPhone());
