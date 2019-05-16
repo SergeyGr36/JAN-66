@@ -291,7 +291,7 @@
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
             <property name="separator" value="," />
-            <property name="maxDuplicateLiterals" value="1" />
+            <property name="maxDuplicateLiterals" value="2" />
             <property name="minimumLength" value="3" />
             <property name="skipAnnotations" value="false" />
             <property name="exceptionList" value="" />
