@@ -1,26 +1,23 @@
-package com.ra.janus.developersteam.connections;
+package com.ra.janus.developersteam.datasources;
 
 import com.ra.janus.developersteam.utils.PropertyReader;
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Properties;
 
-public enum H2Connection implements iConnection {
+public enum H2DataSource implements IDataSource {
 
     INSTANCE;
 
     private JdbcDataSource dataSource;
-    private Properties properties;
 
-    private DataSource init() throws IOException {
-
-        properties = PropertyReader.INSTANCE.getProperties("config.properties");
+    @Override
+    public DataSource get() throws IOException {
 
         if (dataSource == null) {
+            final Properties properties = PropertyReader.INSTANCE.getProperties("config.properties");
             dataSource = new JdbcDataSource();
             dataSource.setURL(properties.getProperty("db.url"));
             dataSource.setUser(properties.getProperty("db.username"));
@@ -28,10 +25,5 @@ public enum H2Connection implements iConnection {
         }
 
         return dataSource;
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException, IOException {
-        return init().getConnection();
     }
 }
