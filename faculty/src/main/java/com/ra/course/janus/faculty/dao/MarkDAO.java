@@ -17,4 +17,4 @@ public interface MarkDAO {
     void delete(Mark mark);
 
     List<Mark> findAll();
-} ;
+}
