@@ -1,11 +1,10 @@
 package com.ra.janus.developersteam.datasources;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
 public class DataSourceFactory {
 
-    public DataSource get(final DataSourceType dataSourceType) throws IOException {
+    public DataSource get(final DataSourceType dataSourceType) {
 
         if (dataSourceType == DataSourceType.H2) {
             return H2DataSource.INSTANCE.get();
