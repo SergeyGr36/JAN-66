@@ -1,17 +1,21 @@
 package com.ra.janus.hotel.entity;
 
-public class TypeRoom {
+import java.io.Serializable;
+
+public class TypeRoom implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private int countPlaces;
     private int prise;
-    private String discription;
+    private String description;
     private String classOfRoom;//Enum?
 
-    public TypeRoom(long id, int countPlaces, int prise, String discription, String classOfRoom) {
+    public TypeRoom(long id, int countPlaces, int prise, String description, String classOfRoom) {
         this.id = id;
         this.countPlaces = countPlaces;
         this.prise = prise;
-        this.discription = discription;
+        this.description = description;
         this.classOfRoom = classOfRoom;
     }
 
@@ -19,19 +23,39 @@ public class TypeRoom {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public int getCountPlaces() {
         return countPlaces;
+    }
+
+    public void setCountPlaces(int countPlaces) {
+        this.countPlaces = countPlaces;
     }
 
     public int getPrise() {
         return prise;
     }
 
-    public String getDiscription() {
-        return discription;
+    public void setPrise(int prise) {
+        this.prise = prise;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getClassOfRoom() {
         return classOfRoom;
+    }
+
+    public void setClassOfRoom(String classOfRoom) {
+        this.classOfRoom = classOfRoom;
     }
 }
