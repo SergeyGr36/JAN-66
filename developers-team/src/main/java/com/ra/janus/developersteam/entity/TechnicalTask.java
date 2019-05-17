@@ -5,6 +5,15 @@ public class TechnicalTask {
     private String title;
     private String description;
 
+    public TechnicalTask() {
+    }
+
+    public TechnicalTask(long id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
     public long getId() {
         return id;
     }

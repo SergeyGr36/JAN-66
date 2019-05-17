@@ -1,7 +1,6 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.dao.interfaces.TechnicalTaskDAO;
-import com.ra.janus.developersteam.entity.Customer;
 import com.ra.janus.developersteam.entity.TechnicalTask;
 import com.ra.janus.developersteam.exception.DAOException;
 
@@ -11,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
-    private static final String INSERT_SQL = "INSERT INTO CUSTOMERS (NAME, ADDRESS, PHONE) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE CUSTOMERS SET NAME=?,ADDRESS=?,PHONE=? WHERE ID=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM CUSTOMERS";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM CUSTOMERS WHERE ID = ?";
-    private static final String DELETE_SQL = "DELETE FROM CUSTOMERS WHERE ID=?";
+    private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
+    private static final String UPDATE_SQL = "UPDATE tasks SET title=?,description=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM tasks";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM tasks WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM tasks WHERE id=?";
 
     transient private final DataSource dataSource;
 
@@ -24,19 +23,18 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public long create(final TechnicalTask customer) {
+    public long create(final TechnicalTask task) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            prepareStatement(ps, customer);
+            prepareStatement(ps, task);
             ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    customer.setId(id);
-
+                    task.setId(id);
                     return id;
                 } else {
-                    throw new IllegalStateException("Couldn't retrieve generated id for customer " + customer);
+                    throw new DAOException("Couldn't retrieve generated id for task " + task);
                 }
             }
         } catch (SQLException e) {
@@ -45,14 +43,14 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public Customer read(final long id) {
+    public TechnicalTask read(final long id) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return toCustomer(rs);
+                    return toTask(rs);
                 }
             }
             return null;
@@ -62,26 +60,26 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public List<Customer> readAll() {
+    public List<TechnicalTask> readAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
 
-            final List<Customer> customers = new ArrayList<>();
+            final List<TechnicalTask> task = new ArrayList<>();
             while (rs.next()) {
-                customers.add(toCustomer(rs));
+                task.add(toTask(rs));
             }
-            return customers;
+            return task;
         } catch (SQLException e) {
             throw new DAOException(e);
         }
     }
 
     @Override
-    public boolean update(final Customer customer) {
+    public boolean update(final TechnicalTask task) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            prepareStatement(ps, customer);
+            prepareStatement(ps, task);
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
@@ -102,16 +100,14 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
         }
     }
 
-    private Customer toCustomer(final ResultSet rs) throws SQLException {
-        return new Customer(rs.getLong("ID"),
-                rs.getString("NAME"),
-                rs.getString("ADDRESS"),
-                rs.getString("PHONE"));
+    private TechnicalTask toTask(final ResultSet rs) throws SQLException {
+        return new TechnicalTask(rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("description"));
     }
 
-    private void prepareStatement(final PreparedStatement ps, final Customer customer) throws SQLException {
-        ps.setString(1, customer.getName());
-        ps.setString(2, customer.getAddress());
-        ps.setString(3, customer.getPhone());
+    private void prepareStatement(final PreparedStatement ps, final TechnicalTask task) throws SQLException {
+        ps.setString(1, task.getTitle());
+        ps.setString(2, task.getDescription());
     }
 }

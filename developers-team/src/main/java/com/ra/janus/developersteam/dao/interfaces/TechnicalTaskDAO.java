@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao.interfaces;
 
-import com.ra.janus.developersteam.entity.Customer;
 import com.ra.janus.developersteam.entity.TechnicalTask;
 
 import java.util.List;
