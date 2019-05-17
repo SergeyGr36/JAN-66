@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlainJdbcCustomerDAO implements CustomerDAO {
-    private static final String INSERT_SQL = "INSERT INTO CUSTOMERS (NAME, ADDRESS, PHONE) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE CUSTOMERS SET NAME=?,ADDRESS=?,PHONE=? WHERE ID=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM CUSTOMERS";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM CUSTOMERS WHERE ID = ?";
-    private static final String DELETE_SQL = "DELETE FROM CUSTOMERS WHERE ID=?";
+    private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE customers SET name=?,address=?,phone=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM customers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM customers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM customers WHERE id=?";
 
     transient private final DataSource dataSource;
 
