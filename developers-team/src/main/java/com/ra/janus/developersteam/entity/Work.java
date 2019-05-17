@@ -1,8 +1,33 @@
 package com.ra.janus.developersteam.entity;
 
+import java.math.BigDecimal;
+
 public class Work {
     private long id;
     private String name;
+    private BigDecimal price;
+
+    public Work() {
+    }
+
+    public Work(String name, BigDecimal price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public Work(long id, String name, BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public long getId() {
         return id;

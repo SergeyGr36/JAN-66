@@ -1,7 +1,7 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.CustomerDAO;
-import com.ra.janus.developersteam.entity.Customer;
+import com.ra.janus.developersteam.dao.interfaces.WorkDAO;
+import com.ra.janus.developersteam.entity.Work;
 import com.ra.janus.developersteam.exception.DAOException;
 
 import javax.sql.DataSource;
@@ -9,33 +9,33 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlainJdbcCustomerDAO implements CustomerDAO {
-    private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE customers SET name=?,address=?,phone=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM customers";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM customers WHERE id = ?";
-    private static final String DELETE_SQL = "DELETE FROM customers WHERE id=?";
+public class PlainJdbcWorkDAO implements WorkDAO {
+    private static final String INSERT_SQL = "INSERT INTO works (name, price) VALUES (?, ?)";
+    private static final String UPDATE_SQL = "UPDATE works SET name=?,price=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM works";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM works WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM works WHERE id=?";
 
     transient private final DataSource dataSource;
 
-    public PlainJdbcCustomerDAO(final DataSource dataSource) {
+    public PlainJdbcWorkDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public long create(final Customer customer) {
+    public long create(final Work work) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            prepareStatement(ps, customer);
+            prepareStatement(ps, work);
             ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    customer.setId(id);
+                    work.setId(id);
 
                     return id;
                 } else {
-                    throw new DAOException("Couldn't retrieve generated id for customer " + customer);
+                    throw new DAOException("Couldn't retrieve generated id for work " + work);
                 }
             }
         } catch (SQLException e) {
@@ -44,14 +44,14 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     @Override
-    public Customer read(final long id) {
+    public Work read(final long id) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return toCustomer(rs);
+                    return toWork(rs);
                 }
             }
             return null;
@@ -61,26 +61,26 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     @Override
-    public List<Customer> readAll() {
+    public List<Work> readAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
 
-            final List<Customer> customers = new ArrayList<>();
+            final List<Work> works = new ArrayList<>();
             while (rs.next()) {
-                customers.add(toCustomer(rs));
+                works.add(toWork(rs));
             }
-            return customers;
+            return works;
         } catch (SQLException e) {
             throw new DAOException(e);
         }
     }
 
     @Override
-    public boolean update(final Customer customer) {
+    public boolean update(final Work work) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            prepareStatement(ps, customer);
+            prepareStatement(ps, work);
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
@@ -101,16 +101,14 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
         }
     }
 
-    private Customer toCustomer(final ResultSet rs) throws SQLException {
-        return new Customer(rs.getLong("id"),
+    private Work toWork(final ResultSet rs) throws SQLException {
+        return new Work(rs.getLong("id"),
                 rs.getString("name"),
-                rs.getString("address"),
-                rs.getString("phone"));
+                rs.getBigDecimal("price"));
     }
 
-    private void prepareStatement(final PreparedStatement ps, final Customer customer) throws SQLException {
-        ps.setString(1, customer.getName());
-        ps.setString(2, customer.getAddress());
-        ps.setString(3, customer.getPhone());
+    private void prepareStatement(final PreparedStatement ps, final Work work) throws SQLException {
+        ps.setString(1, work.getName());
+        ps.setBigDecimal(2, work.getPrice());
     }
 }
