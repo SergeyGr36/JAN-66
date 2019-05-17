@@ -31,7 +31,6 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    task.setId(id);
                     return id;
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for task " + task);
