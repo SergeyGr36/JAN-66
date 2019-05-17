@@ -31,8 +31,6 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
             try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    customer.setId(id);
-
                     return id;
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for customer " + customer);
