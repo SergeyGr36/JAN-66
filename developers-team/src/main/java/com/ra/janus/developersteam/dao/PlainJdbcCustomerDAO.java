@@ -35,7 +35,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
                     return id;
                 } else {
-                    throw new IllegalStateException("Couldn't retrieve generated id for customer " + customer);
+                    throw new DAOException("Couldn't retrieve generated id for customer " + customer);
                 }
             }
         } catch (SQLException e) {
@@ -102,10 +102,10 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     private Customer toCustomer(final ResultSet rs) throws SQLException {
-        return new Customer(rs.getLong("ID"),
-                rs.getString("NAME"),
-                rs.getString("ADDRESS"),
-                rs.getString("PHONE"));
+        return new Customer(rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("address"),
+                rs.getString("phone"));
     }
 
     private void prepareStatement(final PreparedStatement ps, final Customer customer) throws SQLException {
