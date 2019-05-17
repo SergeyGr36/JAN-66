@@ -1,4 +1,4 @@
-package com.ra.course.janus.traintickets.dao.interfaces;
+package com.ra.course.janus.traintickets.dao.api;
 
 import java.util.List;
 
