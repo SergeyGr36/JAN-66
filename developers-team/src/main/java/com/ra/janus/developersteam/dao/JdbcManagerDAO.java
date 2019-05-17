@@ -16,8 +16,8 @@ public class JdbcManagerDAO implements ManagerDAO {
 
     private static final String SELECT_ALL_SQL = "SELECT * FROM MANAGERS";
     private static final String SELECT_ONE_SQL = "SELECT * FROM MANAGERS WHERE id = ?";
-    private static final String INSERT_SQL = "INSERT INTO MANAGERS (name, address, phone) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE MANAGERS SET name=?,address=?,phone=? WHERE id=?";
+    private static final String INSERT_SQL = "INSERT INTO MANAGERS (name, email, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE MANAGERS SET name=?,email=?,phone=? WHERE id=?";
     private static final String DELETE_SQL = "DELETE FROM MANAGERS WHERE id=?";
 
     private DataSource dataSource;
@@ -78,6 +78,7 @@ public class JdbcManagerDAO implements ManagerDAO {
             manager.setId(rs.getLong("id"));
             manager.setName(rs.getString("name"));
             manager.setEmail(rs.getString("email"));
+            manager.setPhone(rs.getString("phone"));
             return manager;
         } catch (SQLException ex) {
             throw  new DAOException(ex);

@@ -9,6 +9,7 @@ public class Manager {
     private Long id;
     private String name;
     private String email;
+    private String phone;
 
     public Long getId() {
         return id;
@@ -34,12 +35,22 @@ public class Manager {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+
     @Override
     public String toString() {
         return "Manager{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
                 '}';
     }
 }
