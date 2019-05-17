@@ -46,5 +46,7 @@ wrapper {
 }
 
 project(':developers-team') {
-
+    dependencies {
+        compile db.h2
+    }
 }
