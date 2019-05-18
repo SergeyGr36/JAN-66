@@ -34,42 +34,54 @@ public class TestDao {
     @Test
     public void testMethodSaveClientInDB() throws DaoException {
 
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
         assertEquals(client, clientDao.findById(client.getId()));
     }
 
+
     @Test
     public void testMethodUpdateClientInDB() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
-        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.update(client1);
         assertEquals(client1, clientDao.findById(client.getId()));
     }
 
+
     @Test
     public void testMethodDeleteClientInDB() throws DaoException {
-        Client client = new Client("TommyString", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("TommyString", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
         int i = clientDao.delete(client.getId());
         assertEquals(i, 1);
     }
 
+
     @Test
     public void testFindByIdInDB() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
-        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client1);
         assertEquals(client1, clientDao.findById(client1.getId()));
     }
 
+
     @Test
     public void testFindAllInDB() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
-        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client1);
         List<Client> clientList1 = new ArrayList<>();
         clientList1.add(client);
@@ -80,25 +92,23 @@ public class TestDao {
         assertEquals(clientList, clientList1);
     }
 
-    @Test
-    public void testMethodSaveClientInDbWithException() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
-        clientDao.save(client);
-        assertEquals(client, clientDao.findById(client.getId()));
-
-    }
 
     @Test
     public void testMethodFindByPhoneNumberInDB() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client);
-        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client1);
-        Client client2 = new Client(client.getId(), "Ben", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client2 = new Client(client.getId(), "Ben", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client2);
-        Client client3 = new Client(client.getId(), "Josh", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client3 = new Client(client.getId(), "Josh", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client3);
-        Client client4 = new Client(client.getId(), "Sam", "0000000000", "sam@", Date.valueOf(LocalDate.now()));
+        Client client4 = new Client(client.getId(), "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
         clientDao.save(client4);
 
         List<Client> clientList = new ArrayList<>();
@@ -109,5 +119,38 @@ public class TestDao {
 
         assertEquals(clientList, clientDao.findByPhoneNumber("0000000000"));
     }
+
+
+    @Test
+    public void testMethodSaveClientInDbWithException() {
+        Client client = new Client(null, "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
+        assertThrows(DaoException.class, () -> clientDao.save(client));
+
+    }
+
+
+    @Test
+    public void testMethodUpdateClientInDbWithException() throws DaoException {
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
+                Date.valueOf(LocalDate.now()));
+        clientDao.save(client);
+        Client client1 = new Client(4, "Sam", "0000000000", "sam@",
+                Date.valueOf(LocalDate.now()));
+        assertThrows(DaoException.class, () -> clientDao.update(client1));
+    }
+
+
+    @Test
+    public void testMethodDeleteClientInDbWithException() {
+        assertThrows(DaoException.class, () -> clientDao.delete(null));
+    }
+
+
+    @Test
+    public void testFindByIdInDbWithException() {
+        assertThrows(DaoException.class, () -> clientDao.findById(null));
+    }
+
 
 }

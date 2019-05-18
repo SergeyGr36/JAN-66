@@ -2,6 +2,7 @@ package com.ra.janus.hotel.entity;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 @NoArgsConstructor
@@ -10,15 +11,18 @@ import java.sql.Date;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class Client {
+public class Client implements Serializable {
 
     private long id;
-    private String firstName;
-    private String secondName;
-    private String lastName;
-    private int age;
+    private String fullName;
     private String telephone;
     private String email;
     private Date birthday;
 
+    public Client(String fullName, String telephone, String email, Date birthday) {
+        this.fullName = fullName;
+        this.telephone = telephone;
+        this.email = email;
+        this.birthday = birthday;
+    }
 }

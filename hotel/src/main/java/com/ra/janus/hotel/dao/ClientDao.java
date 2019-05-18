@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientDao implements GenericDao<Client> {
+
     private final transient DataSource dataSource;
 
 
@@ -23,10 +24,10 @@ public class ClientDao implements GenericDao<Client> {
             fillStatement(ps, client);
             ps.execute();
             client.setId(generateKeys(ps));
-        } catch (SQLException e) {
+            return client;
+        } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }
-        return client;
     }
 
     @Override
@@ -35,42 +36,36 @@ public class ClientDao implements GenericDao<Client> {
              PreparedStatement ps = connection.prepareStatement(Query.CLIENT_UPDATE_SQL)) {
             fillStatement(ps, client);
             ps.setLong(5, client.getId());
-            ps.execute();
+            ps.executeUpdate();
             return findById(client.getId());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }
     }
 
     @Override
-    public int delete(long id) throws DaoException {
+    public int delete(Long id) throws DaoException {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(Query.CLIENT_DELETE_SQL)) {
             ps.setLong(1, id);
-            int i = 0;
-            if (ps.execute() == true) {
-                i = 1;
-            }
-            return i;
-        } catch (SQLException e) {
+            return ps.executeUpdate();
+        } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }
     }
 
     @Override
-    public Client findById(long id) throws DaoException {
+    public Client findById(Long id) throws DaoException {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_BY_ID_SQL)) {
             ps.setLong(1, id);
-
-            Client client = null;
+            Client client;
             try (ResultSet resultSet = ps.executeQuery()) {
-                if (resultSet.next()) {
-                    client = parseRs(resultSet);
-                }
+                resultSet.next();
+                client = parseRs(resultSet);
             }
             return client;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }
     }
@@ -86,7 +81,24 @@ public class ClientDao implements GenericDao<Client> {
                 }
             }
             return clientList;
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            throw new DaoException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Client> findByPhoneNumber(String phoneNumber) throws DaoException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_BY_PHONE_NUMBER_SQL)) {
+            ps.setString(1, phoneNumber);
+            List<Client> clients = new ArrayList<>();
+            try (ResultSet resultSet = ps.executeQuery()) {
+                while (resultSet.next()) {
+                    clients.add(parseRs(resultSet));
+                }
+            }
+            return clients;
+        } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }
     }
@@ -101,12 +113,12 @@ public class ClientDao implements GenericDao<Client> {
     private Long generateKeys(PreparedStatement prepare) throws SQLException {
         ResultSet rs = prepare.getGeneratedKeys();
         rs.next();
-        Long id = rs.getLong(1);
-        return id;
+        return rs.getLong(1);
+
     }
 
     private Client parseRs(ResultSet rs) throws SQLException {
-        return new Client(rs.getLong("id"), rs.getString("fullName"), rs.getString("telephone"),
+        return new Client(rs.getLong("id"), rs.getString("full_name"), rs.getString("phone_number"),
                 rs.getNString("email"), rs.getDate("birthday"));
     }
 }

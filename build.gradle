@@ -46,9 +46,15 @@ wrapper {
 }
 
 project(":hotel") {
-    dependencies {
-        compile db.h2
-        compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
 
+    dependencies {
+
+        compile db.h2
+        compileOnly 'org.projectlombok:lombok:1.18.8'
+        annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        testCompile 'org.mockito', name: 'mockito-all', version: '1.10.19'
+        
     }
 }
+
+

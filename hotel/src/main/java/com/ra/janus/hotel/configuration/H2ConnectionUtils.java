@@ -1,15 +1,17 @@
-package com.ra.janus.hotel.database;
+package com.ra.janus.hotel.configuration;
 
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.Scanner;
 
 public final class H2ConnectionUtils {
 
@@ -38,7 +40,16 @@ public final class H2ConnectionUtils {
         jdbcDataSource.setUrl(props.getProperty("database.url"));
         jdbcDataSource.setUser(props.getProperty("database.username"));
         jdbcDataSource.setPassword(props.getProperty("database.password"));
+        initDatabase(jdbcDataSource);
         return jdbcDataSource;
     }
 
+    public static void initDatabase(JdbcDataSource dataSource) {
+        try {
+            Connection connection = dataSource.getConnection();
+        connection.createStatement().execute(new Scanner(H2ConnectionUtils.class.getClassLoader().getResourceAsStream("sql/Client.sql")).useDelimiter("\\Z").next());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

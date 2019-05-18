@@ -4,19 +4,20 @@ import com.ra.janus.hotel.exception.DaoException;
 
 import java.util.List;
 
-public interface IEntityDAO<T> {
+public interface GenericDao<T> {
 
     T save(T t) throws DaoException;
 
     T update(T t) throws DaoException;
 
-    int delete(long id) throws DaoException;
+    int delete(Long id) throws DaoException;
 
-    T findById(long id) throws DaoException;
+    T findById(Long id) throws DaoException;
 
-    List<T> findByParam(Object... params) throws DaoException;
-
+    List<T> findByPhoneNumber(String phoneNumber) throws DaoException;
+/*
     List<T> findListByParam(Object... params) throws DaoException;
+*/
 
-    List<T> findAll();
+    List<T> findAll() throws DaoException;
 }
