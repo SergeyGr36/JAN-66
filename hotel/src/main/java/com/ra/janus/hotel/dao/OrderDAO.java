@@ -41,6 +41,7 @@ public class OrderDAO implements IEntityDAO<Order> {
     public Order update(final Order order) throws DaoException {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_BY_ID)) {
+            setValueStatement(statement, order);
             if (statement.executeUpdate() == 0) {
                 throw new DaoException("record not updated");
             }
@@ -68,12 +69,15 @@ public class OrderDAO implements IEntityDAO<Order> {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)){
             statement.setLong(1, id);
-            try (ResultSet resultSet = statement.executeQuery();){
-                if (resultSet.next()) {
-                    return orderOfResultSet(resultSet);
-                }
+            final Order order;
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                order = orderOfResultSet(resultSet);
+            } else {
+                order = null;
             }
-            return null;
+            resultSet.close();
+            return order;
         } catch (SQLException e) {
             throw new DaoException(e.getMessage(), e);
         }
@@ -81,14 +85,14 @@ public class OrderDAO implements IEntityDAO<Order> {
 
     @Override
     public List<Order> findAll() throws DaoException {
-        final List<Order> orders = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
-            try (ResultSet resultSet = statement.executeQuery();){
-                while (resultSet.next()) {
-                    orders.add(orderOfResultSet(resultSet));
-                }
+            List<Order> orders = new ArrayList<>();
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                orders.add(orderOfResultSet(resultSet));
             }
+            resultSet.close();
             return orders;
         } catch (SQLException e) {
             throw new DaoException(e.getMessage(), e);
@@ -101,7 +105,7 @@ public class OrderDAO implements IEntityDAO<Order> {
                 null,
                 resultSet.getDate("data_in"),
                 resultSet.getDate("data_out"),
-                StatusOrder.valueOf(resultSet.getString("status")),
+                resultSet.getString("status") == null ? null : StatusOrder.valueOf(resultSet.getString("status")),
                 resultSet.getDate("date_create"),
                 resultSet.getDate("date_update"),
                 null);

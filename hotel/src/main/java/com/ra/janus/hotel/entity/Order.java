@@ -15,7 +15,7 @@ public class Order implements Serializable {
     private TypeRoom typeRoom;
     private Date dateIn;
     private Date dateOut;
-    private StatusOrder status;
+    private StatusOrder status = StatusOrder.NEW;
     private Date dateCreate;
     private Date dateUpdate;
     private Room room;

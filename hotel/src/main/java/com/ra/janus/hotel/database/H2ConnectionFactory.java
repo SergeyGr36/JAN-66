@@ -4,7 +4,7 @@ import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public final class H2ConnectionFactory {
@@ -21,7 +21,7 @@ public final class H2ConnectionFactory {
         return dataSource;
     }
 
-    public static H2ConnectionFactory getInstance() throws SQLException, IOException {
+    public static H2ConnectionFactory getInstance() throws IOException {
         synchronized (H2ConnectionFactory.class) {
             if (factory == null) {
                 factory = new H2ConnectionFactory();
@@ -32,7 +32,10 @@ public final class H2ConnectionFactory {
     }
 
     private void loadProperties() throws IOException {
-        connectProperties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("connect.properties"));
+        final InputStream is = ClassLoader.getSystemResourceAsStream("connect.properties");
+        connectProperties = new Properties();
+        connectProperties.load(is);
+        if (is != null) is.close();
     }
 
     private static void createDateSource() {
