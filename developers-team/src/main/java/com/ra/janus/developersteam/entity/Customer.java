@@ -20,6 +20,11 @@ public class Customer {
         this.id = id;
     }
 
+    public Customer(long id, Customer customer) {
+        this(customer.getName(), customer.getAddress(), customer.getPhone());
+        this.id = id;
+    }
+
     public String getPhone() {
         return phone;
     }

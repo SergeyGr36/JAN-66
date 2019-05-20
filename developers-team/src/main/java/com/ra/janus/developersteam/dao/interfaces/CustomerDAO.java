@@ -13,5 +13,5 @@ public interface CustomerDAO {
 
     boolean delete(long id);
 
-    long create(Customer entity);
+    Customer create(Customer entity);
 }
