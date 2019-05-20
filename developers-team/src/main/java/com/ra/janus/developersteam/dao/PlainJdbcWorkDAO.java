@@ -30,7 +30,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             ps.executeUpdate();
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    final long id = generatedKeys.getLong(1);
+                    final long id  = generatedKeys.getLong(1);
                     return new Work(id, work);
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for work " + work);
