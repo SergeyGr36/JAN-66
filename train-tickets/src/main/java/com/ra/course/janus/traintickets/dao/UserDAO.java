@@ -26,7 +26,7 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public Long save(User user) {
+    public User save(User user) {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement saveStatement = connection.prepareStatement(SAVE_USER);
             fromUser(saveStatement, user);
@@ -34,9 +34,14 @@ public class UserDAO implements DAO<User> {
             ResultSet generatedKeys = saveStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 final long id = generatedKeys.getLong(1);
-                return id;
+                return new User(
+                        id,
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPassword()
+                );
             } else {
-                return -1L;
+                return null;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -50,10 +55,10 @@ public class UserDAO implements DAO<User> {
             fromUser(updateStatement, user);
             updateStatement.setLong(4, id);
             updateStatement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return true;
     }
 
     @Override
@@ -72,9 +77,13 @@ public class UserDAO implements DAO<User> {
     public User findById(Long id) {
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement userStatement = conn.prepareStatement(FIND_BY_ID);
-            userStatement.setLong(4, id);
+            userStatement.setLong(1, id);
             ResultSet rs = userStatement.executeQuery();
-            return toUser(rs);
+            if (rs.next()) {
+                return toUser(rs);
+            } else {
+                return null;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -82,18 +91,17 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList();
-        User user;
         try (Connection conn = dataSource.getConnection()) {
             PreparedStatement userStatement = conn.prepareStatement(FIND_ALL);
             ResultSet rs = userStatement.executeQuery();
-            while ((user = toUser(rs)) != null) {
-                users.add(user);
+            List<User> users = new ArrayList();
+            if (rs.next()) {
+                users.add(toUser(rs));
             }
+            return users;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return users;
     }
 
     private void fromUser(PreparedStatement statement, User user) {
@@ -108,15 +116,11 @@ public class UserDAO implements DAO<User> {
 
     private User toUser(ResultSet rs) throws SQLException {
         User user = new User();
-        if (rs.next()) {
-            user.setId(rs.getLong("id"));
-            user.setName(rs.getString("name"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            return user;
-        } else {
-            return null;
-        }
+        user.setId(rs.getLong("id"));
+        user.setName(rs.getString("name"));
+        user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password"));
+        return user;
     }
 }
 
