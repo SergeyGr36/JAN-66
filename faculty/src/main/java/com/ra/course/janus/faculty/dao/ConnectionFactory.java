@@ -14,10 +14,10 @@ public final class ConnectionFactory {
 
         private static ConnectionFactory connFactory;
         private static JdbcDataSource dataSource;
-        private static Properties dbProperties;
+        private static Properties dbProperties = new Properties();
 
         private ConnectionFactory() throws IOException {
-            dbProperties = new Properties();
+            //dbProperties = new Properties();
             loadProperties();
         }
 

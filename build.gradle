@@ -50,5 +50,8 @@ project(':faculty') {
              compile db.mysql
              compile db.h2
           }
+    spotbugsMain {
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml") 
+    }
 
 }
