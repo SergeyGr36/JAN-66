@@ -48,5 +48,7 @@ wrapper {
 project(':faculty') {
        dependencies {
              compile db.mysql
-          } 
+             compile db.h2
+          }
+
 }

@@ -2,8 +2,14 @@ package com.ra.course.janus.faculty.entity;
 
 public class Mark {
 
+    private Integer tid;
+
     private Integer score;
     private String  reference;
+
+    public Integer getTid() { return tid; }
+
+    public void setTid(Integer tid) {this.tid = tid;  }
 
     public Integer getScore() { return score;   }
 
