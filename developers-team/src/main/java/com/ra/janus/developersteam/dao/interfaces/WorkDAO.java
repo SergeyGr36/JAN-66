@@ -13,5 +13,5 @@ public interface WorkDAO {
 
     boolean delete(long id);
 
-    long create(Work entity);
+    Work create(Work entity);
 }

@@ -21,6 +21,10 @@ public class Work {
         this.price = price;
     }
 
+    public Work(long id, Work work) {
+        this(id, work.getName(), work.getPrice());
+    }
+
     public BigDecimal getPrice() {
         return price;
     }

@@ -23,7 +23,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
     }
 
     @Override
-    public long create(final Work work) {
+    public Work create(final Work work) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, work);
@@ -31,9 +31,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    work.setId(id);
-
-                    return id;
+                    return new Work(id, work);
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for work " + work);
                 }
