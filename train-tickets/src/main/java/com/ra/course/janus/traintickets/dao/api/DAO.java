@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface DAO<T> {
 
-    Long save(T item);
+    T save(T item);
 
     boolean update(Long id, T item);
 
@@ -13,5 +13,4 @@ public interface DAO<T> {
     T findById(Long id);
 
     List<T> findAll();
-
 }
