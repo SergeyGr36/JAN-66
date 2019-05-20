@@ -21,8 +21,7 @@ public class Customer {
     }
 
     public Customer(long id, Customer customer) {
-        this(customer.getName(), customer.getAddress(), customer.getPhone());
-        this.id = id;
+        this(id, customer.getName(), customer.getAddress(), customer.getPhone());
     }
 
     public String getPhone() {
