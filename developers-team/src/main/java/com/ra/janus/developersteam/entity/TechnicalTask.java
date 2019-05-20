@@ -14,6 +14,11 @@ public class TechnicalTask {
         this.description = description;
     }
 
+    public TechnicalTask(long id, TechnicalTask task) {
+        this(id, task.getTitle(), task.getDescription());
+    }
+
+
     public long getId() {
         return id;
     }

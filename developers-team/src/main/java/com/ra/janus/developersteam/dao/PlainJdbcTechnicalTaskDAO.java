@@ -23,7 +23,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public long create(final TechnicalTask task) {
+    public TechnicalTask create(final TechnicalTask task) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, task);
@@ -31,7 +31,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    return id;
+                    return new TechnicalTask(id, task);
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for task " + task);
                 }

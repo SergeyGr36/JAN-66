@@ -13,5 +13,5 @@ public interface TechnicalTaskDAO {
 
     boolean delete(long id);
 
-    long create(TechnicalTask entity);
+    TechnicalTask create(TechnicalTask entity);
 }
