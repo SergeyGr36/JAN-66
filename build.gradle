@@ -49,8 +49,20 @@ project(":hotel") {
     dependencies {
         compile db.h2
         compile testing.mockito
+        compile hibernate.hikari
+        testCompile group: 'com.h2database', name: 'h2', version: '1.4.199'
     }
     spotbugsMain {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
     }
 }
+
+project(":hotel-integration-test") {
+    dependencies {
+        compile db.h2
+        compile hibernate.hikari
+    }
+    spotbugsMain {
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+    }
+}    

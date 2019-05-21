@@ -103,8 +103,8 @@ public class OrderDAO implements IEntityDAO<Order> {
         return new Order(resultSet.getLong("id"),
                 null,
                 null,
-                resultSet.getDate("data_in"),
-                resultSet.getDate("data_out"),
+                resultSet.getDate("date_in"),
+                resultSet.getDate("date_out"),
                 resultSet.getString("status") == null ? null : StatusOrder.valueOf(resultSet.getString("status")),
                 resultSet.getDate("date_create"),
                 resultSet.getDate("date_update"),
@@ -112,6 +112,8 @@ public class OrderDAO implements IEntityDAO<Order> {
     }
 
     private void setValueStatement(final PreparedStatement statement, final Order order) throws SQLException {
+        statement.setLong(1, 0L);
+        statement.setLong(2, 0L);
         //statement.setLong(1, order.getClient().getId());
         //statement.setLong(2, order.getTypeRoom().getId());
         statement.setDate(3, order.getDateIn());
@@ -119,6 +121,7 @@ public class OrderDAO implements IEntityDAO<Order> {
         statement.setString(5, order.getStatus().name());
         statement.setDate(6, order.getDateCreate());
         statement.setDate(7, order.getDateUpdate());
+        statement.setLong(8, 0L);
         //statement.setLong(8, order.getRoom().getId());
         statement.setLong(9, order.getId());
     }
