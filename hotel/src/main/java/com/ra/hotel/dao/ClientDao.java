@@ -1,7 +1,7 @@
-package com.ra.janus.hotel.dao;
+package com.ra.hotel.dao;
 
-import com.ra.janus.hotel.entity.Client;
-import com.ra.janus.hotel.exception.DaoException;
+import com.ra.hotel.entity.Client;
+import com.ra.hotel.exceptions.DaoException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -81,23 +81,6 @@ public class ClientDao implements GenericDao<Client> {
                 }
             }
             return clientList;
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Client> findByPhoneNumber(String phoneNumber) throws DaoException {
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_BY_PHONE_NUMBER_SQL)) {
-            ps.setString(1, phoneNumber);
-            List<Client> clients = new ArrayList<>();
-            try (ResultSet resultSet = ps.executeQuery()) {
-                while (resultSet.next()) {
-                    clients.add(parseRs(resultSet));
-                }
-            }
-            return clients;
         } catch (Exception e) {
             throw new DaoException(e.getMessage());
         }

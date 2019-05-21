@@ -1,12 +1,10 @@
-package com.ra.janus.hotel.configuration;
+package com.ra.hotel.configuration;
 
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.MissingResourceException;

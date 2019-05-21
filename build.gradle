@@ -52,9 +52,14 @@ project(":hotel") {
         compile db.h2
         compileOnly 'org.projectlombok:lombok:1.18.8'
         annotationProcessor 'org.projectlombok:lombok:1.18.8'
-        testCompile 'org.mockito', name: 'mockito-all', version: '1.10.19'
-        
+        testCompile testing.mockito
     }
 }
+project(':hotel-integration') {
+    dependencies {
+        compile project(':hotel')
+    }
+}
+
 
 

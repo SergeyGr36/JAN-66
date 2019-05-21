@@ -1,4 +1,4 @@
-package com.ra.janus.hotel.entity;
+package com.ra.hotel.entity;
 
 import lombok.*;
 
