@@ -47,12 +47,13 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return toCustomer(rs);
-                }
+            Customer customer = null;
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                customer = toCustomer(rs);
             }
-            return null;
+            rs.close();
+            return customer;
         } catch (SQLException e) {
             throw new DAOException(e);
         }
