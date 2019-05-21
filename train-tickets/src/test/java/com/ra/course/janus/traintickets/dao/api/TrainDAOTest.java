@@ -53,4 +53,9 @@ class TrainDAOTest {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    void update(){
+
+    }
 }
