@@ -10,6 +10,9 @@ public class Train  {
 
     private int numberOfPlaces;
 
+    public Train() {
+    }
+
     public Train(long id, String name, int numberOfPlaces) {
         this.id = id;
         this.name = name;
