@@ -1,4 +1,4 @@
-package com.ra.course.janus.traintickets.dao.classes;
+package com.ra.course.janus.traintickets.dao.datasources;
 
 import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;

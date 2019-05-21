@@ -6,12 +6,11 @@ public interface DAO<T> {
 
     T save(T item);
 
-    T update(Long id, T item);
+    boolean update(Long id, T item);
 
-    T delete(Long id);
+    boolean delete(Long id);
 
     T findById(Long id);
 
     List<T> findAll();
-
 }
