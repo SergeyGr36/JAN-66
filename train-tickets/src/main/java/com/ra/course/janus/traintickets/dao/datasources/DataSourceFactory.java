@@ -28,9 +28,6 @@ public enum DataSourceFactory {
             ds.setJdbcUrl(props.getProperty("db.h2_in_memory.url"));
             ds.setUsername(props.getProperty("db.h2_in_memory.user"));
             ds.setPassword(props.getProperty("db.h2_in_memory.password"));
-            ds.addDataSourceProperty("cachePrepStmts", "true");
-            ds.addDataSourceProperty("prepStmtCacheSize", "250");
-            ds.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
             return ds;
         }
     };
