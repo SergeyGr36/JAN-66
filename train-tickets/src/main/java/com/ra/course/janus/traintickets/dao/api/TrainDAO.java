@@ -14,6 +14,7 @@ public class TrainDAO implements DAO<Train> {
 
     private final String INSERT_TRAIN = "insert into Trains (name, id) values (?, ?)";
     private final String SELECT_TRAIN = "SELECT * FROM USERS WHERE id = ?";
+    private final String UPDATE_TRAIN = "UPDATE Trains SET name = ? WHERE id = ?";
 
     public TrainDAO(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -35,7 +36,16 @@ public class TrainDAO implements DAO<Train> {
     }
 
     @Override
-    public boolean update(Long id, Train item) {
+    public boolean update(Long id, Train train) {
+        try(Connection connection = dataSource.getConnection()){
+            connection.setAutoCommit(false);
+            PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN);
+            ps.setString(1,train.getName());
+            ps.setLong(2,train.getId());
+            ps.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
         return false;
     }
 
