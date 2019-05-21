@@ -47,12 +47,13 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return toTask(rs);
-                }
+            TechnicalTask task = null;
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                task = toTask(rs);
             }
-            return null;
+            rs.close();
+            return task;
         } catch (SQLException e) {
             throw new DAOException(e);
         }
