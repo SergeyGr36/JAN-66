@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -42,5 +43,14 @@ class TrainDAOTest {
 
     @Test
     void save() {
+        TrainDAO trainDAO = new TrainDAO(DATA_SOURCE);
+        trainDAO.save(train);
+        ResultSet rs;
+        try(Connection connection = DATA_SOURCE.getConnection()){
+            Statement statement = connection.createStatement();
+            rs = statement.executeQuery("SELECT * FROM TRAINS");
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }
