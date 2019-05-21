@@ -47,12 +47,13 @@ public class PlainJdbcWorkDAO implements WorkDAO {
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
             ps.setLong(1, id);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return toWork(rs);
-                }
+            Work work = null;
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                work = toWork(rs);
             }
-            return null;
+            rs.close();
+            return work;
         } catch (SQLException e) {
             throw new DAOException(e);
         }
