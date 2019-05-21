@@ -1,5 +1,7 @@
 package com.ra.janus.developersteam.entity;
 
+import java.util.Objects;
+
 public class Customer {
     private long id;
     private String name;
@@ -18,6 +20,19 @@ public class Customer {
     public Customer(long id, String name, String address, String phone) {
         this(name, address, phone);
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return id == customer.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public Customer(long id, Customer customer) {

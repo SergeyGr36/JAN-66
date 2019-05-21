@@ -1,16 +1,17 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Customer;
+import com.ra.janus.developersteam.exception.DAOException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.util.List;
 
 class PlainJdbcCustomerDAOTest {
     private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
@@ -21,40 +22,226 @@ class PlainJdbcCustomerDAOTest {
     private DataSource mockDataSource;
 
     private PlainJdbcCustomerDAO customerDAO;
+    private Connection mockConnection;
+    private PreparedStatement mockPreparedStatement;
+    private ResultSet mockResultSet;
+
     @BeforeEach
-    public void before(){
+    public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
         customerDAO = new PlainJdbcCustomerDAO(mockDataSource);
-    }
-    @Test
-    void create() {
+
+        mockConnection = Mockito.mock(Connection.class);
+        Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
+
+        mockPreparedStatement = Mockito.mock(PreparedStatement.class);
+        mockResultSet = Mockito.mock(ResultSet.class);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
     @Test
-    void shouldReadCustomerFromDbById() throws Exception {
+    void whenCreateCustomerShouldReturnCustomer() throws Exception {
+        //given
         long testId = 1L;
-        Connection connection = Mockito.mock(Connection.class);
-        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet = Mockito.mock(ResultSet.class);
-        Mockito.when(mockDataSource.getConnection()).thenReturn(connection);
-        Mockito.when(connection.prepareStatement(SELECT_ONE_SQL)).thenReturn(statement);
-        Mockito.when(statement.executeQuery()).thenReturn(resultSet);
-        Mockito.when(resultSet.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(resultSet.getLong("id")).thenReturn(testId);
+        int columnIdIndex = 1;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenReturn(true);
+        Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
+        //when
+        Customer customer = customerDAO.create(testCustomer);
+
+        //then
+        assertEquals(testCustomer, customer);
+    }
+
+    @Test
+    void whenCreateCustomerShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
+        //given
+        long testId = 1L;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenReturn(false);
+
+        //when
+        final Executable executable = () -> customerDAO.create(testCustomer);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenCreateCustomerShouldThrowException() throws Exception {
+        //given
+        long testId = 1L;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.create(testCustomer);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenReadCustomerFromDbByIdThenReturnIt() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
+
+        //when
         Customer customer = customerDAO.read(testId);
+
+        //then
         assertEquals(testId, customer.getId());
     }
 
     @Test
-    void readAll() {
+    void whenReadAbsentCustomerFromDbByIdThenReturnNull() throws Exception {
+        //given
+        long testId = 1L;
+        Customer expectedCustomer = null;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(false);
+
+        //when
+        Customer customer = customerDAO.read(testId);
+
+        //then
+        assertEquals(expectedCustomer, customer);
     }
 
     @Test
-    void update() {
+    void whenReadCustomerFromDbByIdThenThrowException() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.read(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void delete() {
+    void whenReadAllCustomersFromDbThenReturnNonEmptyList() throws Exception {
+        //given
+        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+
+        //when
+        List<Customer> list = customerDAO.readAll();
+
+        //then
+        assertFalse(list.isEmpty());
+    }
+
+    @Test
+    void whenReadAllCustomersFromDbThenThrowException() throws Exception {
+        //given
+        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.readAll();
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenUpdateCustomerInDbThenReturnTrue() throws Exception {
+        //given
+        long testId = 1L;
+        int testCount = 1;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean updated = customerDAO.update(testCustomer);
+
+        //then
+        assertEquals(true, updated);
+    }
+
+    @Test
+    void whenUpdateCustomerInDbThenReturnFalse() throws Exception {
+        //given
+        long testId = 1L;
+        int testCount = 0;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean updated = customerDAO.update(testCustomer);
+
+        //then
+        assertEquals(false, updated);
+    }
+
+    @Test
+    void whenUpdateCustomerInDbThenThrowException() throws Exception {
+        //given
+        long testId = 1L;
+        Customer testCustomer = new Customer(testId, null,null, null);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.update(testCustomer);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenDeleteCustomerFromDbThenReturnTrue()throws Exception  {
+        //given
+        long testId = 1L;
+        int testCount = 1;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean deleted = customerDAO.delete(testId);
+
+        //then
+        assertEquals(true, deleted);
+    }
+
+    @Test
+    void whenDeleteCustomerFromDbThenReturnFalse()throws Exception  {
+        //given
+        long testId = 1L;
+        int testCount = 0;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean deleted = customerDAO.delete(testId);
+
+        //then
+        assertEquals(false, deleted);
+    }
+
+    @Test
+    void whenDeleteCustomerFromDbThenThrowException()throws Exception  {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.delete(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
     }
 }
