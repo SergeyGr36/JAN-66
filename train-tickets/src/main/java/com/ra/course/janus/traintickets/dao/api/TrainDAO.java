@@ -12,10 +12,10 @@ public class TrainDAO implements DAO<Train> {
 
     private final DataSource dataSource;
 
-    private final String INSERT_TRAIN = "insert into Trains (name, id) values (?, ?)";
-    private final String SELECT_TRAIN = "SELECT * FROM USERS WHERE id = ?";
-    private final String UPDATE_TRAIN = "UPDATE Trains SET name = ? WHERE id = ?";
-    private final String DELETE_TRAIN = "DELETE * FROM Trains WHERE id = ?";
+    private final String INSERT_TRAIN = "INSERT into TRAINS (name, id) values (?, ?)";
+    private final String SELECT_TRAIN = "SELECT * FROM TRAINS WHERE id = ?";
+    private final String UPDATE_TRAIN = "UPDATE TRAINS SET name = ? WHERE id = ?";
+    private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
 
     public TrainDAO(DataSource dataSource) {
         this.dataSource = dataSource;
