@@ -8,6 +8,8 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
@@ -15,6 +17,8 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private static final String SELECT_ALL_SQL = "SELECT * FROM tasks";
     private static final String SELECT_ONE_SQL = "SELECT * FROM tasks WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM tasks WHERE id=?";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcTechnicalTaskDAO.class);
 
     transient private final DataSource dataSource;
 
@@ -33,11 +37,11 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
                     final long id = generatedKeys.getLong(1);
                     return new TechnicalTask(id, task);
                 } else {
-                    throw new DAOException("Couldn't retrieve generated id for task " + task);
+                    throw logAndThrow(new DAOException("Couldn't retrieve generated id for task " + task));
                 }
             }
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -55,7 +59,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             rs.close();
             return task;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -71,7 +75,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             }
             return task;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -83,7 +87,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -96,7 +100,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -109,5 +113,10 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private void prepareStatement(final PreparedStatement ps, final TechnicalTask task) throws SQLException {
         ps.setString(1, task.getTitle());
         ps.setString(2, task.getDescription());
+    }
+
+    private RuntimeException logAndThrow(RuntimeException ex) {
+        LOGGER.error("An exception occurred!", ex);
+        return ex;
     }
 }
