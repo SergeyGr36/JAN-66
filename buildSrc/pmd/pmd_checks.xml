@@ -14,7 +14,12 @@
     <exclude-pattern>.*/ApplicationRunner.java</exclude-pattern>
 
     <!-- bestpractices -->
-    <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables" />
+    <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables">
+        <properties>
+            <property name="foreachReassign" value="deny" />
+            <property name="forReassign" value="deny" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters" />
     <rule ref="category/java/bestpractices.xml/AccessorMethodGeneration" />
     <rule ref="category/java/bestpractices.xml/AbstractClassWithoutAbstractMethod" />
@@ -24,11 +29,29 @@
     <rule ref="category/java/bestpractices.xml/AvoidStringBufferField" />
     <rule ref="category/java/bestpractices.xml/AvoidUsingHardCodedIP" />
     <rule ref="category/java/bestpractices.xml/CheckResultSet" />
-    <rule ref="category/java/bestpractices.xml/ConstantsInInterface" />
+    <rule ref="category/java/bestpractices.xml/ConstantsInInterface">
+        <properties>
+            <property name="ignoreIfHasMethods" value="true" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach" />
     <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt" />
-    <rule ref="category/java/bestpractices.xml/ForLoopVariableCount" />
-    <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine" />
+    <rule ref="category/java/bestpractices.xml/ForLoopVariableCount">
+        <properties>
+            <property name="maximumVariables" value="1" />
+        </properties>
+    </rule>
+    <rule ref="category/java/bestpractices.xml/GuardLogStatement">
+        <properties>
+            <property name="logLevels" value="trace,debug,info,warn,error,log,finest,finer,fine,info,warning,severe" />
+            <property name="guardsMethods" value="isTraceEnabled,isDebugEnabled,isInfoEnabled,isWarnEnabled,isErrorEnabled,isLoggable" />
+        </properties>
+    </rule>
+    <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine">
+        <properties>
+            <property name="strictMode" value="true" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/PositionLiteralsFirstInCaseInsensitiveComparisons" />
     <rule ref="category/java/bestpractices.xml/PreserveStackTrace" />
     <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
@@ -41,7 +64,11 @@
     <rule ref="category/java/bestpractices.xml/JUnit4TestShouldUseBeforeAnnotation" />
     <rule ref="category/java/bestpractices.xml/JUnit4TestShouldUseTestAnnotation" />
     <rule ref="category/java/bestpractices.xml/JUnitAssertionsShouldIncludeMessage" />
-    <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts" />
+    <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
+        <properties>
+            <property name="maximumAsserts" value="2" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/JUnitTestsShouldIncludeAssert" />
     <rule ref="category/java/bestpractices.xml/JUnitUseExpected" />
     <rule ref="category/java/bestpractices.xml/LooseCoupling" />
@@ -50,15 +77,28 @@
     <rule ref="category/java/bestpractices.xml/ReplaceHashtableWithMap" />
     <rule ref="category/java/bestpractices.xml/ReplaceVectorWithList" />
     <rule ref="category/java/bestpractices.xml/SystemPrintln" />
-    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
+    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter">
+        <properties>
+            <property name="checkAll" value="true" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/UnusedImports" />
     <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
-    <rule ref="category/java/bestpractices.xml/UnusedPrivateField" />
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField">
+        <properties>
+            <property name="ignoredAnnotations" value="lombok.Setter|lombok.Getter|lombok.Builder|lombok.Data|lombok.RequiredArgsConstructor|lombok.AllArgsConstructor|lombok.Value|lombok.NoArgsConstructor|java.lang.Deprecated|javafx.fxml.FXML" />
+        </properties>
+    </rule>
     <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
     <rule ref="category/java/bestpractices.xml/UseAssertEqualsInsteadOfAssertTrue" />
     <rule ref="category/java/bestpractices.xml/UseAssertNullInsteadOfAssertTrue" />
     <rule ref="category/java/bestpractices.xml/UseAssertSameInsteadOfAssertTrue" />
     <rule ref="category/java/bestpractices.xml/UseAssertTrueInsteadOfAssertEquals" />
+    <rule ref="category/java/bestpractices.xml/UseTryWithResources">
+        <properties>
+            <property name="closeMethods" value="close,closeQuietly" />
+        </properties>
+    </rule>
     <!-- codestyle -->
     <rule ref="category/java/codestyle.xml/AvoidDollarSigns" />
     <rule ref="category/java/codestyle.xml/BooleanGetMethodName" />
@@ -291,7 +331,7 @@
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
             <property name="separator" value="," />
-            <property name="maxDuplicateLiterals" value="1" />
+            <property name="maxDuplicateLiterals" value="2" />
             <property name="minimumLength" value="3" />
             <property name="skipAnnotations" value="false" />
             <property name="exceptionList" value="" />
