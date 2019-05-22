@@ -3,13 +3,13 @@ package com.ra.janus.developersteam.dao;
 import com.ra.janus.developersteam.dao.interfaces.CustomerDAO;
 import com.ra.janus.developersteam.entity.Customer;
 import com.ra.janus.developersteam.exception.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PlainJdbcCustomerDAO implements CustomerDAO {
     private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
@@ -18,6 +18,8 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     private static final String SELECT_ONE_SQL = "SELECT * FROM customers WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM customers WHERE id=?";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcCustomerDAO.class);
+
     transient private final DataSource dataSource;
 
 
@@ -25,7 +27,6 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
         this.dataSource = dataSource;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(PlainJdbcCustomerDAO.class);
 
     @Override
     public Customer create(final Customer customer) {
@@ -48,17 +49,17 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
     @Override
     public Customer read(final long id) {
+        final int paramether = 1;
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setLong(1, id);
+             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);) {
 
-            Customer customer = null;
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                customer = toCustomer(rs);
+            ps.setLong(paramether, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return toCustomer(rs);
+                }
             }
-            rs.close();
-            return customer;
+            return null;
         } catch (SQLException e) {
             throw logAndThrow(new DAOException(e));
         }
@@ -118,8 +119,8 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
         ps.setString(3, customer.getPhone());
     }
 
-    private RuntimeException logAndThrow(RuntimeException ex) {
-        logger.error("An exception occurred!", ex);
+    private RuntimeException logAndThrow(final RuntimeException ex) {
+        LOGGER.error("An exception occurred!", ex);
         return ex;
     }
 }
