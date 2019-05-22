@@ -81,7 +81,7 @@ public class JdbcManagerDAO implements ManagerDAO {
     }
 
     @Override
-    public Long create(final Manager manager) {
+    public Manager create(final Manager manager) {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -92,7 +92,7 @@ public class JdbcManagerDAO implements ManagerDAO {
             try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    return id;
+                    return new Manager(id, manager);
                 } else {
                     throw new DAOException("Couldn't retrieve generated id for manager " + manager);
                 }

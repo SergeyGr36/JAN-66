@@ -48,5 +48,9 @@ wrapper {
 project(':developers-team') {
     dependencies {
         compile db.h2
+        testCompile testing.mockito
+        testCompile testing.hamcrestCore
+
+
     }
 }

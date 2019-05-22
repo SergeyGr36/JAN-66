@@ -1,5 +1,7 @@
 package com.ra.janus.developersteam.entity;
 
+import java.util.Objects;
+
 //@Entity
 //@Table(name="MANAGERS")
 public class Manager {
@@ -10,6 +12,43 @@ public class Manager {
     private String name;
     private String email;
     private String phone;
+
+    public Manager(Long id, String name, String email, String phone) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+    }
+
+    public Manager() {
+    }
+
+    public Manager(Long id) {
+        this.id = id;
+    }
+
+    public Manager(Long id, Manager manager) {
+        this.id = id;
+        this.name = manager.getName();
+        this.email = manager.getEmail();
+        this.phone = manager.getPhone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Manager)) return false;
+        Manager manager = (Manager) o;
+        return Objects.equals(getId(), manager.getId()) &&
+                Objects.equals(getName(), manager.getName()) &&
+                Objects.equals(getEmail(), manager.getEmail()) &&
+                Objects.equals(getPhone(), manager.getPhone());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getEmail(), getPhone());
+    }
 
     public Long getId() {
         return id;

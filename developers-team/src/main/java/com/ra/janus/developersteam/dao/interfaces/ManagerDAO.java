@@ -9,7 +9,7 @@ public interface ManagerDAO {
     List<Manager> findAll();
     Manager findById(Long id);
     Manager findByName(String name);
-    Long create(Manager manager);
+    Manager create(Manager manager);
     Boolean updade(Manager manager);
     Boolean delete(Long id);
 
