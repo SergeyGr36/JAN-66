@@ -8,6 +8,8 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlainJdbcCustomerDAO implements CustomerDAO {
     private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
@@ -18,9 +20,12 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
     transient private final DataSource dataSource;
 
+
     public PlainJdbcCustomerDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
+
+    private final Logger logger = LoggerFactory.getLogger(PlainJdbcCustomerDAO.class);
 
     @Override
     public Customer create(final Customer customer) {
@@ -33,7 +38,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
                     final long id = generatedKeys.getLong(1);
                     return new Customer(id, customer);
                 } else {
-                    throw new DAOException("Couldn't retrieve generated id for customer " + customer);
+                    throw logAndThrow(new DAOException("Couldn't retrieve generated id for customer " + customer));
                 }
             }
         } catch (SQLException e) {
@@ -55,7 +60,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
             rs.close();
             return customer;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -71,7 +76,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
             }
             return customers;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -83,7 +88,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -96,7 +101,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw logAndThrow(new DAOException(e));
         }
     }
 
@@ -111,5 +116,10 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
         ps.setString(1, customer.getName());
         ps.setString(2, customer.getAddress());
         ps.setString(3, customer.getPhone());
+    }
+
+    private RuntimeException logAndThrow(RuntimeException ex) {
+        logger.error("An exception occurred!", ex);
+        return ex;
     }
 }
