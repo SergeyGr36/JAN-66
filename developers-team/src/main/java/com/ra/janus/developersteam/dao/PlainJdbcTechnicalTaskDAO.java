@@ -52,7 +52,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             ps.setLong(1, id);
 
             TechnicalTask task = null;
-            ResultSet rs = ps.executeQuery();
+            final ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 task = toTask(rs);
             }
@@ -115,7 +115,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
         ps.setString(2, task.getDescription());
     }
 
-    private RuntimeException logAndThrow(RuntimeException ex) {
+    private RuntimeException logAndThrow(final RuntimeException ex) {
         LOGGER.error("An exception occurred!", ex);
         return ex;
     }
