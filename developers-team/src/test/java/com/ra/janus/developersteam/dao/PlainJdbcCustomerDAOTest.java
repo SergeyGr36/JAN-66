@@ -88,6 +88,8 @@ class PlainJdbcCustomerDAOTest {
         assertThrows(DAOException.class, executable);
     }
 
+    //==============================
+
     @Test
     void whenReadCustomerFromDbByIdThenReturnIt() throws Exception {
         //given
@@ -119,7 +121,20 @@ class PlainJdbcCustomerDAOTest {
     }
 
     @Test
-    void whenReadCustomerFromDbByIdThenThrowException() throws Exception {
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.read(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
@@ -130,6 +145,38 @@ class PlainJdbcCustomerDAOTest {
         //then
         assertThrows(DAOException.class, executable);
     }
+
+    @Test
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.read(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
+        //given
+        long testId = 1L;
+        final int testParametherIndex = 1;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> customerDAO.read(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    //==============================
 
     @Test
     void whenReadAllCustomersFromDbThenReturnNonEmptyList() throws Exception {
@@ -155,6 +202,8 @@ class PlainJdbcCustomerDAOTest {
         //then
         assertThrows(DAOException.class, executable);
     }
+
+    //==============================
 
     @Test
     void whenUpdateCustomerInDbThenReturnTrue() throws Exception {
@@ -201,6 +250,8 @@ class PlainJdbcCustomerDAOTest {
         //then
         assertThrows(DAOException.class, executable);
     }
+
+    //==============================
 
     @Test
     void whenDeleteCustomerFromDbThenReturnTrue()throws Exception  {

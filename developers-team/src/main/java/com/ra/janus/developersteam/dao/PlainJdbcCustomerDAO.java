@@ -49,11 +49,11 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
     @Override
     public Customer read(final long id) {
-        final int paramether = 1;
+        final int parametherIndex = 1;
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);) {
 
-            ps.setLong(paramether, id);
+            ps.setLong(parametherIndex, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return toCustomer(rs);
