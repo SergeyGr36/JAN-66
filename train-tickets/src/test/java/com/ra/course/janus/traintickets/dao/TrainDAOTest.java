@@ -1,6 +1,5 @@
-package com.ra.course.janus.traintickets.dao.api;
-
-import com.ra.course.janus.traintickets.dao.datasources.DataSourceFactory;
+package com.ra.course.janus.traintickets.dao;
+import com.ra.course.janus.traintickets.datasources.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Train;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +18,7 @@ class TrainDAOTest {
 
     private static final Long TRAIN_ID = 15L;
     private static final String TRAIN_NAME = "test_train";
+    private static final int QUANTITY_PLACES = 100;
     private static final int FREE_PLACES = 99;
     private static final DataSource DATA_SOURCE =
             DataSourceFactory.H2_IN_MEMORY.getDataSource();
@@ -40,26 +40,31 @@ class TrainDAOTest {
         train = new Train();
         train.setId(TRAIN_ID);
         train.setName(TRAIN_NAME);
-        train.getQuantityPlaces();
+        train.setQuanyityPlaces(QUANTITY_PLACES);
         train.setFreePlaces(FREE_PLACES);
-
     }
 
     @Test
-    void save() {
+    void save() throws SQLException {
         TrainDAO trainDAO = new TrainDAO(DATA_SOURCE);
         trainDAO.save(train);
         ResultSet rs;
-        try(Connection connection = DATA_SOURCE.getConnection()){
+        try(Connection connection = DATA_SOURCE.getConnection()) {
             Statement statement = connection.createStatement();
             rs = statement.executeQuery("SELECT * FROM TRAINS");
-        }catch (SQLException e){
-            throw new RuntimeException(e);
         }
     }
 
     @Test
-    void update(){
-
+    void update() throws SQLException {
+        TrainDAO trainDAO = new TrainDAO(DATA_SOURCE);
+        trainDAO.update(5L,train);
+        ResultSet rs;
+//        try(Connection connection = DATA_SOURCE.getConnection()) {
+//            Statement statement = connection.createStatement();
+//            rs = statement.
+//                    executeQuery("UPDATE TRAINS SET ID LONG[*] ");
+//           // TODO...
+//        }
     }
 }

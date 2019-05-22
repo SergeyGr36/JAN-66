@@ -1,8 +1,8 @@
-package com.ra.course.janus.traintickets.dao.api;
+package com.ra.course.janus.traintickets.dao;
 
 import java.util.List;
 
-public interface DAO<T> {
+public interface IJdbcDao<T> {
 
     T save(T item);
 

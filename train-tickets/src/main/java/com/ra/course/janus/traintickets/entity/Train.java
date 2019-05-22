@@ -4,11 +4,11 @@ package com.ra.course.janus.traintickets.entity;
 
 public class Train  {
 
-    private static final int QUANTITY_PLACES = 100;
-
     private long id;
 
     private String name;
+
+    private int quanyityPlaces;
 
     private int freePlaces;
 
@@ -16,15 +16,10 @@ public class Train  {
     public Train() {
     }
 
-    public Train(long id, String name) {
+    public Train(long id, String name, int quanyityPlaces, int freePlaces) {
         this.id = id;
         this.name = name;
-        this.freePlaces = QUANTITY_PLACES;
-    }
-
-    public Train(long id, String name, int freePlaces) {
-        this.id = id;
-        this.name = name;
+        this.quanyityPlaces = quanyityPlaces;
         this.freePlaces = freePlaces;
     }
 
@@ -44,8 +39,12 @@ public class Train  {
         this.name = name;
     }
 
-    public int getQuantityPlaces() {
-        return QUANTITY_PLACES;
+    public int getQuanyityPlaces() {
+        return quanyityPlaces;
+    }
+
+    public void setQuanyityPlaces(int quanyityPlaces) {
+        this.quanyityPlaces = quanyityPlaces;
     }
 
     public int getFreePlaces() {
