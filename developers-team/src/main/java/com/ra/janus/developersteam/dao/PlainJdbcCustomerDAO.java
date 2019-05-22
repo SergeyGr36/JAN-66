@@ -7,7 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,15 +38,15 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
             ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
-                if (generatedKeys.next()) {
-                    final long id = generatedKeys.getLong(1);
-                    return new Customer(id, customer);
-                } else {
-                    throw logAndThrow(new DAOException("Couldn't retrieve generated id for customer " + customer));
-                }
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                final long id = generatedKeys.getLong(1);
+                return new Customer(id, customer);
+            } else {
+                throw new DAOException("Could not create a Customer");
             }
         } catch (SQLException e) {
+            LOGGER.error("An exception occurred!", e);
             throw new DAOException(e);
         }
     }
@@ -50,19 +54,17 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     @Override
     public Customer read(final long id) {
         final int parametherIndex = 1;
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);) {
-
+        try (Connection conn = dataSource.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ResultSet rs = ps.executeQuery();
             ps.setLong(parametherIndex, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return toCustomer(rs);
-                }
+            if (rs.next()) {
+                return toCustomer(rs);
             }
-            return null;
         } catch (SQLException e) {
             throw logAndThrow(new DAOException(e));
         }
+        return null;
     }
 
     @Override
