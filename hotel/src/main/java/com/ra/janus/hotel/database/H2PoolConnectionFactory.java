@@ -11,14 +11,14 @@ public class H2PoolConnectionFactory {
 
     private static HikariDataSource dataSource;
     private static HikariConfig poolconfig;
-    private static H2PoolConnectionFactory poolConnectionFactory;
+    private static H2PoolConnectionFactory factory;
 
     public H2PoolConnectionFactory() throws IOException {
         createPoolConfig();
     }
 
     private void createPoolConfig() throws IOException {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.load(ClassLoader.getSystemResourceAsStream("poolconnect.properties"));
         poolconfig = new HikariConfig();
         poolconfig.setJdbcUrl(properties.getProperty("jdbc_url"));
@@ -31,11 +31,11 @@ public class H2PoolConnectionFactory {
 
     public static H2PoolConnectionFactory getInstance() throws IOException {
         synchronized (H2PoolConnectionFactory.class) {
-            if (poolConnectionFactory == null) {
-                poolConnectionFactory = new H2PoolConnectionFactory();
+            if (factory == null) {
+                factory = new H2PoolConnectionFactory();
                 dataSource = new HikariDataSource(poolconfig);
             }
-            return poolConnectionFactory;
+            return factory;
         }
     }
 

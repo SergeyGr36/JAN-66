@@ -28,8 +28,6 @@ public final class H2ConnectionFactory {
                 dataSource.setURL(connectProperties.getProperty("db.url"));
                 dataSource.setUser(connectProperties.getProperty("db.user"));
                 dataSource.setPassword(connectProperties.getProperty("db.pass"));
-
-//                createDateSource();
             }
             return factory;
         }
@@ -39,14 +37,5 @@ public final class H2ConnectionFactory {
         connectProperties = new Properties();
         connectProperties.load(ClassLoader.getSystemResourceAsStream("connect.properties"));
     }
-
-/*
-    private static void createDateSource() {
-            dataSource = new JdbcDataSource();
-            dataSource.setURL(connectProperties.getProperty("db.url"));
-            dataSource.setUser(connectProperties.getProperty("db.user"));
-            dataSource.setPassword(connectProperties.getProperty("db.pass"));
-    }
-*/
 
 }

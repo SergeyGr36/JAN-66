@@ -70,14 +70,14 @@ public class OrderDAO implements IEntityDAO<Order> {
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)){
             statement.setLong(1, id);
             final Order order;
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                order = orderOfResultSet(resultSet);
-            } else {
-                order = null;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    order = orderOfResultSet(resultSet);
+                } else {
+                    order = null;
+                }
+                return order;
             }
-            resultSet.close();
-            return order;
         } catch (SQLException e) {
             throw new DaoException(e.getMessage(), e);
         }
@@ -87,25 +87,27 @@ public class OrderDAO implements IEntityDAO<Order> {
     public List<Order> findAll() throws DaoException {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
-            List<Order> orders = new ArrayList<>();
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                orders.add(orderOfResultSet(resultSet));
+            final List<Order> orders = new ArrayList<>();
+            try(ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    orders.add(orderOfResultSet(resultSet));
+                }
+                resultSet.close();
+                return orders;
             }
-            resultSet.close();
-            return orders;
         } catch (SQLException e) {
             throw new DaoException(e.getMessage(), e);
         }
     }
 
     private Order orderOfResultSet(final ResultSet resultSet) throws SQLException {
+        final String status = resultSet.getString("status");
         return new Order(resultSet.getLong("id"),
                 null,
                 null,
                 resultSet.getDate("date_in"),
                 resultSet.getDate("date_out"),
-                resultSet.getString("status") == null ? null : StatusOrder.valueOf(resultSet.getString("status")),
+                status == null ? null : StatusOrder.valueOf(status),
                 resultSet.getDate("date_create"),
                 resultSet.getDate("date_update"),
                 null);

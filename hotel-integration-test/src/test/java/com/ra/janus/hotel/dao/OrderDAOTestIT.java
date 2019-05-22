@@ -1,6 +1,5 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.dao.OrderDAO;
 import com.ra.janus.hotel.database.H2ConnectionFactory;
 import com.ra.janus.hotel.entity.Order;
 import com.ra.janus.hotel.enums.StatusOrder;
@@ -24,8 +23,8 @@ class OrderDAOTestIT {
     @BeforeEach
     private void init() throws IOException, SQLException {
         DataSource dataSource = H2ConnectionFactory.getInstance().getDataSource();
-        orderDAO = new OrderDAO(dataSource);
         createDB(dataSource);
+        orderDAO = new OrderDAO(dataSource);
     }
 
     private void createDB(final DataSource dataSource) throws SQLException, IOException {

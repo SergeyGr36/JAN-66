@@ -51,9 +51,11 @@ project(":hotel") {
         compile testing.mockito
         compile hibernate.hikari
     }
+/*
     spotbugsMain {
-        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+        excludeFilter = file("${rootProject.projectDir}/buildSrc/findbugs/exclude.xml")
     }
+*/
 }
 
 project(":hotel-integration-test") {

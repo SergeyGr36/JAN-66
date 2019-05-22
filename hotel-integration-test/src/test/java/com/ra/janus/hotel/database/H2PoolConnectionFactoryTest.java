@@ -1,4 +1,4 @@
-package com.ra.janus.hotel.database;
+/*package com.ra.janus.hotel.database;
 
 import com.ra.janus.hotel.database.H2PoolConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -18,4 +18,4 @@ class H2PoolConnectionFactoryTest {
     void whenCallGetDataSourceThenReturnNotNull() throws IOException {
         assertNotNull(H2PoolConnectionFactory.getInstance().getDataSource());
     }
-}
+}*/
