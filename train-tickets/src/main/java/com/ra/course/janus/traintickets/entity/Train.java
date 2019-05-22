@@ -4,13 +4,13 @@ package com.ra.course.janus.traintickets.entity;
 
 public class Train  {
 
-    private static final int QUANTITY_OF_PLACES_IN_TRAIN = 100;
+    private static final int QUANTITY_PLACES = 100;
 
     private long id;
 
     private String name;
 
-    private int numberOfFreePlacesInTheTrain;
+    private int freePlaces;
 
 
     public Train() {
@@ -19,13 +19,13 @@ public class Train  {
     public Train(long id, String name) {
         this.id = id;
         this.name = name;
-        this.numberOfFreePlacesInTheTrain = QUANTITY_OF_PLACES_IN_TRAIN;
+        this.freePlaces = QUANTITY_PLACES;
     }
 
-    public Train(long id, String name, int numberOfFreePlacesInTheTrain) {
+    public Train(long id, String name, int freePlaces) {
         this.id = id;
         this.name = name;
-        this.numberOfFreePlacesInTheTrain = numberOfFreePlacesInTheTrain;
+        this.freePlaces = freePlaces;
     }
 
     public long getId() {
@@ -44,15 +44,15 @@ public class Train  {
         this.name = name;
     }
 
-    public int getQuantityOfPlacesInTrain() {
-        return QUANTITY_OF_PLACES_IN_TRAIN;
+    public int getQuantityPlaces() {
+        return QUANTITY_PLACES;
     }
 
-    public int getNumberOfFreePlacesInTheTrain() {
-        return numberOfFreePlacesInTheTrain;
+    public int getFreePlaces() {
+        return freePlaces;
     }
 
-    public void setNumberOfFreePlacesInTheTrain(int numberOfFreePlacesInTheTrain) {
-        this.numberOfFreePlacesInTheTrain = numberOfFreePlacesInTheTrain;
+    public void setFreePlaces(int freePlaces) {
+        this.freePlaces = freePlaces;
     }
 }

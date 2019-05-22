@@ -19,6 +19,7 @@ class TrainDAOTest {
 
     private static final Long TRAIN_ID = 15L;
     private static final String TRAIN_NAME = "test_train";
+    private static final int FREE_PLACES = 99;
     private static final DataSource DATA_SOURCE =
             DataSourceFactory.H2_IN_MEMORY.getDataSource();
 
@@ -28,7 +29,7 @@ class TrainDAOTest {
     public static void setupH2Schema() {
         try (Connection connection = DATA_SOURCE.getConnection()) {
             Statement st = connection.createStatement();
-            st.execute("create table trains(id long, name varchar(44))");
+            st.execute("create table trains(id long, name varchar(44), quantity_plases int, free_plases int)");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -39,6 +40,9 @@ class TrainDAOTest {
         train = new Train();
         train.setId(TRAIN_ID);
         train.setName(TRAIN_NAME);
+        train.getQuantityPlaces();
+        train.setFreePlaces(FREE_PLACES);
+
     }
 
     @Test

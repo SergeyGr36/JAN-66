@@ -28,8 +28,8 @@ public class TrainDAO implements DAO<Train> {
             PreparedStatement trainStatement = connection.prepareStatement(INSERT_TRAIN);
             trainStatement.setLong(1,train.getId());
             trainStatement.setString(2,train.getName());
-            trainStatement.setInt(3,train.getQuantityOfPlacesInTrain());
-            trainStatement.setInt(4,train.getNumberOfFreePlacesInTheTrain());
+            trainStatement.setInt(3,train.getQuantityPlaces());
+            trainStatement.setInt(4,train.getFreePlaces());
             trainStatement.executeUpdate();
             connection.commit();
         }catch (SQLException e){
