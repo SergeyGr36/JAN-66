@@ -48,8 +48,13 @@ wrapper {
 project(':train-tickets') {
     dependencies {
         compile db.h2
-        //runtime db.h2
-        //compile db.mysql
+        compile hibernate.hikari
+        compile log.slf4jSimple
     }
-    
+}
+
+project(':train-tickets-integration-tests') {
+    dependencies {
+        compile project(':train-tickets')
+    }
 }
