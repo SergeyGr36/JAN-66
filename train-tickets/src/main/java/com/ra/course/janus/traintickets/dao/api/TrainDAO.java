@@ -12,7 +12,7 @@ public class TrainDAO implements DAO<Train> {
 
     private final DataSource dataSource;
 
-    private final String INSERT_TRAIN = "INSERT into TRAINS (name, id) values (?, ?)";
+    private final String INSERT_TRAIN = "INSERT into TRAINS (id, name, quantity_plases, free_plases) values (?, ?, ?, ?)";
     private final String SELECT_TRAIN = "SELECT * FROM TRAINS WHERE id = ?";
     private final String UPDATE_TRAIN = "UPDATE TRAINS SET name = ? WHERE id = ?";
     private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
@@ -26,8 +26,10 @@ public class TrainDAO implements DAO<Train> {
         try(Connection connection = dataSource.getConnection()){
             connection.setAutoCommit(false);
             PreparedStatement trainStatement = connection.prepareStatement(INSERT_TRAIN);
-            trainStatement.setString(1,train.getName());
-            trainStatement.setLong(2,train.getId());
+            trainStatement.setLong(1,train.getId());
+            trainStatement.setString(2,train.getName());
+            trainStatement.setInt(3,train.getQuantityOfPlacesInTrain());
+            trainStatement.setInt(4,train.getNumberOfFreePlacesInTheTrain());
             trainStatement.executeUpdate();
             connection.commit();
         }catch (SQLException e){
