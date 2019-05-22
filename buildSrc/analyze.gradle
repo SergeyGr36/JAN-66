@@ -26,6 +26,14 @@ jacocoTestReport {
         csv.enabled = false
         html.destination file("${buildDir}/jacocoHtml")
     }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+            )
+        })
+    }
 }
 
 jacocoTestCoverageVerification {
@@ -33,7 +41,7 @@ jacocoTestCoverageVerification {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exceptions/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
             )
         })
     }
