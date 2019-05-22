@@ -64,49 +64,45 @@ public class TrainDAO implements IJdbcDao<Train> {
             ps.setLong(1,id);
             ps.execute();
             connection.commit();
+            return true;
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-        return false;//TODO...
     }
 
     @Override
     public Train findById(Long id) {
         Train train = new Train();
-        try(Connection connection = dataSource.getConnection()){
-            try (Statement statement = connection.createStatement()) {
-                try(ResultSet resultSet = statement.executeQuery(SELECT_TRAIN_ID)) {
-                    train.setId(resultSet.getLong(1));
-                    train.setName(resultSet.getString(2));
-                    train.setQuanyityPlaces(resultSet.getInt(3));
-                    train.setFreePlaces(resultSet.getInt(4));
-                }
-            }
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ID);
+        ResultSet rs = pr.executeQuery()){
+            train.setId(rs.getLong(1));
+            train.setName(rs.getString(2));
+            train.setQuanyityPlaces(rs.getInt(3));
+            train.setFreePlaces(rs.getInt(4));
+            return train;
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-        return train;
     }
 
     @Override
     public List<Train> findAll() {
         ArrayList <Train> trainsList = new ArrayList<>();
         Train train = new Train();
-        try(Connection connection = dataSource.getConnection()){
-            try(Statement statement = connection.createStatement()){
-                try(ResultSet resultSet = statement.executeQuery(SELECT_TRAIN_ALL)){
-                    while (resultSet.next()){
-                        train.setId(resultSet.getLong(1));
-                        train.setName(resultSet.getString(2));
-                        train.setQuanyityPlaces(resultSet.getInt(3));
-                        train.setFreePlaces(resultSet.getInt(4));
-                        trainsList.add(train);
-                    }
-                }
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL);
+        ResultSet rs = pr.executeQuery()){
+            while (rs.next()){
+                train.setId(rs.getLong(1));
+                train.setName(rs.getString(2));
+                train.setQuanyityPlaces(rs.getInt(3));
+                train.setFreePlaces(rs.getInt(4));
+                trainsList.add(train);
             }
+            return trainsList;
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-        return trainsList;
     }
 }
