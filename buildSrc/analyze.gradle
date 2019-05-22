@@ -22,17 +22,17 @@ jacocoTestReport {
         csv.enabled = false
         html.destination file("${buildDir}/jacocoHtml")
     }
+}
+
+jacocoTestCoverageVerification {
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exceptions/**', '**/configuration/**']
             )
         })
     }
-}
-
-jacocoTestCoverageVerification {
     violationRules {
 
         rule {
@@ -77,5 +77,5 @@ test {
     useJUnitPlatform()
 }
 
-test.finalizedBy jacocoTestReport
 check.dependsOn jacocoTestCoverageVerification
+test.finalizedBy jacocoTestReport

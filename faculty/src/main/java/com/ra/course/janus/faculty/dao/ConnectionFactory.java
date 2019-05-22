@@ -38,7 +38,7 @@ public final class ConnectionFactory {
                 if (connFactory == null) {
                     connFactory = new ConnectionFactory();
                     dataSource = new JdbcDataSource();
-                    dataSource.setURL(dbProperties.getProperty("db.url")+";INIT=runscript from '"+
+                    dataSource.setURL(dbProperties.getProperty("db.url")+";INIT=runscript from 'classpath:scripts/"+
                                       dbProperties.getProperty("db.start")+"'"
                                     );
                     dataSource.setUser(dbProperties.getProperty("db.username"));

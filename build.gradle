@@ -47,9 +47,16 @@ wrapper {
 
 project(':faculty') {
        dependencies {
-             compile db.mysql
-             compile db.h2
-          }
+           compile log.log4jDependency
+           compile log.log4jExtras
+           compile log.log4j2Api
+           compile log.log4jCore
+           compile log.disruptor
+
+           compile db.mysql
+           compile db.h2
+           testCompile testing.mockito
+       }
     spotbugsMain {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml") 
     }

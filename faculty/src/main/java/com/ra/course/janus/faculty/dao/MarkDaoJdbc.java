@@ -17,42 +17,35 @@ public class MarkDaoJdbc implements MarkDao {
     private static final String DELETE_SQL = "DELETE FROM MARK WHERE MARK_TID=?";
 
 
-    private transient final DataSource dataSource;
+    private transient final Connection connection;
 
-    public MarkDaoJdbc(final DataSource dataSource) {
-        this.dataSource = dataSource;
+    public MarkDaoJdbc(final Connection connection) {
+        this.connection = connection;
     }
 
     @Override
     public Mark insert(final Mark mark) throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, mark.getScore());
             ps.setString(2, mark.getReference());
             final int n = ps.executeUpdate();
 
-            if (n > 0) {
-                try (ResultSet markTid = ps.getGeneratedKeys()) {
-
-                    markTid.next();
-                    mark.setTid(markTid.getInt(1));
-                    return mark;
-                }
-            } else {
-                return null;
+            try (ResultSet markTid = ps.getGeneratedKeys()) {
+                markTid.next();
+                mark.setTid(markTid.getLong(1));
+                return mark;
             }
         }
     }
 
     @Override
     public Mark update(final Mark mark) throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
+        try (PreparedStatement ps = connection.prepareStatement(UPDATE_SQL)) {
 
             ps.setInt(1, mark.getScore());
             ps.setString(2, mark.getReference());
-            ps.setInt(3, mark.getTid());
+            ps.setLong(3, mark.getTid());
             return ps.executeUpdate() > 0 ? mark : null;
 
         }
@@ -61,19 +54,16 @@ public class MarkDaoJdbc implements MarkDao {
 
     @Override
     public boolean delete(final Mark mark) throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-            ps.setInt(1, mark.getTid());
+        try (PreparedStatement ps = connection.prepareStatement(DELETE_SQL)) {
+            ps.setLong(1, mark.getTid());
             return ps.executeUpdate() > 0 ? true : false;
-
         }
     }
 
     @Override
-    public Mark findByTid(final Integer tid) throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setInt(1, tid.intValue());
+    public Mark findByTid(final long tid) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement(SELECT_ONE_SQL)) {
+            ps.setLong(1, tid);
             try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {
@@ -87,8 +77,7 @@ public class MarkDaoJdbc implements MarkDao {
 
     @Override
     public List<Mark> findAll() throws SQLException {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
+        try (PreparedStatement ps = connection.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
 
             final List<Mark> marks = new ArrayList<>();
@@ -103,7 +92,7 @@ public class MarkDaoJdbc implements MarkDao {
 
     private Mark toMark(final ResultSet rs) throws SQLException {
         final Mark result  = new Mark();
-        result.setTid(rs.getInt("MARK_TID"));
+        result.setTid(rs.getLong("MARK_TID"));
         result.setScore(rs.getInt("SCORE"));
         result.setReference(rs.getString("REFERENCE"));
         return result;

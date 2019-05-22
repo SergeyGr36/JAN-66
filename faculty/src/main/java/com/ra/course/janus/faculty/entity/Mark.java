@@ -2,14 +2,14 @@ package com.ra.course.janus.faculty.entity;
 
 public class Mark {
 
-    private Integer tid;
+    private long tid;
 
-    private Integer score;
+    private int score;
     private String  reference;
 
-    public Integer getTid() { return tid; }
+    public long getTid() { return tid; }
 
-    public void setTid(Integer tid) {this.tid = tid;  }
+    public void setTid(long tid) {this.tid = tid;  }
 
     public Integer getScore() { return score;   }
 
@@ -19,12 +19,4 @@ public class Mark {
 
     public void setReference(String reference) {this.reference = reference;  }
 
-    @Override
-    public String toString() {
-        return "Mark{" +
-                "score=" + score +
-                ", reference='" + reference + '\'' +
-                '}';
     }
-
-}

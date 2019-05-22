@@ -13,7 +13,7 @@ public interface MarkDao {
 
     boolean delete(Mark mark) throws SQLException;
 
-    Mark findByTid(Integer tid) throws SQLException;
+    Mark findByTid(long tid) throws SQLException;
 
     List<Mark> findAll() throws SQLException;
 }
