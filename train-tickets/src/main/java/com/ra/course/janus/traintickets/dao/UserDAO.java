@@ -27,13 +27,14 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public User save(User user) {
+        verifyNotNull(user);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement saveStatement = connection.prepareStatement(SAVE_USER);
             fromUser(saveStatement, user);
             saveStatement.executeUpdate();
             ResultSet generatedKeys = saveStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
-                final long id = generatedKeys.getLong(1);
+                final long id = generatedKeys.getLong("id");
                 return new User(
                         id,
                         user.getName(),
@@ -41,15 +42,16 @@ public class UserDAO implements DAO<User> {
                         user.getPassword()
                 );
             } else {
-                return null;
+                throw new RuntimeException("failed to save user");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("failed to save user", e);
         }
     }
 
     @Override
     public boolean update(Long id, User user) {
+        verifyNotNull(user);
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement updateStatement = connection.prepareStatement(UPDATE_USER);
             fromUser(updateStatement, user);
@@ -115,12 +117,17 @@ public class UserDAO implements DAO<User> {
     }
 
     private User toUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setName(rs.getString("name"));
-        user.setEmail(rs.getString("email"));
-        user.setPassword(rs.getString("password"));
-        return user;
+        return new User(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("email"),
+                rs.getString("password")
+        );
+    }
+
+    private void verifyNotNull(User user) {
+        if(user == null) {
+            throw new IllegalArgumentException();
+        }
     }
 }
-

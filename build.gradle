@@ -48,8 +48,7 @@ wrapper {
 project(':train-tickets') {
     dependencies {
         compile db.h2
-        //runtime db.h2
-        //compile db.mysql
+        testCompile testing.mockito
     }
     
 }
