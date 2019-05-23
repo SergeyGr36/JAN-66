@@ -19,7 +19,7 @@ public enum H2DataSource implements IDataSource {
 
         try {
             if (dataSource == null) {
-                final Properties properties = PropertyReader.INSTANCE.getProperties("config.properties");
+                final Properties properties = PropertyReader.INSTANCE.getProperties("application.properties");
                 dataSource = new JdbcDataSource();
                 dataSource.setURL(properties.getProperty("db.url"));
                 dataSource.setUser(properties.getProperty("db.username"));
