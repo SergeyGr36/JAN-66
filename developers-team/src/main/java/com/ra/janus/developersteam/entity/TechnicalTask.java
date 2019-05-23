@@ -1,5 +1,7 @@
 package com.ra.janus.developersteam.entity;
 
+import java.util.Objects;
+
 public class TechnicalTask {
     private long id;
     private String title;
@@ -18,6 +20,18 @@ public class TechnicalTask {
         this(id, task.getTitle(), task.getDescription());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TechnicalTask that = (TechnicalTask) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     public long getId() {
         return id;
