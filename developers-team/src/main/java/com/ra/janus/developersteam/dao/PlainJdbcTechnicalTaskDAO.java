@@ -19,6 +19,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private static final String DELETE_SQL = "DELETE FROM tasks WHERE id=?";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcTechnicalTaskDAO.class);
+    private static final String EXCEPTION_WARN = "An exception occurred!";
 
     transient private final DataSource dataSource;
 
@@ -37,11 +38,12 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
                     final long id = generatedKeys.getLong(1);
                     return new TechnicalTask(id, task);
                 } else {
-                    throw logAndThrow(new DAOException("Couldn't retrieve generated id for task " + task));
+                    throw new DAOException("Could not create a task");
                 }
             }
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -59,7 +61,8 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             rs.close();
             return task;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -75,7 +78,8 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             }
             return task;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -87,7 +91,8 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -100,7 +105,8 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -113,10 +119,5 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private void prepareStatement(final PreparedStatement ps, final TechnicalTask task) throws SQLException {
         ps.setString(1, task.getTitle());
         ps.setString(2, task.getDescription());
-    }
-
-    private RuntimeException logAndThrow(final RuntimeException ex) {
-        LOGGER.error("An exception occurred!", ex);
-        return ex;
     }
 }
