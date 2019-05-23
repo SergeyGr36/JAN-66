@@ -23,6 +23,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     private static final String DELETE_SQL = "DELETE FROM customers WHERE id=?";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcCustomerDAO.class);
+    public static final String EXCEPTION_LOG_WARN = "An exception occurred!";
 
     transient private final DataSource dataSource;
 
@@ -38,7 +39,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
             ps.executeUpdate();
-            ResultSet generatedKeys = ps.getGeneratedKeys();
+            final ResultSet generatedKeys = ps.getGeneratedKeys();
             if (generatedKeys.next()) {
                 final long id = generatedKeys.getLong(1);
                 return new Customer(id, customer);
@@ -46,7 +47,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
                 throw new DAOException("Could not create a Customer");
             }
         } catch (SQLException e) {
-            LOGGER.error("An exception occurred!", e);
+            LOGGER.error(EXCEPTION_LOG_WARN, e);
             throw new DAOException(e);
         }
     }
@@ -55,8 +56,8 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     public Customer read(final long id) {
         final int parametherIndex = 1;
         try (Connection conn = dataSource.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
-            ResultSet rs = ps.executeQuery();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            final ResultSet rs = ps.executeQuery();
             ps.setLong(parametherIndex, id);
             if (rs.next()) {
                 return toCustomer(rs);
@@ -122,7 +123,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     private RuntimeException logAndThrow(final RuntimeException ex) {
-        LOGGER.error("An exception occurred!", ex);
+        LOGGER.error(EXCEPTION_LOG_WARN, ex);
         return ex;
     }
 }
