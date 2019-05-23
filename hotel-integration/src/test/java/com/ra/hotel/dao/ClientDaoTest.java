@@ -2,7 +2,7 @@ package com.ra.hotel.dao;
 
 import com.ra.hotel.configuration.H2ConnectionUtils;
 import com.ra.hotel.entity.Client;
-import com.ra.hotel.exceptions.DaoException;
+import com.ra.hotel.exception.DaoException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

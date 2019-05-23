@@ -2,7 +2,7 @@ package com.ra.hotel.dao;
 
 import com.ra.hotel.entity.Client;
 import com.ra.hotel.entity.enums.Query;
-import com.ra.hotel.exceptions.DaoException;
+import com.ra.hotel.exception.DaoException;
 
 import javax.sql.DataSource;
 import java.sql.*;

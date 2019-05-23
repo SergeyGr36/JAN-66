@@ -1,4 +1,4 @@
-package com.ra.hotel.exceptions;
+package com.ra.hotel.exception;
 
 public class DaoException extends RuntimeException {
 

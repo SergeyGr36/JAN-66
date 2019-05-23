@@ -1,6 +1,6 @@
 package com.ra.hotel.configuration;
 
-import com.ra.hotel.exceptions.DaoException;
+import com.ra.hotel.exception.DaoException;
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;

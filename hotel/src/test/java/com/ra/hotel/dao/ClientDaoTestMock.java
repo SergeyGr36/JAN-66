@@ -2,7 +2,7 @@ package com.ra.hotel.dao;
 
 import com.ra.hotel.entity.Client;
 import com.ra.hotel.entity.enums.Query;
-import com.ra.hotel.exceptions.DaoException;
+import com.ra.hotel.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -96,33 +96,33 @@ public class ClientDaoTestMock {
 
     @Test
     public void whenFindAllThanThrowException() throws SQLException {
-        when(mockDataSource.getConnection()).thenThrow(new DaoException(" "));
+        when(mockDataSource.getConnection()).thenThrow(new SQLException());
         assertThrows(DaoException.class, () -> clientDao.findAll());
 
     }
 
     @Test
     public void whenUpdateClientInDbThanThrowException() throws SQLException {
-        when(mockDataSource.getConnection()).thenThrow(new DaoException(" "));
-        assertThrows(DaoException.class, () -> clientDao.findAll());
+        when(mockDataSource.getConnection()).thenThrow(new SQLException());
+        assertThrows(DaoException.class, () -> clientDao.update(mockClient));
     }
 
     @Test
     public void whenDeleteClientFromDbThenThrowException() throws SQLException {
-        when(mockDataSource.getConnection()).thenThrow(new DaoException(" "));
-        assertThrows(DaoException.class, () -> clientDao.findAll());
+        when(mockDataSource.getConnection()).thenThrow(new SQLException());
+        assertThrows(DaoException.class, () -> clientDao.delete(1L));
     }
 
     @Test
-    public void whenSearchClientByIdThanThrowException() throws SQLException {
-        when(mockDataSource.getConnection()).thenThrow(new DaoException(" "));
-        assertThrows(DaoException.class, () -> clientDao.findAll());
+    public void whenFindByIdClientByIdThanThrowException() throws SQLException {
+        when(mockDataSource.getConnection()).thenThrow(new SQLException());
+        assertThrows(DaoException.class, () -> clientDao.findById(1L));
     }
 
     @Test
-    public void whenInsertClientInDbThanThrowException() throws SQLException, DaoException {
-        when(mockDataSource.getConnection()).thenThrow(new DaoException(" "));
-        assertThrows(DaoException.class, () -> clientDao.findAll());
+    public void whenSaveClientInDbThanThrowException() throws SQLException, DaoException {
+        when(mockDataSource.getConnection()).thenThrow(new SQLException());
+        assertThrows(DaoException.class, () -> clientDao.save(mockClient));
 
     }
 }
