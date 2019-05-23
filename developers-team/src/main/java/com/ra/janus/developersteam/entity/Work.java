@@ -1,6 +1,7 @@
 package com.ra.janus.developersteam.entity;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Work {
     private long id;
@@ -23,6 +24,19 @@ public class Work {
 
     public Work(long id, Work work) {
         this(id, work.getName(), work.getPrice());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Work work = (Work) o;
+        return id == work.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public BigDecimal getPrice() {
