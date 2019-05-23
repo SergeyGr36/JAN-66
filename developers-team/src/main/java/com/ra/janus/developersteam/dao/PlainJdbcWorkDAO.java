@@ -20,6 +20,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
     private static final String DELETE_SQL = "DELETE FROM works WHERE id=?";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcWorkDAO.class);
+    private static final String EXCEPTION_WARN = "An exception occurred!";
 
     transient private final DataSource dataSource;
 
@@ -38,10 +39,11 @@ public class PlainJdbcWorkDAO implements WorkDAO {
                     final long id  = generatedKeys.getLong(1);
                     return new Work(id, work);
                 } else {
-                    throw logAndThrow(new DAOException("Couldn't retrieve generated id for work " + work));
+                    throw new DAOException("Could not create a work");
                 }
             }
         } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
             throw new DAOException(e);
         }
     }
@@ -59,7 +61,8 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             }
             return null;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -75,7 +78,8 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             }
             return works;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -87,7 +91,8 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -100,7 +105,8 @@ public class PlainJdbcWorkDAO implements WorkDAO {
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
-            throw logAndThrow(new DAOException(e));
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
         }
     }
 
@@ -113,10 +119,5 @@ public class PlainJdbcWorkDAO implements WorkDAO {
     private void prepareStatement(final PreparedStatement ps, final Work work) throws SQLException {
         ps.setString(1, work.getName());
         ps.setBigDecimal(2, work.getPrice());
-    }
-
-    private RuntimeException logAndThrow(final RuntimeException ex) {
-        LOGGER.error("An exception occurred!", ex);
-        return ex;
     }
 }
