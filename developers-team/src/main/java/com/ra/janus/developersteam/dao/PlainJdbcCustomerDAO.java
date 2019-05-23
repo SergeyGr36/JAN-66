@@ -39,12 +39,13 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
             ps.executeUpdate();
-            final ResultSet generatedKeys = ps.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                final long id = generatedKeys.getLong(1);
-                return new Customer(id, customer);
-            } else {
-                throw new DAOException("Could not create a Customer");
+            try (ResultSet generatedKeys = ps.getGeneratedKeys(); generatedKeys) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong(1);
+                    return new Customer(id, customer);
+                } else {
+                    throw new DAOException("Could not create a Customer");
+                }
             }
         } catch (SQLException e) {
             LOGGER.error(EXCEPTION_WARN, e);
@@ -54,19 +55,24 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
 
     @Override
     public Customer read(final long id) {
-        final int parametherIndex = 1;
-        try (Connection conn = dataSource.getConnection()) {
+        try  {
+            final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
             final ResultSet rs = ps.executeQuery();
-            ps.setLong(parametherIndex, id);
-            if (rs.next()) {
-                return toCustomer(rs);
+            try {
+                if (rs.next()) {
+                    return toCustomer(rs);
+                } else {
+                    return null;
+                }
+            } finally {
+                rs.close();
+                conn.close();
             }
         } catch (SQLException e) {
             LOGGER.error(EXCEPTION_WARN, e);
             throw new DAOException(e);
         }
-        return null;
     }
 
     @Override
