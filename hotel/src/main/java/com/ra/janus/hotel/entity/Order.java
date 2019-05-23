@@ -11,17 +11,21 @@ public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private long id;
-    private Client client;
-    private TypeRoom typeRoom;
+    //private Client client;
+    private long idClient;
+    //private TypeRoom typeRoom;
+    private long idTypeRoom;
     private Date dateIn;
     private Date dateOut;
     private StatusOrder status = StatusOrder.NEW;
     private Date dateCreate;
     private Date dateUpdate;
-    private Room room;
+    //private Room room;
+    private Long idRoom;
 
     public Order() {}
 
+/*
     public Order(long id, Client client, TypeRoom typeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Room room) {
         this.id = id;
         this.client = client;
@@ -33,6 +37,19 @@ public class Order implements Serializable {
         this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
         this.room = room;
     }
+*/
+
+    public Order(long id, long idClient, long idTypeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Long idRoom) {
+        this.id = id;
+        this.idClient = idClient;
+        this.idTypeRoom = idTypeRoom;
+        this.dateIn = dateIn != null ? (Date) dateIn.clone() : null;
+        this.dateOut = dateOut != null ? (Date) dateOut.clone() : null;
+        this.status = status;
+        this.dateCreate = dateCreate != null ? (Date) dateCreate.clone() : null;
+        this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
+        this.idRoom = idRoom;
+    }
 
     public long getId() {
         return id;
@@ -40,22 +57,6 @@ public class Order implements Serializable {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public TypeRoom getTypeRoom() {
-        return typeRoom;
-    }
-
-    public void setTypeRoom(TypeRoom typeRoom) {
-        this.typeRoom = typeRoom;
     }
 
     public Date getDateIn() {
@@ -98,12 +99,28 @@ public class Order implements Serializable {
         this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
     }
 
-    public Room getRoom() {
-        return room;
+    public long getIdClient() {
+        return idClient;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setIdClient(long idClient) {
+        this.idClient = idClient;
+    }
+
+    public long getIdTypeRoom() {
+        return idTypeRoom;
+    }
+
+    public void setIdTypeRoom(long idTypeRoom) {
+        this.idTypeRoom = idTypeRoom;
+    }
+
+    public Long getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(Long idRoom) {
+        this.idRoom = idRoom;
     }
 
     @Override

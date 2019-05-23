@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,11 +32,12 @@ class OrderDAOTestIT {
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         File file = new File(ClassLoader.getSystemResource("create_databases.sql").getFile());
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file, Charset.defaultCharset()));
         String sqlScript;
         while ((sqlScript = bufferedReader.readLine()) != null) {
             statement.execute(sqlScript);
         }
+        bufferedReader.close();
         statement.close();
         connection.close();
     }
@@ -44,7 +46,7 @@ class OrderDAOTestIT {
     void whenCallSaveThenReturnOrder() throws DaoException {
         Order order = new Order();
         order.setId(3L);
-        order.setClient(null);
+        order.setIdClient(1L);
         order.setStatus(StatusOrder.NEW);
         assertNotNull(orderDAO.save(order));
     }

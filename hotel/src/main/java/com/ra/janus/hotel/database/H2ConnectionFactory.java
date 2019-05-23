@@ -23,6 +23,7 @@ public final class H2ConnectionFactory {
     public static H2ConnectionFactory getInstance() throws IOException {
         synchronized (H2ConnectionFactory.class) {
             if (factory == null) {
+                connectProperties = new Properties();
                 factory = new H2ConnectionFactory();
                 dataSource = new JdbcDataSource();
                 dataSource.setURL(connectProperties.getProperty("db.url"));
@@ -34,7 +35,6 @@ public final class H2ConnectionFactory {
     }
 
     private void loadProperties() throws IOException {
-        connectProperties = new Properties();
         connectProperties.load(ClassLoader.getSystemResourceAsStream("connect.properties"));
     }
 
