@@ -13,6 +13,8 @@ import java.sql.Date;
 @EqualsAndHashCode
 public class Client implements Serializable {
 
+    static final Long serialVersionUID = 1L;
+
     private long id;
     private String fullName;
     private String telephone;

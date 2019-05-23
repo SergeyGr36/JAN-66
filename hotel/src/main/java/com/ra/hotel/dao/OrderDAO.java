@@ -1,5 +1,7 @@
+/*
 package com.ra.hotel.dao;
 
+import com.ra.hotel.entity.enums.Query;
 import com.ra.hotel.exceptions.DaoException;
 import com.ra.hotel.entity.Order;
 import com.ra.hotel.entity.enums.StatusOrder;
@@ -20,7 +22,7 @@ public class OrderDAO implements GenericDao<Order> {
     @Override
     public Order save(final Order order) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(Query.ORDER_INSERT)) {
+             PreparedStatement statement = connection.prepareStatement(Query.ORDER_INSERT.get())) {
             setValueStatement(statement, order);
             if (statement.executeUpdate() == 0) {
                 throw new DaoException("record not saved");
@@ -34,7 +36,7 @@ public class OrderDAO implements GenericDao<Order> {
     @Override
     public Order update(final Order order) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(Query.ORDER_UPDATE_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.ORDER_UPDATE.get())) {
             if (statement.executeUpdate() == 0) {
                 throw new DaoException("record not updated");
             }
@@ -47,20 +49,20 @@ public class OrderDAO implements GenericDao<Order> {
     @Override
     public int delete(final Long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(Query.ORDER_DELETE_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.ORDER_DELETE.get())) {
             statement.setLong(1, id);
-           return statement.executeUpdate();
+            return statement.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Order findById(final Long id)  {
+    public Order findById(final Long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(Query.ORDER_SELECT_BY_ID)){
+             PreparedStatement statement = connection.prepareStatement(Query.ORDER_FIND_BY_ID.get())) {
             statement.setLong(1, id);
-            try (ResultSet resultSet = statement.executeQuery();){
+            try (ResultSet resultSet = statement.executeQuery();) {
                 if (resultSet.next()) {
                     return orderOfResultSet(resultSet);
                 }
@@ -72,11 +74,11 @@ public class OrderDAO implements GenericDao<Order> {
     }
 
     @Override
-    public List<Order> findAll() throws DaoException {
+    public List<Order> findAll() {
         final List<Order> orders = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(Query.ORDER_SELECT_ALL)){
-            try (ResultSet resultSet = statement.executeQuery();){
+             PreparedStatement statement = connection.prepareStatement(Query.ORDER_FIND_ALL.get())) {
+            try (ResultSet resultSet = statement.executeQuery();) {
                 while (resultSet.next()) {
                     orders.add(orderOfResultSet(resultSet));
                 }
@@ -111,3 +113,4 @@ public class OrderDAO implements GenericDao<Order> {
         statement.setLong(9, order.getId());
     }
 }
+*/

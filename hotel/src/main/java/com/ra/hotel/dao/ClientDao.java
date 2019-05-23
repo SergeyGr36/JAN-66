@@ -1,6 +1,7 @@
 package com.ra.hotel.dao;
 
 import com.ra.hotel.entity.Client;
+import com.ra.hotel.entity.enums.Query;
 import com.ra.hotel.exceptions.DaoException;
 
 import javax.sql.DataSource;
@@ -13,94 +14,91 @@ public class ClientDao implements GenericDao<Client> {
     private final transient DataSource dataSource;
 
 
-    public ClientDao(DataSource dataSource) {
+    public ClientDao(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public Client save(Client client) throws DaoException {
+    public Client save(final Client client) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_SAVE.get(), Statement.RETURN_GENERATED_KEYS)) {
             fillStatement(ps, client);
             ps.execute();
-            client.setId(generateKeys(ps));
+            try (
+                    ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                generatedKeys.next();
+                client.setId(generatedKeys.getLong(1));
+            }
             return client;
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Client update(Client client) throws DaoException {
+    public Client update(final Client client) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_UPDATE_SQL)) {
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_UPDATE.get())) {
             fillStatement(ps, client);
             ps.setLong(5, client.getId());
             ps.executeUpdate();
             return findById(client.getId());
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage(), e);
         }
     }
 
     @Override
-    public int delete(Long id) throws DaoException {
+    public int delete(final Long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_DELETE_SQL)) {
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_DELETE.get())) {
             ps.setLong(1, id);
             return ps.executeUpdate();
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage(), e);
         }
     }
 
     @Override
-    public Client findById(Long id) throws DaoException {
+    public Client findById(final Long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_BY_ID_SQL)) {
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_BY_ID.get())) {
             ps.setLong(1, id);
-            Client client;
+            final Client client;
             try (ResultSet resultSet = ps.executeQuery()) {
                 resultSet.next();
                 client = parseRs(resultSet);
             }
             return client;
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
+        } catch (final SQLException e) {
+            throw new DaoException(e.getMessage() ,e);
         }
     }
 
     @Override
-    public List<Client> findAll() throws DaoException {
+    public List<Client> findAll() {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_ALL)) {
-            List<Client> clientList = new ArrayList<>();
+             PreparedStatement ps = connection.prepareStatement(Query.CLIENT_FIND_ALL.get())) {
+            final List<Client> clientList = new ArrayList<>();
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     clientList.add(parseRs(rs));
                 }
             }
             return clientList;
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage());
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage(), e);
         }
     }
 
-    private void fillStatement(PreparedStatement prepare, Client client) throws SQLException {
+    private void fillStatement(final PreparedStatement prepare, final Client client) throws SQLException {
         prepare.setString(1, client.getFullName());
         prepare.setString(2, client.getTelephone());
         prepare.setString(3, client.getEmail());
         prepare.setDate(4, client.getBirthday());
     }
 
-    private Long generateKeys(PreparedStatement prepare) throws SQLException {
-        ResultSet rs = prepare.getGeneratedKeys();
-        rs.next();
-        return rs.getLong(1);
-
-    }
-
-    private Client parseRs(ResultSet rs) throws SQLException {
+    private Client parseRs(final ResultSet rs) throws SQLException {
         return new Client(rs.getLong("id"), rs.getString("full_name"), rs.getString("phone_number"),
                 rs.getNString("email"), rs.getDate("birthday"));
     }

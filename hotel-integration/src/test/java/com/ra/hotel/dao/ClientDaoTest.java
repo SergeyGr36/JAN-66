@@ -28,7 +28,7 @@ public class ClientDaoTest {
         clientDao = new ClientDao(dataSource);
         Connection c = dataSource.getConnection();
         Statement statement = c.createStatement();
-        statement.execute(Query.TRUNCATE_CLIENT_TABLE);
+        statement.execute("TRUNCATE TABLE client");
     }
 
 
@@ -94,33 +94,6 @@ public class ClientDaoTest {
     }
 
 
-/*    @Test
-    public void testMethodFindByPhoneNumberInDB() throws DaoException {
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
-                Date.valueOf(LocalDate.now()));
-        clientDao.save(client);
-        Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
-                Date.valueOf(LocalDate.now()));
-        clientDao.save(client1);
-        Client client2 = new Client(client.getId(), "Ben", "0000000000", "sam@",
-                Date.valueOf(LocalDate.now()));
-        clientDao.save(client2);
-        Client client3 = new Client(client.getId(), "Josh", "0000000000", "sam@",
-                Date.valueOf(LocalDate.now()));
-        clientDao.save(client3);
-        Client client4 = new Client(client.getId(), "Sam", "0000000000", "sam@",
-                Date.valueOf(LocalDate.now()));
-        clientDao.save(client4);
-
-        List<Client> clientList = new ArrayList<>();
-        clientList.add(client1);
-        clientList.add(client2);
-        clientList.add(client3);
-        clientList.add(client4);
-
-        assertEquals(clientList, clientDao.findByPhoneNumber("0000000000"));
-    }*/
-
 
     @Test
     public void testMethodSaveClientInDbWithException() {
@@ -140,18 +113,5 @@ public class ClientDaoTest {
                 Date.valueOf(LocalDate.now()));
         assertThrows(DaoException.class, () -> clientDao.update(client1));
     }
-
-
-    @Test
-    public void testMethodDeleteClientInDbWithException() {
-        assertThrows(DaoException.class, () -> clientDao.delete(null));
-    }
-
-
-    @Test
-    public void testFindByIdInDbWithException() {
-        assertThrows(DaoException.class, () -> clientDao.findById(null));
-    }
-
 
 }
