@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO implements DAO<User> {
-    private final DataSource dataSource;
+    private final transient DataSource dataSource;
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set (name,email,password) values (?,?,?) WHERE id=?";
@@ -21,28 +21,29 @@ public class UserDAO implements DAO<User> {
     private static final String FIND_ALL = "select * from USERS";
 
 
-    public UserDAO(DataSource dataSource) {
+    public UserDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
     public User save(User user) {
         verifyNotNull(user);
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement saveStatement = connection.prepareStatement(SAVE_USER);
-            fromUser(saveStatement, user);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement saveStatement = prepareSaveStatement(connection, user)) {
             saveStatement.executeUpdate();
-            ResultSet generatedKeys = saveStatement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                final long id = generatedKeys.getLong("id");
-                return new User(
-                        id,
-                        user.getName(),
-                        user.getEmail(),
-                        user.getPassword()
-                );
-            } else {
-                throw new RuntimeException("failed to save user");
+            try (ResultSet generatedKeys = saveStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong("id");
+                    return new User(
+                            id,
+                            user.getName(),
+                            user.getEmail(),
+                            user.getPassword()
+                    );
+                }
+                else {
+                    throw new RuntimeException("failed to save user");
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("failed to save user", e);
@@ -52,10 +53,8 @@ public class UserDAO implements DAO<User> {
     @Override
     public boolean update(Long id, User user) {
         verifyNotNull(user);
-        try (Connection connection = dataSource.getConnection()) {
-            PreparedStatement updateStatement = connection.prepareStatement(UPDATE_USER);
-            fromUser(updateStatement, user);
-            updateStatement.setLong(4, id);
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement updateStatement = prepareUpdateStatement(connection, user)) {
             updateStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -106,17 +105,24 @@ public class UserDAO implements DAO<User> {
         }
     }
 
-    private void fromUser(PreparedStatement statement, User user) {
-        try {
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getEmail());
-            statement.setString(3, user.getPassword());
-        } catch (SQLException e) {
-            throw new RuntimeException("failed to prepare statment", e);
-        }
+    private PreparedStatement prepareSaveStatement(final Connection conn, final User user) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement(SAVE_USER);
+        statement.setString(1, user.getName());
+        statement.setString(2, user.getEmail());
+        statement.setString(3, user.getPassword());
+        return statement;
     }
 
-    private User toUser(ResultSet rs) throws SQLException {
+    private PreparedStatement prepareUpdateStatement(final Connection conn, final User user) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement(UPDATE_USER);
+        statement.setString(1, user.getName());
+        statement.setString(2, user.getEmail());
+        statement.setString(3, user.getPassword());
+        statement.setLong(4, user.getId());
+        return statement;
+    }
+
+    private User toUser(final ResultSet rs) throws SQLException {
         return new User(
                 rs.getLong("id"),
                 rs.getString("name"),
