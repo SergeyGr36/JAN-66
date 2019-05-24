@@ -34,9 +34,9 @@ public class PlainJdbcWorkDAO implements WorkDAO {
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, work);
             ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
                 if (generatedKeys.next()) {
-                    final long id  = generatedKeys.getLong(1);
+                    final long id = generatedKeys.getLong(1);
                     return new Work(id, work);
                 } else {
                     throw new DAOException("Could not create a work");
@@ -50,16 +50,20 @@ public class PlainJdbcWorkDAO implements WorkDAO {
 
     @Override
     public Work read(final long id) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setLong(1, id);
-
-            try (ResultSet rs = ps.executeQuery()) {
+        try  {
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            final ResultSet rs = ps.executeQuery();
+            try {
                 if (rs.next()) {
                     return toWork(rs);
+                } else {
+                    return null;
                 }
+            } finally {
+                rs.close();
+                conn.close();
             }
-            return null;
         } catch (SQLException e) {
             LOGGER.error(EXCEPTION_WARN, e);
             throw new DAOException(e);
