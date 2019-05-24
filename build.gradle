@@ -48,6 +48,10 @@ wrapper {
 project(":hotel") {
     dependencies {
         compile db.h2
+        compile testing.mockito
+        compile hibernate.hikari
+        compile log.log4j2Api
+        compile log.log4jCore
     }
     spotbugsMain {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")

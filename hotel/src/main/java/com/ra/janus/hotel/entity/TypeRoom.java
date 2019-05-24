@@ -9,7 +9,9 @@ public class TypeRoom implements Serializable {
     private int countPlaces;
     private int prise;
     private String description;
-    private String classOfRoom;//Enum?
+    private String classOfRoom;
+
+    public TypeRoom(){};
 
     public TypeRoom(long id, int countPlaces, int prise, String description, String classOfRoom) {
         this.id = id;
