@@ -51,7 +51,5 @@ project(':developers-team') {
         compile db.h2
         compile hibernate.hikari
 
-
-
     }
 }
