@@ -2,7 +2,17 @@ apply plugin: 'java'
 apply plugin: 'pmd'
 apply plugin: 'jdepend'
 apply plugin: 'jacoco'
-apply plugin: "com.github.spotbugs"
+apply plugin: 'com.github.spotbugs'
+
+jacoco {
+    toolVersion = '0.8.4'
+}
+
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = 'max'
+    reportLevel = 'high'
+}
 
 pmd {
     toolVersion = "6.14.0"
@@ -33,6 +43,14 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+            )
+        })
+    }
     violationRules {
 
         rule {
@@ -77,5 +95,5 @@ test {
     useJUnitPlatform()
 }
 
-test.finalizedBy jacocoTestReport
 check.dependsOn jacocoTestCoverageVerification
+test.finalizedBy jacocoTestReport
