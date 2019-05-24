@@ -3,13 +3,13 @@ package com.ra.janus.developersteam.dao;
 import com.ra.janus.developersteam.dao.interfaces.TechnicalTaskDAO;
 import com.ra.janus.developersteam.entity.TechnicalTask;
 import com.ra.janus.developersteam.exception.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
@@ -49,17 +49,20 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
 
     @Override
     public TechnicalTask read(final long id) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setLong(1, id);
-
-            TechnicalTask task = null;
+        try  {
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
             final ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                task = toTask(rs);
+            try {
+                if (rs.next()) {
+                    return toTask(rs);
+                } else {
+                    return null;
+                }
+            } finally {
+                rs.close();
+                conn.close();
             }
-            rs.close();
-            return task;
         } catch (SQLException e) {
             LOGGER.error(EXCEPTION_WARN, e);
             throw new DAOException(e);
