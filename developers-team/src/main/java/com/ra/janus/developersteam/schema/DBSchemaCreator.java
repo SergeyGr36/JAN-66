@@ -11,12 +11,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.BiPredicate;
 
 public class DBSchemaCreator {
     private static final String EXCEPTION_WARN = "An exception occurred!";
@@ -75,10 +77,13 @@ public class DBSchemaCreator {
     private void processDirectory(final Path path) {
         try {
             Files.find(path, 100,
-                    (filePath, fileAttributes) -> {
-                        final File file = filePath.toFile();
-                        return !file.isDirectory() &&
-                                file.getName().endsWith(".sql");
+                    new BiPredicate<Path, BasicFileAttributes>() {
+                        @Override
+                        public boolean test(final Path filePath, final BasicFileAttributes fileAttributes) {
+                            final File file = filePath.toFile();
+                            return !file.isDirectory() &&
+                                    file.getName().endsWith(".sql");
+                        }
                     }).forEach(this::processFile);
         } catch (IOException e) {
             LOGGER.error(EXCEPTION_WARN, e);
