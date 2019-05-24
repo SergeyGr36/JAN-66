@@ -2,59 +2,52 @@ package com.ra.janus.developersteam.entity;
 
 import java.util.Objects;
 
-//@Entity
-//@Table(name="MANAGERS")
 public class Manager {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private long id;
     private String name;
     private String email;
     private String phone;
 
-    public Manager(Long id, String name, String email, String phone) {
-        this.id = id;
+    public Manager(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
     }
 
-    public Manager() {
+    public Manager(Long id, String name, String email, String phone) {
+        this(name, email, phone);
+        this.id = id;
     }
 
     public Manager(Long id) {
+        this(null, null, null);
         this.id = id;
     }
 
     public Manager(Long id, Manager manager) {
+        this(manager.getName(), manager.getEmail(), manager.getPhone());
         this.id = id;
-        this.name = manager.getName();
-        this.email = manager.getEmail();
-        this.phone = manager.getPhone();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Manager)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Manager manager = (Manager) o;
-        return Objects.equals(getId(), manager.getId()) &&
-                Objects.equals(getName(), manager.getName()) &&
-                Objects.equals(getEmail(), manager.getEmail()) &&
-                Objects.equals(getPhone(), manager.getPhone());
+        return id == manager.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getEmail(), getPhone());
+        return Objects.hash(id);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

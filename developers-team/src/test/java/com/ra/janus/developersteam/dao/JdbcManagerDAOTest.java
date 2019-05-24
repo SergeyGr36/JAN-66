@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.ManagerDAO;
 import com.ra.janus.developersteam.entity.Manager;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.junit.jupiter.api.*;
@@ -11,281 +10,290 @@ import org.mockito.Mockito;
 
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class JdbcManagerDAOTest {
 
-    private static final String SELECT_ALL_SQL = "SELECT * FROM MANAGERS";
-    private static final String SELECT_BY_ID_SQL = "SELECT * FROM MANAGERS WHERE id = ?";
-    private static final String SELECT_BY_MANE_SQL = "SELECT * FROM MANAGERS WHERE NAME = ?";
-    private static final String INSERT_SQL = "INSERT INTO MANAGERS (name, email, phone) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE MANAGERS SET name=?,email=?,phone=? WHERE id=?";
-    private static final String DELETE_SQL = "DELETE FROM MANAGERS WHERE id=?";
+    private static final String INSERT_SQL = "INSERT INTO managers (name, email, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE managers SET name=?,email=?,phone=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM managers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM managers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM managers WHERE id=?";
 
-    private JdbcManagerDAO managerDAO;
-    private DataSource dataSource;
-    private Connection conn;
-    private PreparedStatement ps;
-    private ResultSet rs;
+    private DataSource mockDataSource;
+    private BaseDao<Manager> managerDAO;
+    private Connection mockConnection;
+    private PreparedStatement mockPreparedStatement;
+    private ResultSet mockResultSet;
 
     @BeforeEach
     public void before() throws Exception {
-
-        dataSource = Mockito.mock(DataSource.class);
-        managerDAO = new JdbcManagerDAO(dataSource);
-
-        conn = Mockito.mock(Connection.class);
-        Mockito.when(dataSource.getConnection()).thenReturn(conn);
-
-        ps = Mockito.mock(PreparedStatement.class);
-        rs = Mockito.mock(ResultSet.class);
-        Mockito.when(ps.executeQuery()).thenReturn(rs);
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenReturnNotEmptyList() throws Exception {
-
-        Mockito.when(conn.prepareStatement(SELECT_ALL_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(true).thenReturn(false);
-
-        List<Manager> managers = managerDAO.findAll();
-        assertFalse(managers.isEmpty());
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenReturnEmptyList() throws Exception {
-
-        Mockito.when(conn.prepareStatement(SELECT_ALL_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(false);
-
-        List<Manager> managers = managerDAO.findAll();
-        assertTrue(managers.isEmpty());
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenThrowConnException() throws Exception {
-
-        Mockito.when(dataSource.getConnection()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findAll();
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenThrowPSException() throws Exception {
-
-        Mockito.when(conn.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findAll();
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenThrowRSException() throws Exception {
-
-        Mockito.when(conn.prepareStatement(SELECT_ALL_SQL)).thenReturn(ps);
-        Mockito.when(ps.executeQuery()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findAll();
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    public void whenCallFindAllManagersThenThrowRSNextException() throws Exception {
-
-        Mockito.when(conn.prepareStatement(SELECT_ALL_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findAll();
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenReturnEntity() throws Exception {
-
-        String name = "test";
-        Mockito.when(conn.prepareStatement(SELECT_BY_MANE_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(rs.getString("name")).thenReturn(name);
-
-        Manager manager = managerDAO.findByName(name);
-
-        assertEquals(name, manager.getName());
-
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenReturnNull() throws Exception {
-
-        String name = "test";
-        Manager expectedManager = null;
-        Mockito.when(conn.prepareStatement(SELECT_BY_MANE_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(false);
-
-        Manager manager = managerDAO.findByName(name);
-
-        assertEquals(expectedManager, manager);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenThrowConnException() throws Exception {
-
-        String name = "test";
-        Mockito.when(dataSource.getConnection()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findByName(name);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenThrowPSException() throws Exception {
-
-        String name = "test";
-        Mockito.when(conn.prepareStatement(SELECT_BY_MANE_SQL)).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findByName(name);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenThrowRSException() throws Exception {
-
-        String name = "test";
-        Mockito.when(conn.prepareStatement(SELECT_BY_MANE_SQL)).thenReturn(ps);
-        Mockito.when(ps.executeQuery()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findByName(name);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByNameThenThrowRSNextException() throws Exception {
-
-        String name = "test";
-        Mockito.when(conn.prepareStatement(SELECT_BY_MANE_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findByName(name);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenReturnEntity() throws Exception {
-
-        Long id = 1L;
-        Mockito.when(conn.prepareStatement(SELECT_BY_ID_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(rs.getLong("id")).thenReturn(id);
-
-        Manager manager = managerDAO.findById(id);
-
-        assertEquals(id, manager.getId());
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenReturnNull() throws Exception {
-
-        Long id = 1L;
-        Manager expectedManager = null;
-        Mockito.when(conn.prepareStatement(SELECT_BY_ID_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenReturn(false);
-
-        Manager manager = managerDAO.findById(id);
-
-        assertEquals(expectedManager, manager);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenThrowConnException() throws Exception {
-
-        Long id = 1L;
-        Mockito.when(dataSource.getConnection()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findById(id);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenThrowPSException() throws Exception {
-
-        Long id = 1L;
-        Mockito.when(conn.prepareStatement(SELECT_BY_ID_SQL)).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findById(id);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenThrowRSException() throws Exception {
-
-        Long id = 1L;
-        Mockito.when(conn.prepareStatement(SELECT_BY_ID_SQL)).thenReturn(ps);
-        Mockito.when(ps.executeQuery()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findById(id);
-        assertThrows(DAOException.class, executable);
-
-    }
-
-    @Test
-    public void whenCallFindManagerByIdThenThrowRSNextException() throws Exception {
-
-        Long id = 1L;
-        Mockito.when(conn.prepareStatement(SELECT_BY_ID_SQL)).thenReturn(ps);
-        Mockito.when(rs.next()).thenThrow(new SQLException());
-
-        final Executable executable = () -> managerDAO.findById(id);
-        assertThrows(DAOException.class, executable);
-
+        mockDataSource = Mockito.mock(DataSource.class);
+        managerDAO = new JdbcManagerDAO(mockDataSource);
+
+        mockConnection = Mockito.mock(Connection.class);
+        Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
+
+        mockPreparedStatement = Mockito.mock(PreparedStatement.class);
+        mockResultSet = Mockito.mock(ResultSet.class);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
     @Test
     void whenCreateManagerShouldReturnManager() throws Exception {
+        //given
+        long testId = 1L;
+        int columnIdIndex = 1;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenReturn(true);
+        Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
-        Long id = 1L;
-        int index = 1;
-        Manager testManager = new Manager(id);
-        Mockito.when(conn.prepareStatement(INSERT_SQL, ps.RETURN_GENERATED_KEYS)).thenReturn(ps);
-        Mockito.when(ps.getGeneratedKeys()).thenReturn(rs);
-        Mockito.when(rs.next()).thenReturn(true);
-        Mockito.when(rs.getLong(index)).thenReturn(id);
-
+        //when
         Manager manager = managerDAO.create(testManager);
 
+        //then
         assertEquals(testManager, manager);
     }
 
     @Test
-    void whenCreateManagerIdWasNotGeneratedThrowException() throws Exception {
-        Long id = 1L;
-        Manager testManager = new Manager(id);
-        Mockito.when(conn.prepareStatement(INSERT_SQL, ps.RETURN_GENERATED_KEYS)).thenReturn(ps);
-        Mockito.when(ps.getGeneratedKeys()).thenReturn(rs);
-        Mockito.when(rs.next()).thenReturn(false);
+    void whenCreateManagerShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
+        //given
+        long testId = 1L;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenReturn(false);
 
+        //when
         final Executable executable = () -> managerDAO.create(testManager);
 
+        //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void updade() {
+    void whenCreateManagerShouldThrowException() throws Exception {
+        //given
+        long testId = 1L;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.create(testManager);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    //==============================
+
+    @Test
+    void whenGetManagerFromDbByIdThenReturnIt() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
+
+        //when
+        Manager manager = managerDAO.get(testId);
+
+        //then
+        assertEquals(testId, manager.getId());
     }
 
     @Test
-    void delete() {
+    void whenGetAbsentManagerFromDbByIdThenReturnNull() throws Exception {
+        //given
+        long testId = 1L;
+        Manager expectedManager = null;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(false);
+
+        //when
+        Manager manager = managerDAO.get(testId);
+
+        //then
+        assertEquals(expectedManager, manager);
+    }
+
+    @Test
+    void whenGetManagerFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.get(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenGetManagerFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.get(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenGetManagerFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.get(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    @Test
+    void whenGetManagerFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
+        //given
+        long testId = 1L;
+        final int testParametherIndex = 1;
+        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.get(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    //==============================
+
+    @Test
+    void whenGetAllManagersFromDbThenReturnNonEmptyList() throws Exception {
+        //given
+        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+
+        //when
+        List<Manager> list = managerDAO.getAll();
+
+        //then
+        assertFalse(list.isEmpty());
+    }
+
+    @Test
+    void whenGetAllManagersFromDbThenThrowException() throws Exception {
+        //given
+        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.getAll();
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    //==============================
+
+    @Test
+    void whenUpdateManagerInDbThenReturnTrue() throws Exception {
+        //given
+        long testId = 1L;
+        int testCount = 1;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean updated = managerDAO.update(testManager);
+
+        //then
+        assertEquals(true, updated);
+    }
+
+    @Test
+    void whenUpdateManagerInDbThenReturnFalse() throws Exception {
+        //given
+        long testId = 1L;
+        int testCount = 0;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean updated = managerDAO.update(testManager);
+
+        //then
+        assertEquals(false, updated);
+    }
+
+    @Test
+    void whenUpdateManagerInDbThenThrowException() throws Exception {
+        //given
+        long testId = 1L;
+        Manager testManager = new Manager(testId);
+        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.update(testManager);
+
+        //then
+        assertThrows(DAOException.class, executable);
+    }
+
+    //==============================
+
+    @Test
+    void whenDeleteManagerFromDbThenReturnTrue()throws Exception  {
+        //given
+        long testId = 1L;
+        int testCount = 1;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean deleted = managerDAO.delete(testId);
+
+        //then
+        assertEquals(true, deleted);
+    }
+
+    @Test
+    void whenDeleteManagerFromDbThenReturnFalse()throws Exception  {
+        //given
+        long testId = 1L;
+        int testCount = 0;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+
+        //when
+        boolean deleted = managerDAO.delete(testId);
+
+        //then
+        assertEquals(false, deleted);
+    }
+
+    @Test
+    void whenDeleteManagerFromDbThenThrowException()throws Exception  {
+        //given
+        long testId = 1L;
+        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
+
+        //when
+        final Executable executable = () -> managerDAO.delete(testId);
+
+        //then
+        assertThrows(DAOException.class, executable);
     }
 }
