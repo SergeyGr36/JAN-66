@@ -1,12 +1,7 @@
 package com.ra.janus.developersteam.datasources;
 
-import com.ra.janus.developersteam.exception.DataSourceException;
-import com.ra.janus.developersteam.utils.PropertyReader;
 import org.h2.jdbcx.JdbcDataSource;
-
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Properties;
 
 public enum H2DataSource implements IDataSource {
 
@@ -15,20 +10,14 @@ public enum H2DataSource implements IDataSource {
     private JdbcDataSource dataSource;
 
     @Override
-    public DataSource get() {
+    public DataSource get(final String url, final String user, final String pass) {
 
-        try {
-            if (dataSource == null) {
-                final Properties properties = PropertyReader.INSTANCE.getProperties("config.properties");
-                dataSource = new JdbcDataSource();
-                dataSource.setURL(properties.getProperty("db.url"));
-                dataSource.setUser(properties.getProperty("db.username"));
-                dataSource.setPassword(properties.getProperty("db.password"));
-            }
-        } catch (IOException ex) {
-            throw new DataSourceException(ex);
+        if (dataSource == null) {
+            dataSource = new JdbcDataSource();
+            dataSource.setURL(url);
+            dataSource.setUser(user);
+            dataSource.setPassword(pass);
         }
-
         return dataSource;
     }
 }
