@@ -11,7 +11,7 @@ import java.util.Properties;
  * PropertyReader is Singleton
  *
  * Can work with many property files. implemented as HashMap where key is
- * properties file name. default properties file is "application.properties"
+ * properties file name. default properties file is "config.properties"
  *
  */
 public enum PropertyReader {
@@ -21,7 +21,7 @@ public enum PropertyReader {
     private Map<String, Properties> propMap;
 
     public Properties getProperties() throws IOException {
-        return getProperties("application.properties");
+        return getProperties("config.properties");
     }
 
     public Properties getProperties(final String propertiesFile) throws IOException {
