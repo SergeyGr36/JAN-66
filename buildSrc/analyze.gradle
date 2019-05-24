@@ -2,12 +2,29 @@ apply plugin: 'java'
 apply plugin: 'pmd'
 apply plugin: 'jdepend'
 apply plugin: 'jacoco'
+apply plugin: 'com.github.spotbugs'
+
+jacoco {
+    toolVersion = '0.8.4'
+}
+
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = 'max'
+    reportLevel = 'high'
+}
 
 pmd {
     toolVersion = "6.14.0"
     consoleOutput = true
     sourceSets = [sourceSets.main]
     ruleSetFiles = rootProject.files('buildSrc/pmd/pmd_checks.xml')
+}
+
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = "max"
+    reportLevel = "high"
 }
 
 jdepend {
@@ -21,6 +38,14 @@ jacocoTestReport {
         csv.enabled = false
         html.destination file("${buildDir}/jacocoHtml")
     }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(
+                    dir: it,
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/utils/**', '**/datasources/**', '**/configuration/**']
+            )
+        })
+    }
 }
 
 jacocoTestCoverageVerification {
@@ -28,7 +53,7 @@ jacocoTestCoverageVerification {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exceptions/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/utils/**', '**/datasources/**', '**/configuration/**']
             )
         })
     }
