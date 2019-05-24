@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,76 +16,125 @@ import com.ra.janus.developersteam.interfaces.IBaseDAO;
 
 public class DeveloperDao implements IBaseDAO<Developer> {
 
-    private static final String SELECT_ALL_SQL = "SELECT * FROM DEVELOPER";
-    private static final String UPDATE_SQL = "UPDATE DEVELOPER SET NAME = ? WHERE ID = ?";
-    private static final String DELETE_SQL = "DELETE FROM DEVELOPER WHERE ID = ?";
-    
-    private final DataSource dataSource;
+	private static final String SELECT_ALL_SQL = "SELECT * FROM DEVELOPER";
+	private static final String UPDATE_SQL = "UPDATE DEVELOPER SET NAME = ? WHERE ID = ?";
+	private static final String DELETE_SQL = "DELETE FROM DEVELOPER WHERE ID = ?";
+	private static final String SELECT_ONE_SQL = "SELECT * FROM DEVELOPER WHERE ID = ?";
+	private static final String INSERT_SQL = "INSERT INTO DEVELOPER (ID, NAME) VALUES (?, ?)";
 
-    public DeveloperDao(DataSource dataSource) {
+	private final DataSource dataSource;
 
-    	this.dataSource = dataSource;
-    }
-    
+	public DeveloperDao(DataSource dataSource) {
+
+		this.dataSource = dataSource;
+	}
+
 	@Override
 	public List<Developer> getAll() {
 
+		final List<Developer> developers = new ArrayList<>();
+
 		try {
-			   Connection conn = dataSource.getConnection();
-               PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
-               ResultSet rs = ps.executeQuery();
+			Connection conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
+			ResultSet rs = ps.executeQuery();
 
-               final List<Developer> developers = new ArrayList<>();
-               while (rs.next()) {
-            	   //developers.add(toWork(rs));
-               }
+			while (rs.next()) {
 
-               return developers;
-           } catch (SQLException e) {
+				developers.add(new Developer(rs.getLong("ID"), rs.getString("NAME")));
+			}
 
-        	   throw new DAOException(e);
-           }
+		} catch (SQLException e) {
+
+			throw new DAOException(e);
+		}
+
+		return developers;
 	}
 
 	@Override
 	public Developer getById(long id) {
-		// TODO Auto-generated method stub
-		return null;
+
+		Developer result;
+
+		try (Connection conn = dataSource.getConnection();
+				PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
+
+			ps.setLong(1, id);
+
+			try (ResultSet rs = ps.executeQuery()) {
+
+				result = rs.next() ? new Developer(rs.getLong("ID"), rs.getNString("NAME")) : null;
+			}
+		} catch (SQLException e) {
+
+			throw new DAOException(e);
+		}
+
+		return result;
 	}
 
 	@Override
 	public boolean update(Developer entity) {
 
 		try {
-        	  Connection conn = dataSource.getConnection();
-              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
-              prepareStatement(ps, entity);
 
-               return ps.executeUpdate() != 0;
-           } catch (SQLException e) {
+			Connection conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
+			ps.setString(1, entity.getDeveloperName());
+			ps.setLong(2, entity.getId());
 
-        	   throw new DAOException(e);
-           }
-        }
+			return ps.executeUpdate() != 0;
+		} catch (SQLException e) {
+
+			throw new DAOException(e);
+		}
+	}
 
 	@Override
 	public boolean delete(long id) {
 
 		try {
-                Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
-                ps.setLong(1, id);
 
-            return ps.executeUpdate() != 0;
-        } catch (SQLException e) {
+			Connection conn = dataSource.getConnection();
+			PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
+			ps.setLong(1, id);
 
-        	throw new DAOException(e);
-        }
-    }
+			return ps.executeUpdate() != 0;
+		} catch (SQLException e) {
+
+			throw new DAOException(e);
+		}
+	}
 
 	@Override
-	public boolean create(Developer entity) {
-		// TODO Auto-generated method stub
-		return false;
+	public Developer save(Developer entity) {
+
+		Developer result;
+
+		try (Connection conn = dataSource.getConnection();
+				PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+
+			ps.setLong(1, entity.getId());
+			ps.setString(2, entity.getDeveloperName());
+
+			ps.executeUpdate();
+
+			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+
+				if (generatedKeys.next()) {
+
+					result = new Developer(generatedKeys.getLong(1), entity.getDeveloperName());
+				} else {
+
+					throw new DAOException("Could not create a Developer");
+				}
+			}
+		} catch (SQLException e) {
+
+			throw new DAOException(e);
+		}
+
+		return result;
 	}
 }
