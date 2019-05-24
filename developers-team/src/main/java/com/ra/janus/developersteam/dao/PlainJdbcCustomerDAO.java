@@ -39,7 +39,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             prepareStatement(ps, customer);
             ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys(); generatedKeys) {
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
                     return new Customer(id, customer);
