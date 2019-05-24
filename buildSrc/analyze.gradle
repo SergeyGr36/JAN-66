@@ -21,6 +21,12 @@ pmd {
     ruleSetFiles = rootProject.files('buildSrc/pmd/pmd_checks.xml')
 }
 
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = "max"
+    reportLevel = "high"
+}
+
 jdepend {
     toolVersion = "2.9.1"
     sourceSets = [sourceSets.main]
@@ -36,7 +42,7 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/utils/**', '**/datasources/**', '**/configuration/**']
             )
         })
     }
@@ -47,7 +53,7 @@ jacocoTestCoverageVerification {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/utils/**', '**/datasources/**', '**/configuration/**']
             )
         })
     }
