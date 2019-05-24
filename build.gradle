@@ -54,5 +54,7 @@ wrapper {
 project(':developers-team') {
     dependencies {
         compile db.h2
+        compile hibernate.hikari
+
     }
 }
