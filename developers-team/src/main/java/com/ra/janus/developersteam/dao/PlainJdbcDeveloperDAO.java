@@ -10,11 +10,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.ra.janus.developersteam.dao.interfaces.DeveloperDAO;
 import com.ra.janus.developersteam.entity.Developer;
 import com.ra.janus.developersteam.exception.DAOException;
-import com.ra.janus.developersteam.interfaces.IBaseDAO;
 
-public class DeveloperDao implements IBaseDAO<Developer> {
+public class PlainJdbcDeveloperDAO implements DeveloperDAO<Developer> {
 
 	private static final String SELECT_ALL_SQL = "SELECT * FROM DEVELOPER";
 	private static final String UPDATE_SQL = "UPDATE DEVELOPER SET NAME = ? WHERE ID = ?";
@@ -24,7 +24,7 @@ public class DeveloperDao implements IBaseDAO<Developer> {
 
 	private final DataSource dataSource;
 
-	public DeveloperDao(DataSource dataSource) {
+	public PlainJdbcDeveloperDAO(DataSource dataSource) {
 
 		this.dataSource = dataSource;
 	}

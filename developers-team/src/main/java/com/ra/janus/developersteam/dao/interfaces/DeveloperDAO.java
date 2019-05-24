@@ -1,10 +1,10 @@
-package com.ra.janus.developersteam.interfaces;
+package com.ra.janus.developersteam.dao.interfaces;
 
 import java.util.List;
 
 import com.ra.janus.developersteam.entity.Developer;
 
-public interface IDeveloperDAO<T extends Developer> {
+public interface DeveloperDAO<T extends Developer> {
 
 	List<T> getAll();
 
@@ -14,5 +14,5 @@ public interface IDeveloperDAO<T extends Developer> {
 
 	boolean delete(long id);
 
-	boolean save(T entity);
+	T save(T entity);
 }
