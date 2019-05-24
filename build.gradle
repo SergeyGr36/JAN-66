@@ -50,6 +50,7 @@ project(':train-tickets') {
         compile db.h2
         compile hibernate.hikari
         compile log.slf4jSimple
+        testCompile testing.mockito
     }
 }
 

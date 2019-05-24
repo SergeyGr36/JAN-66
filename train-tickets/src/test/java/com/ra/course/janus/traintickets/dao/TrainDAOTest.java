@@ -4,6 +4,7 @@ import com.ra.course.janus.traintickets.entity.Train;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 
@@ -13,8 +14,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TrainDAOTest {
+
+    private final String INSERT_TRAIN = "INSERT into TRAINS (id, name, quantity_plases, free_plases) values (?, ?, ?, ?)";
+    private final String SELECT_TRAIN_ID = "SELECT * FROM TRAINS WHERE id = ?";
+    private final String UPDATE_TRAIN = "UPDATE TRAINS SET name = ?, quantity_plases = ?, free_plases = ? WHERE id = ?";
+    private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
+    private final String SELECT_TRAIN_ALL = "SELECT * FROM TRAINS";
 
     private static final Long TRAIN_ID = 15L;
     private static final String TRAIN_NAME = "test_train";
@@ -24,6 +33,8 @@ class TrainDAOTest {
             DataSourceFactory.H2_IN_MEMORY.getDataSource();
 
     private Train train;
+    private TrainDAO trainDAO;
+    private DataSource mokeDataSourse;
 
     @BeforeAll
     public static void setupH2Schema() {
@@ -37,6 +48,8 @@ class TrainDAOTest {
 
     @BeforeEach
     public void setup(){
+        mokeDataSourse = mock(DataSource.class);
+        trainDAO = new TrainDAO(mokeDataSourse);
         train = new Train();
         train.setId(TRAIN_ID);
         train.setName(TRAIN_NAME);
@@ -60,11 +73,14 @@ class TrainDAOTest {
         TrainDAO trainDAO = new TrainDAO(DATA_SOURCE);
         trainDAO.update(5L,train);
         ResultSet rs;
-//        try(Connection connection = DATA_SOURCE.getConnection()) {
-//            Statement statement = connection.createStatement();
-//            rs = statement.
-//                    executeQuery("UPDATE TRAINS SET ID LONG[*] ");
-//           // TODO...
-//        }
     }
+
+    @Test
+   public void blDbTest() throws Exception{
+        var connection = mock(Connection.class);
+        when(mokeDataSourse.getConnection()).thenReturn(connection);
+
+
+    }
+
 }
