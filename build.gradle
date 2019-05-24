@@ -38,6 +38,7 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
+        testCompile testing.mockito
     }
 }
 
@@ -48,8 +49,8 @@ wrapper {
 project(':developers-team') {
     dependencies {
         compile db.h2
-        testCompile testing.mockito
-        testCompile testing.hamcrestCore
+        compile hibernate.hikari
+
 
 
     }
