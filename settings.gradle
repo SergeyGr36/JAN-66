@@ -1,4 +1,4 @@
 rootProject.name = 'janus'
 include 'train-tickets'
-
+include 'train-tickets-integration-tests'
 

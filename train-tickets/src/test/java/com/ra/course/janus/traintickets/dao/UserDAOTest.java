@@ -1,10 +1,8 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.User;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 
@@ -12,13 +10,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,21 +38,20 @@ class UserDAOTest {
     private static final String USER_PASSWORD = "password";
     private static final User TEST_USER = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
 
-    User user;
-    UserDAO userDAO;
-    DataSource mockDataSource;
-    Connection conn;
-    PreparedStatement ps;
-    ResultSet rs;
+    private User user;
+    private UserDAO userDAO;
+    private Connection mockConn;
+    private PreparedStatement mockPrepSt;
+    private ResultSet mockResSet;
 
     @BeforeEach
     void setUp() throws SQLException {
-        mockDataSource = mock(DataSource.class);
+        final DataSource mockDataSource = mock(DataSource.class);
         userDAO = new UserDAO(mockDataSource);
-        conn = mock(Connection.class);
-        ps = mock(PreparedStatement.class);
-        rs = mock(ResultSet.class);
-        when(mockDataSource.getConnection()).thenReturn(conn);
+        mockConn = mock(Connection.class);
+        mockPrepSt = mock(PreparedStatement.class);
+        mockResSet = mock(ResultSet.class);
+        when(mockDataSource.getConnection()).thenReturn(mockConn);
     }
 
 
@@ -64,18 +63,18 @@ class UserDAOTest {
     // 6 Throws in resource specification (the with part, e.g. constructor call)
     // 7 Throws in try block but AutoCloseable is null
 
-    // testSave()-------------
+    // Test save-------------------------------------------------------
 
     // 1
     @Test
-    void saveHappyPathNonNullConn() throws SQLException {
-        when(conn.prepareStatement(SAVE_USER)).thenReturn(ps);
-        when(ps.getGeneratedKeys()).thenReturn(rs);
-        when(rs.next()).thenReturn(true);
-        when(rs.getLong("id")).thenReturn(USER_ID);
+    void saveUserHappyPath() throws SQLException {
+        when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        when(mockResSet.getLong("id")).thenReturn(USER_ID);
         user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
         user = userDAO.save(user);
-        assertTrue(TEST_USER != user);
+        assertNotSame(TEST_USER, user);
         assertEquals(TEST_USER, user);
     }
 
@@ -84,77 +83,189 @@ class UserDAOTest {
 
     // 3
     @Test
-    void saveThrowsOnExecute() throws SQLException {
+    void saveUserThrowsOnExecute() throws SQLException {
         user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        when(conn.prepareStatement(SAVE_USER)).thenReturn(ps);
-        when(ps.executeUpdate()).thenThrow(SQLException.class);
+        when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
         assertThrows(RuntimeException.class, () -> userDAO.save(user));
     }
 
     // 4
     @Test
-    void saveThrowsOnClose() throws SQLException {
-        when(conn.prepareStatement(SAVE_USER)).thenReturn(ps);
-        when(ps.getGeneratedKeys()).thenReturn(rs);
-        when(rs.next()).thenReturn(true);
-        when(rs.getLong("id")).thenReturn(USER_ID);
+    void saveUserThrowsOnClose() throws SQLException {
+        when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        when(mockResSet.getLong("id")).thenReturn(USER_ID);
         user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        doThrow(new SQLException()).when(conn).close();
+        doThrow(new SQLException()).when(mockConn).close();
         assertThrows(RuntimeException.class, () -> userDAO.save(user));
-
     }
 
     // 5
     @Test
-    void saveThrowsOnExecuteAndClose() throws SQLException {
+    void saveUserThrowsOnExecuteAndClose() throws SQLException {
         user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        when(conn.prepareStatement(SAVE_USER)).thenReturn(ps);
-        when(ps.executeUpdate()).thenThrow(SQLException.class);
-        doThrow(new SQLException()).when(conn).close();
+        when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
         assertThrows(RuntimeException.class, () -> userDAO.save(user));
     }
 
     @Test
     void saveUserFailToGenerateKey() throws SQLException {
         user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        when(conn.prepareStatement(SAVE_USER)).thenReturn(ps);
-        when(ps.getGeneratedKeys()).thenReturn(rs);
-        when(rs.next()).thenReturn(false);
-        assertNull(userDAO.save(user));
+        when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(false);
+        assertThrows(RuntimeException.class, () -> userDAO.save(user));
+    }
+
+    // Test update-----------------------------------------------------
+
+    @Test
+    void updateUserHappyPath() throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeUpdate()).thenReturn(1);
+        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        assertTrue(userDAO.update(USER_ID, user));
     }
 
     @Test
-    void saveNullUserThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.save(null));
-    }
-
-    // testUpdate--------------
-    @Test
-    void update() {
-    }
-    @Test
-    void updateNullUserThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.update(anyLong(), null));
-    }
-
-    // testUpdate--------------
-//    @Test
-//    void update() {
-//        assertTrue(userDAO.update(anyLong(), user));
-//    }
-
-    @Test
-    void delete() {
-        assertTrue(userDAO.delete(anyLong()));
+    void updateUserNotFound() throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeUpdate()).thenReturn(0);
+        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        assertFalse(userDAO.update(USER_ID, user));
     }
 
     @Test
-    void findById() {
-        assertNotNull(userDAO.findById(anyLong()));
+    void updateUserThrowsOnExecute() throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        assertThrows(RuntimeException.class, () -> userDAO.update(USER_ID, user));
     }
 
     @Test
-    void findAll() {
-        assertNotNull(userDAO.findAll());
+    void updateUserThrowsOnClose() throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockConn).close();
+        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        assertThrows(RuntimeException.class, () -> userDAO.update(USER_ID, user));
+    }
+
+
+    @Test
+    void updateUserThrowsOnExecuteAndClose() throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
+        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        assertThrows(RuntimeException.class, () -> userDAO.update(USER_ID, user));
+    }
+
+    // Test delete-----------------------------------------------------
+
+    @Test
+    void deleteUserHappyPath() throws SQLException {
+        when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeUpdate()).thenReturn(1);
+        assertTrue(userDAO.delete(USER_ID));
+    }
+
+    @Test
+    void deleteUserNotFound() throws SQLException {
+        when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeUpdate()).thenReturn(0);
+        assertFalse(userDAO.delete(USER_ID));
+    }
+
+
+    @Test
+    void deleteUserThrowsOnExecute() throws SQLException {
+        when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        assertThrows(RuntimeException.class, () -> userDAO.delete(USER_ID));
+    }
+
+    @Test
+    void deleteUserThrowsOnExecuteAndClose() throws SQLException {
+        when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> userDAO.delete(USER_ID));
+    }
+
+    // Test findById-------------------------------------------------------
+
+    @Test
+    void findUserByIdHappyPath() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        mockMapUser(mockResSet);
+        user = userDAO.findById(USER_ID);
+        assertEquals(TEST_USER, user);
+    }
+
+    @Test
+    void findUserByIdNotFoundReturnNull() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(false);
+        mockMapUser(mockResSet);
+        user = userDAO.findById(USER_ID);
+        assertNull(user);
+    }
+
+    @Test
+    void findUserByIdHappyPathThrowsOnResSetClose() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        mockMapUser(mockResSet);
+        doThrow(new SQLException()).when(mockResSet).close();
+        assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
+    }
+
+    @Test
+    void findUserByIdThrowsOnExecute() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
+    }
+
+    @Test
+    void findUserByIdHappyPathThrowsOnConnClose() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        mockMapUser(mockResSet);
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
+    }
+
+    // Test findAll----------------------------------------------------
+
+    @Test
+    void findAllHappyPath() throws SQLException {
+        when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true).thenReturn(false);
+        when(mockResSet.getLong("id")).thenReturn(USER_ID);
+        when(mockResSet.getString("name")).thenReturn(USER_NAME);
+        when(mockResSet.getString("email")).thenReturn(USER_EMAIL);
+        when(mockResSet.getString("password")).thenReturn(USER_PASSWORD);
+        List<User> users = userDAO.findAll();
+        assertTrue(users.size() == 1);
+        assertTrue(users.contains(TEST_USER));
+    }
+
+    private void mockMapUser(ResultSet mockRS) throws SQLException {
+        when(mockRS.getLong("id")).thenReturn(USER_ID);
+        when(mockRS.getString("name")).thenReturn(USER_NAME);
+        when(mockRS.getString("email")).thenReturn(USER_EMAIL);
+        when(mockRS.getString("password")).thenReturn(USER_PASSWORD);
     }
 }
