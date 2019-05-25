@@ -27,7 +27,7 @@ public enum FilesContentReader {
 
     private Map<String, List<FileContent>> contentMap;
 
-    public List<String> getContent(final String directoryName, String... fileNames) throws IOException {
+    public List<String> getContent(final String directoryName, String... fileNames) {
         if (contentMap == null) {
             contentMap = new Hashtable<>();
         }
