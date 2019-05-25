@@ -1,4 +1,4 @@
-ext.springBootVersion = '2.1.4.RELEASE'
+ ext.springBootVersion = '2.1.4.RELEASE'
 
 ext.extDependencies = {
     classpath("io.spring.gradle:dependency-management-plugin:1.0.6.RELEASE")

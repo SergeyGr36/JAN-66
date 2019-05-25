@@ -1,8 +1,11 @@
 package com.ra.hotel.dao;
 
+import com.ra.hotel.configuration.H2ConnectionUtils;
 import com.ra.hotel.entity.Client;
 import com.ra.hotel.entity.enums.Query;
 import com.ra.hotel.exception.DaoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -12,7 +15,7 @@ import java.util.List;
 public class ClientDao implements GenericDao<Client> {
 
     private final transient DataSource dataSource;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionUtils.class);
 
     public ClientDao(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -31,6 +34,7 @@ public class ClientDao implements GenericDao<Client> {
             }
             return client;
         } catch (SQLException e) {
+            LOGGER.info(e.getMessage());
             throw new DaoException(e.getMessage(), e);
         }
     }
@@ -44,6 +48,7 @@ public class ClientDao implements GenericDao<Client> {
             ps.executeUpdate();
             return findById(client.getId());
         } catch (SQLException e) {
+            LOGGER.info(e.getMessage());
             throw new DaoException(e.getMessage(), e);
         }
     }
@@ -55,6 +60,7 @@ public class ClientDao implements GenericDao<Client> {
             ps.setLong(1, id);
             return ps.executeUpdate();
         } catch (SQLException e) {
+            LOGGER.info(e.getMessage());
             throw new DaoException(e.getMessage(), e);
         }
     }
@@ -71,7 +77,8 @@ public class ClientDao implements GenericDao<Client> {
             }
             return client;
         } catch (final SQLException e) {
-            throw new DaoException(e.getMessage() ,e);
+            LOGGER.info(e.getMessage());
+            throw new DaoException(e.getMessage(), e);
         }
     }
 
@@ -87,6 +94,7 @@ public class ClientDao implements GenericDao<Client> {
             }
             return clientList;
         } catch (SQLException e) {
+            LOGGER.info(e.getMessage());
             throw new DaoException(e.getMessage(), e);
         }
     }

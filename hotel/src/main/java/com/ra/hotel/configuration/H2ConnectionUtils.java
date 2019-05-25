@@ -1,7 +1,9 @@
 package com.ra.hotel.configuration;
 
-import com.ra.hotel.exception.DaoException;
-import org.h2.jdbcx.JdbcDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -15,6 +17,8 @@ import java.util.Scanner;
 public final class H2ConnectionUtils {
 
     private final static Properties PROPS = new Properties();
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionUtils.class);
+
 
     static {
         try {
@@ -27,7 +31,7 @@ public final class H2ConnectionUtils {
                 throw new MissingResourceException("database.properties not found", H2ConnectionUtils.class.getName(), "");
             }
         } catch (IOException e) {
-            new DaoException(e.getMessage(),e);
+            LOGGER.info(e.getMessage());
         }
     }
 
@@ -35,19 +39,24 @@ public final class H2ConnectionUtils {
     }
 
     public static DataSource getDefaultDataSource() {
-        final JdbcDataSource jdbcDataSource = new JdbcDataSource();
-        jdbcDataSource.setUrl(PROPS.getProperty("database.url"));
-        jdbcDataSource.setUser(PROPS.getProperty("database.username"));
-        jdbcDataSource.setPassword(PROPS.getProperty("database.password"));
-        initDatabase(jdbcDataSource);
-        return jdbcDataSource;
+        final HikariDataSource hikariDataSource;
+        final HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(PROPS.getProperty("database.url"));
+        config.setUsername(PROPS.getProperty("database.username"));
+        config.setPassword(PROPS.getProperty("database.password"));
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "150");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "1000");
+        hikariDataSource = new HikariDataSource(config);
+        initDatabase(hikariDataSource);
+        return hikariDataSource;
     }
 
-    public static void initDatabase(final JdbcDataSource dataSource) {
+    public static void initDatabase(final HikariDataSource dataSource) {
         try (Connection connection = dataSource.getConnection();) {
             connection.createStatement().execute(new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("sql/Client.sql")).useDelimiter("\\Z").next());
         } catch (SQLException e) {
-            throw new DaoException(e.getMessage(), e);
+            LOGGER.info(e.getMessage());
         }
     }
 }

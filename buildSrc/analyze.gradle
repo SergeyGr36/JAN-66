@@ -12,6 +12,7 @@ spotbugs {
     toolVersion = '3.1.12'
     effort = 'max'
     reportLevel = 'high'
+   
 }
 
 pmd {
@@ -94,6 +95,7 @@ jacocoTestCoverageVerification {
 test {
     useJUnitPlatform()
 }
+
 
 check.dependsOn jacocoTestCoverageVerification
 test.finalizedBy jacocoTestReport
