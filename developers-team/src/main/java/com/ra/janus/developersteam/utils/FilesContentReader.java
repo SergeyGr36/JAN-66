@@ -68,9 +68,22 @@ public enum FilesContentReader {
     }
 
     private Path getDirectoryPath(final String dirName) {
-        final Path path = Paths.get("/" + dirName);
-        validatePath(path);
-        return path;
+        //URL url = Thread.currentThread().getContextClassLoader().getResource("/" + dirName);
+        URL url = getClass().getClassLoader().getResource("/" + dirName);
+        if (url == null) {
+            final IllegalStateException e = new IllegalStateException("The directory does not exist: " + dirName);
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw e;
+        }
+
+        try {
+            Path path = Paths.get(url.toURI());
+            validatePath(path);
+            return path;
+        } catch (URISyntaxException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new IllegalStateException("An URI Syntax error occurred.");
+        }
     }
 
     private void validatePath(final Path path) {
