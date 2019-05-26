@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -237,6 +238,14 @@ class UserDAOTest {
     }
 
     @Test
+    void findUserByIdThrowsOnExecuteAndConnClose() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
+    }
+
+    @Test
     void findUserByIdHappyPathThrowsOnConnClose() throws SQLException {
         when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
@@ -246,6 +255,28 @@ class UserDAOTest {
         assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
     }
 
+    @Test
+    void findUserByIdHappyPathThrowsOnResSetAndConnClose() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        mockMapUser(mockResSet);
+        doThrow(new SQLException()).when(mockResSet).close();
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> userDAO.findById(USER_ID));
+    }
+
+    @Test
+    void findUserByIdHappyPathConnNull() throws SQLException {
+        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        mockMapUser(mockResSet);
+        when(mockResSet.next()).thenReturn(true);
+        user = userDAO.findById(USER_ID);
+
+    }
+
     // Test findAll----------------------------------------------------
 
     @Test
@@ -253,10 +284,7 @@ class UserDAOTest {
         when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
         when(mockResSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResSet.getLong("id")).thenReturn(USER_ID);
-        when(mockResSet.getString("name")).thenReturn(USER_NAME);
-        when(mockResSet.getString("email")).thenReturn(USER_EMAIL);
-        when(mockResSet.getString("password")).thenReturn(USER_PASSWORD);
+        mockMapUser(mockResSet);
         List<User> users = userDAO.findAll();
         assertTrue(users.size() == 1);
         assertTrue(users.contains(TEST_USER));
