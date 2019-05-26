@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,14 +68,9 @@ public enum FilesContentReader {
     }
 
     private Path getDirectoryPath(final String dirName) {
-        try {
-            final Path path = Paths.get(ClassLoader.getSystemResource(dirName).toURI());
-            validatePath(path);
-            return path;
-        } catch (URISyntaxException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new IllegalStateException("A syntax URI rule violation occurred!", e);
-        }
+        final Path path = Paths.get("/" + dirName);
+        validatePath(path);
+        return path;
     }
 
     private void validatePath(final Path path) {

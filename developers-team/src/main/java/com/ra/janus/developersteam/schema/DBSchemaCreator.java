@@ -45,15 +45,18 @@ public enum DBSchemaCreator {
         }
     }
 
-    public void createSchema(final Connection connection, String... fileNames) {
+    public int createSchema(final Connection connection, String... fileNames) {
         this.connection = connection;
         final String[] dirNames = scriptsDirs.split(";");
+        int processed = 0;
         for (String  dirName:dirNames) {
             List<String> list = FilesContentReader.INSTANCE.getContent(dirName, fileNames);
+            processed += list.size();
             for (String script:list) {
                 processScript(script);
             }
         }
+        return processed;
     }
 
     private void processScript(final String script) {
