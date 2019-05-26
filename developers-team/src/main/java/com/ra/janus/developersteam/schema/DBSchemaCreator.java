@@ -25,7 +25,8 @@ public enum DBSchemaCreator {
     INSTANCE;
 
     private static final String EXCEPTION_WARN = "An exception occurred!";
-    private static final String DEFAULT_DIRS = "sql_schema_scripts";
+    public static final String PROP_KEY = "db.sql_schema_scripts_directories";
+    public static final String DEFAULT_DIRS = "sql_schema_scripts";
     private static final Logger LOGGER = LoggerFactory.getLogger(DBSchemaCreator.class);
 
     transient private String scriptsDirs;
@@ -39,7 +40,7 @@ public enum DBSchemaCreator {
             throw new IllegalStateException("Could not read the application properties file.", e);
         }
 
-        scriptsDirs = properties.getProperty("db.sql_schema_scripts_directories");
+        scriptsDirs = properties.getProperty(PROP_KEY);
         if (scriptsDirs == null) {
             scriptsDirs = DEFAULT_DIRS;
         }
