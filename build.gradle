@@ -57,3 +57,8 @@ project(':developers-team') {
         compile hibernate.hikari
     }
 }
+project(':developers-team-integration-tests') {
+    dependencies {
+        compile project(':developers-team')
+    }
+}
