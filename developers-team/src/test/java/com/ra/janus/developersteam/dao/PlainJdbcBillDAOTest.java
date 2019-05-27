@@ -102,7 +102,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
 
         //when
-        Bill bill = billDAO.read(testId);
+        Bill bill = billDAO.get(testId);
 
         //then
         assertEquals(testId, bill.getId());
@@ -117,7 +117,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Bill bill = billDAO.read(testId);
+        Bill bill = billDAO.get(testId);
 
         //then
         assertEquals(expectedBill, bill);
@@ -130,7 +130,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.read(testId);
+        final Executable executable = () -> billDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -143,7 +143,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.read(testId);
+        final Executable executable = () -> billDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -157,7 +157,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.read(testId);
+        final Executable executable = () -> billDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -172,7 +172,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.read(testId);
+        final Executable executable = () -> billDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -187,7 +187,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
-        List<Bill> list = billDAO.readAll();
+        List<Bill> list = billDAO.getAll();
 
         //then
         assertFalse(list.isEmpty());
@@ -199,7 +199,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.readAll();
+        final Executable executable = () -> billDAO.getAll();
 
         //then
         assertThrows(DAOException.class, executable);

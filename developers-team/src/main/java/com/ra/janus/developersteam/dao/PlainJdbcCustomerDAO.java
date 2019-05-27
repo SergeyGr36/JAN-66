@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.CustomerDAO;
 import com.ra.janus.developersteam.entity.Customer;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
@@ -15,7 +14,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlainJdbcCustomerDAO implements CustomerDAO {
+public class PlainJdbcCustomerDAO implements BaseDao<Customer> {
     private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE customers SET name=?,address=?,phone=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM customers";
@@ -54,7 +53,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     @Override
-    public Customer read(final long id) {
+    public Customer get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -76,7 +75,7 @@ public class PlainJdbcCustomerDAO implements CustomerDAO {
     }
 
     @Override
-    public List<Customer> readAll() {
+    public List<Customer> getAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {

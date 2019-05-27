@@ -50,7 +50,6 @@ class DBSchemaCreatorTest {
     @Test
     void whenCreateSchemaForAllFilesShouldThrowException() throws Exception {
         //given
-        int notExpected = 0;
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenThrow(new SQLException());
 
         //when
@@ -60,70 +59,6 @@ class DBSchemaCreatorTest {
         assertThrows(IllegalStateException.class, executable);
     }
 
-    @Test
-    void whenCreateSchemaUsingExistingFileShouldCreateSchema() throws Exception {
-        //given
-        int notExpected = 0;
-        Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenReturn(1);
-
-        //when
-        int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(mockConnection, "CREATE_TABLE_customer.sql");
-
-        //then
-        assertNotEquals(notExpected, scriptsProcessed);
-    }
-
-    @Test
-    @Disabled
-    void whenCreateSchemaUsingNonExistingFileShouldThrowException() throws Exception {
-        //when
-        final Executable executable = () ->  DBSchemaCreator.INSTANCE.createSchema(mockConnection, "NonExistingFile");
-
-        //then
-        assertThrows(IllegalStateException.class, executable);
-    }
-
-    @Test
-    @Disabled
-    void whenCreateSchemaUsingNonExistingDirectoryShouldThrowException() throws Exception {
-        //given
-        Properties properties = PropertyReader.INSTANCE.getProperties();
-        String oldValue = properties.getProperty(DBSchemaCreator.PROP_KEY);
-        properties.setProperty(DBSchemaCreator.PROP_KEY, "NonExistingDirectory");
-
-        //when
-        final Executable executable = () ->  DBSchemaCreator.INSTANCE.createSchema(mockConnection);
-
-        //then
-        assertThrows(IllegalStateException.class, executable);
-
-        if (oldValue == null) {
-            properties.remove(DBSchemaCreator.PROP_KEY);
-        } else {
-            properties.setProperty(DBSchemaCreator.PROP_KEY, oldValue);
-        }
-    }
-
-    @Test
-    @Disabled
-    void whenCreateSchemaUsingFileInsteadOfdirectoryShouldThrowException() throws Exception {
-        //given
-        Properties properties = PropertyReader.INSTANCE.getProperties();
-        String oldValue = properties.getProperty(DBSchemaCreator.PROP_KEY);
-        properties.setProperty(DBSchemaCreator.PROP_KEY, "config.properties");
-
-        //when
-        final Executable executable = () -> DBSchemaCreator.INSTANCE.createSchema(mockConnection);
-
-        //then
-        assertThrows(IllegalStateException.class, executable);
-
-        if (oldValue == null) {
-            properties.remove(DBSchemaCreator.PROP_KEY);
-        } else {
-            properties.setProperty(DBSchemaCreator.PROP_KEY, oldValue);
-        }
-    }
 
     @Test
     void integrationTest() throws Exception{
@@ -135,11 +70,11 @@ class DBSchemaCreatorTest {
         //when
         int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(connection);
 
-        DatabaseMetaData md = connection.getMetaData();
-        ResultSet rs = md.getTables(null, null, "%", null);
-        while (rs.next()) {
-            System.out.println(rs.getString(3));
-        }
+//        DatabaseMetaData md = connection.getMetaData();
+//        ResultSet rs = md.getTables(null, null, "%", null);
+//        while (rs.next()) {
+//            System.out.println(rs.getString(3));
+//        }
 
         //then
         assertNotEquals(notExpected, scriptsProcessed);

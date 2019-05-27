@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.TechnicalTaskDAO;
 import com.ra.janus.developersteam.entity.TechnicalTask;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
+public class PlainJdbcTechnicalTaskDAO implements BaseDao<TechnicalTask> {
     private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE tasks SET title=?,description=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM tasks";
@@ -48,7 +47,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public TechnicalTask read(final long id) {
+    public TechnicalTask get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -70,7 +69,7 @@ public class PlainJdbcTechnicalTaskDAO implements TechnicalTaskDAO {
     }
 
     @Override
-    public List<TechnicalTask> readAll() {
+    public List<TechnicalTask> getAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {

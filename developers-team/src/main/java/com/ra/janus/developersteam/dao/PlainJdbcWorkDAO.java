@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.WorkDAO;
 import com.ra.janus.developersteam.entity.Work;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlainJdbcWorkDAO implements WorkDAO {
+public class PlainJdbcWorkDAO implements BaseDao<Work> {
     private static final String INSERT_SQL = "INSERT INTO works (name, price) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE works SET name=?,price=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM works";
@@ -49,7 +48,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
     }
 
     @Override
-    public Work read(final long id) {
+    public Work get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -71,7 +70,7 @@ public class PlainJdbcWorkDAO implements WorkDAO {
     }
 
     @Override
-    public List<Work> readAll() {
+    public List<Work> getAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {

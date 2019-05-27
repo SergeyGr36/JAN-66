@@ -15,15 +15,12 @@ import java.util.stream.Stream;
 public enum DBSchemaCreator {
     INSTANCE;
 
-    public static final String PROP_KEY = "db.sql_schema_scripts_directories";
     private static final String SQL_SCRIPT_PATH = "sql_schema_scripts";
-    transient private Connection connection;
 
-    public int createSchema(final Connection connection, final String... fileNames) {
+    public int createSchema(final Connection connection) {
         try {
-            this.connection = connection;
             final String script = readAllScripts().collect(Collectors.joining());
-            processScript(script);
+            processScript(connection, script);
             return 1;
         } catch (IOException | URISyntaxException | SQLException e) {
             throw new IllegalStateException("Could not read the application properties file.", e);
@@ -43,7 +40,7 @@ public enum DBSchemaCreator {
     }
 
 
-    private void processScript(final String script) throws SQLException {
+    private void processScript(final Connection connection, final String script) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(script);
         }
