@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.dao.interfaces.BillDAO;
 import com.ra.janus.developersteam.entity.Bill;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlainJdbcBillDAO implements BillDAO {
+public class PlainJdbcBillDAO implements BaseDao<Bill> {
     private static final String INSERT_SQL = "INSERT INTO bills (docDate) VALUES (?)";
     private static final String UPDATE_SQL = "UPDATE bills SET docDate=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM bills";
@@ -49,7 +48,7 @@ public class PlainJdbcBillDAO implements BillDAO {
     }
 
     @Override
-    public Bill read(final long id) {
+    public Bill get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -71,7 +70,7 @@ public class PlainJdbcBillDAO implements BillDAO {
     }
 
     @Override
-    public List<Bill> readAll() {
+    public List<Bill> getAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
