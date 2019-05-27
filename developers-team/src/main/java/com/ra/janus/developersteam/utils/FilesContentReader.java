@@ -119,7 +119,7 @@ public enum FilesContentReader {
         String fileName;
         String content;
 
-        public FileContent(String fileName, String content) {
+        public FileContent(final String fileName, final String content) {
             this.fileName = fileName;
             this.content = content;
         }

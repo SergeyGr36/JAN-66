@@ -5,21 +5,12 @@ import com.ra.janus.developersteam.utils.PropertyReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.BiPredicate;
 
 public enum DBSchemaCreator {
     INSTANCE;
@@ -28,7 +19,6 @@ public enum DBSchemaCreator {
     public static final String PROP_KEY = "db.sql_schema_scripts_directories";
     private static final Logger LOGGER = LoggerFactory.getLogger(DBSchemaCreator.class);
 
-    transient private String scriptsDirs;
     transient private Connection connection;
 
     public int createSchema(final Connection connection, String... fileNames) {
@@ -39,7 +29,7 @@ public enum DBSchemaCreator {
             throw new IllegalStateException("Could not read the application properties file.", e);
         }
 
-        scriptsDirs = properties.getProperty(PROP_KEY);
+        final String scriptsDirs = properties.getProperty(PROP_KEY);
         this.connection = connection;
         final String[] dirNames = scriptsDirs.split(";");
         int processed = 0;
