@@ -28,38 +28,42 @@ public enum FilesContentReader {
 
     private Map<String, List<FileContent>> contentMap;
 
-    public List<String> getContent(final String directoryName, String... fileNames) {
+    public List<String> getContent(final String directoryName, final String... fileNames) {
         if (contentMap == null) {
             contentMap = new Hashtable<>();
         }
 
         if (!contentMap.containsKey(directoryName)) {
             contentMap.put(directoryName, new ArrayList<>());
-            Path path = getDirectoryPath(directoryName);
+            final Path path = getDirectoryPath(directoryName);
             cacheDirectory(path);
         }
 
-        final List<FileContent> filesContents = contentMap.get(directoryName);
-        final List<String> result = new ArrayList();
+        return findContents(directoryName, fileNames);
+    }
+
+    private List<String> findContents(final String directoryName, final String[] fileNames) {
+        final List<String> result;
         if (fileNames.length == 0) {
-            for (FileContent fileContent : filesContents) {
+            final List<FileContent> filesContents = contentMap.get(directoryName);
+            result = new ArrayList<>();
+            for (final FileContent fileContent : filesContents) {
                 result.add(fileContent.content);
             }
         } else {
-            for (String fileName : fileNames) {
-                boolean wasFound = false;
-                for (FileContent fileContent : filesContents) {
-                    if (fileName.equals(fileContent.fileName)) {
-                        result.add(fileContent.fileName);
-                        wasFound = true;
+            result = new ArrayList<>();
+            for (final String fileName : fileNames) {
+                final int wasSize = result.size();
+                final List<FileContent> filesContents = contentMap.get(directoryName);
+                for (final FileContent fileContent : filesContents) {
+                    if (fileName.equals(fileContent.getFileName())) {
+                        result.add(fileContent.getContent());
                         break;
                     }
 
                 }
-                if (!wasFound) {
-                    IllegalStateException e = new IllegalStateException("The file " + fileName + " was not found in " + directoryName);
-                    LOGGER.error(EXCEPTION_WARN, e);
-                    throw e;
+                if (wasSize == result.size()) {
+                    throw new IllegalStateException("The file " + fileName + " was not found in " + directoryName);
                 }
             }
         }
@@ -68,14 +72,15 @@ public enum FilesContentReader {
     }
 
     private Path getDirectoryPath(final String dirName) {
-        URL url = getClass().getClassLoader().getResource(dirName);
+        //final URL url = getClass().getClassLoader().getResource(dirName);
+        final URL url = Thread.currentThread().getContextClassLoader().getResource(dirName);
         if (url == null) {
             final IllegalStateException e = new IllegalStateException("The directory does not exist: " + dirName);
             LOGGER.error(EXCEPTION_WARN, e);
             throw e;
         }
 
-        Path path = Paths.get(URI.create(url.toString()));
+        final Path path = Paths.get(URI.create(url.toString()));
         validatePath(path);
         return path;
     }
@@ -105,7 +110,7 @@ public enum FilesContentReader {
     }
 
     private void cacheFile(final String directoryName, final Path filePath) {
-        List<FileContent> list = contentMap.get(directoryName);
+        final List<FileContent> list = contentMap.get(directoryName);
         try {
             final String content = new String(Files.readAllBytes(filePath));
             list.add(new FileContent(filePath.toFile().getName(), content));
@@ -116,12 +121,20 @@ public enum FilesContentReader {
     }
 
     private class FileContent {
-        String fileName;
-        String content;
+        transient private final String fileName;
+        transient private final String content;
 
         public FileContent(final String fileName, final String content) {
             this.fileName = fileName;
             this.content = content;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public String getContent() {
+            return content;
         }
     }
 }
