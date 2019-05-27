@@ -1,3 +1,4 @@
 rootProject.name = 'janus'
 include 'developers-team'
+include 'developers-team-integration-tests'
 
