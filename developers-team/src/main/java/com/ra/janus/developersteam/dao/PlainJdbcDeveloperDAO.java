@@ -1,140 +1,123 @@
 package com.ra.janus.developersteam.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.ra.janus.developersteam.entity.Developer;
+import com.ra.janus.developersteam.exception.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
+public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
+    private static final String EXCEPTION_WARN = "An exception occurred!";
+    private static final String INSERT_SQL = "INSERT INTO developers (name) VALUES (?)";
+    private static final String UPDATE_SQL = "UPDATE developers SET name=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM developers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM developers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM developers WHERE id=?";
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcDeveloperDAO.class);
+    transient private final DataSource dataSource;
 
-import com.ra.janus.developersteam.dao.interfaces.DeveloperDAO;
-import com.ra.janus.developersteam.entity.Developer;
-import com.ra.janus.developersteam.exception.DAOException;
 
-public class PlainJdbcDeveloperDAO implements DeveloperDAO<Developer> {
+    public PlainJdbcDeveloperDAO(final DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
-	private static final String SELECT_ALL_SQL = "SELECT * FROM DEVELOPER";
-	private static final String UPDATE_SQL = "UPDATE DEVELOPER SET NAME = ? WHERE ID = ?";
-	private static final String DELETE_SQL = "DELETE FROM DEVELOPER WHERE ID = ?";
-	private static final String SELECT_ONE_SQL = "SELECT * FROM DEVELOPER WHERE ID = ?";
-	private static final String INSERT_SQL = "INSERT INTO DEVELOPER (ID, NAME) VALUES (?, ?)";
 
-	private final DataSource dataSource;
+    @Override
+    public Developer create(final Developer developer) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            prepareStatement(ps, developer);
+            ps.executeUpdate();
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong(1);
+                    return new Developer(id, developer);
+                } else {
+                    throw new DAOException("Could not create a Developer");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
+        }
+    }
 
-	public PlainJdbcDeveloperDAO(DataSource dataSource) {
+    @Override
+    public Developer get(final long id) {
+        try {
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            final ResultSet rs = ps.executeQuery();
+            try {
+                if (rs.next()) {
+                    return toDeveloper(rs);
+                } else {
+                    return null;
+                }
+            } finally {
+                rs.close();
+                conn.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
+        }
+    }
 
-		this.dataSource = dataSource;
-	}
+    @Override
+    public List<Developer> getAll() {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
+             ResultSet rs = ps.executeQuery()) {
 
-	@Override
-	public List<Developer> getAll() {
+            final List<Developer> developers = new ArrayList<>();
+            while (rs.next()) {
+                developers.add(toDeveloper(rs));
+            }
+            return developers;
+        } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
+        }
+    }
 
-		final List<Developer> developers = new ArrayList<>();
+    @Override
+    public boolean update(final Developer developer) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
+            prepareStatement(ps, developer);
+            final int rowCount = ps.executeUpdate();
+            return rowCount != 0;
+        } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
+        }
+    }
 
-		try {
-			Connection conn = dataSource.getConnection();
-			PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
-			ResultSet rs = ps.executeQuery();
+    @Override
+    public boolean delete(final long id) {
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
+            ps.setLong(1, id);
+            final int rowCount = ps.executeUpdate();
+            return rowCount != 0;
+        } catch (SQLException e) {
+            LOGGER.error(EXCEPTION_WARN, e);
+            throw new DAOException(e);
+        }
+    }
 
-			while (rs.next()) {
+    private Developer toDeveloper(final ResultSet rs) throws SQLException {
+        return new Developer(rs.getLong("id"),
+                rs.getString("name"));
+    }
 
-				developers.add(new Developer(rs.getLong("ID"), rs.getString("NAME")));
-			}
-
-		} catch (SQLException e) {
-
-			throw new DAOException(e);
-		}
-
-		return developers;
-	}
-
-	@Override
-	public Developer getById(long id) {
-
-		Developer result;
-
-		try (Connection conn = dataSource.getConnection();
-				PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-
-			ps.setLong(1, id);
-
-			try (ResultSet rs = ps.executeQuery()) {
-
-				result = rs.next() ? new Developer(rs.getLong("ID"), rs.getNString("NAME")) : null;
-			}
-		} catch (SQLException e) {
-
-			throw new DAOException(e);
-		}
-
-		return result;
-	}
-
-	@Override
-	public boolean update(Developer entity) {
-
-		try {
-
-			Connection conn = dataSource.getConnection();
-			PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
-			ps.setString(1, entity.getDeveloperName());
-			ps.setLong(2, entity.getId());
-
-			return ps.executeUpdate() != 0;
-		} catch (SQLException e) {
-
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public boolean delete(long id) {
-
-		try {
-
-			Connection conn = dataSource.getConnection();
-			PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
-			ps.setLong(1, id);
-
-			return ps.executeUpdate() != 0;
-		} catch (SQLException e) {
-
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public Developer save(Developer entity) {
-
-		Developer result;
-
-		try (Connection conn = dataSource.getConnection();
-				PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-
-			ps.setLong(1, entity.getId());
-			ps.setString(2, entity.getDeveloperName());
-
-			ps.executeUpdate();
-
-			try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
-
-				if (generatedKeys.next()) {
-
-					result = new Developer(generatedKeys.getLong(1), entity.getDeveloperName());
-				} else {
-
-					throw new DAOException("Could not create a Developer");
-				}
-			}
-		} catch (SQLException e) {
-
-			throw new DAOException(e);
-		}
-
-		return result;
-	}
+    private void prepareStatement(final PreparedStatement ps, final Developer developer) throws SQLException {
+        ps.setString(1, developer.getName());
+    }
 }

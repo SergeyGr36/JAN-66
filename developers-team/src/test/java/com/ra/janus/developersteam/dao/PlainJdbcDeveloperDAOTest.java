@@ -1,15 +1,28 @@
 package com.ra.janus.developersteam.dao;
 
-public class PlainJdbcDeveloperDAOTest {
-    private static final String SELECT_ALL_SQL = "SELECT * FROM DEVELOPER";
-    private static final String UPDATE_SQL = "UPDATE DEVELOPER SET NAME = ? WHERE ID = ?";
-    private static final String DELETE_SQL = "DELETE FROM DEVELOPER WHERE ID = ?";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM DEVELOPER WHERE ID = ?";
-    private static final String INSERT_SQL = "INSERT INTO DEVELOPER (ID, NAME) VALUES (?, ?)";
+import com.ra.janus.developersteam.entity.Customer;
+import com.ra.janus.developersteam.entity.Developer;
+import com.ra.janus.developersteam.exception.DAOException;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mockito;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.List;
+
+class PlainJdbcDeveloperDAOTest {
+    private static final String INSERT_SQL = "INSERT INTO developers (name) VALUES (?)";
+    private static final String UPDATE_SQL = "UPDATE developers SET name=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM developers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM developers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM developers WHERE id=?";
     private DataSource mockDataSource;
 
-    private PlainJdbcDeveloperDAO DeveloperDAO;
+    private PlainJdbcDeveloperDAO developerDAO;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
@@ -17,7 +30,7 @@ public class PlainJdbcDeveloperDAOTest {
     @BeforeEach
     public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
-        DeveloperDAO = new PlainJdbcDeveloperDAO(mockDataSource);
+        developerDAO = new PlainJdbcDeveloperDAO(mockDataSource);
 
         mockConnection = Mockito.mock(Connection.class);
         Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
@@ -32,30 +45,32 @@ public class PlainJdbcDeveloperDAOTest {
         //given
         long testId = 1L;
         int columnIdIndex = 1;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(true);
         Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
         //when
-        Developer Developer = DeveloperDAO.create(testDeveloper);
+        Developer developer = developerDAO.create(testDeveloper);
 
         //then
-        assertEquals(testDeveloper, Developer);
+        assertEquals(testDeveloper, developer);
     }
 
     @Test
     void whenCreateDeveloperShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
         long testId = 1L;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        final Executable executable = () -> DeveloperDAO.create(testDeveloper);
+        final Executable executable = () -> developerDAO.create(testDeveloper);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -65,12 +80,13 @@ public class PlainJdbcDeveloperDAOTest {
     void whenCreateDeveloperShouldThrowException() throws Exception {
         //given
         long testId = 1L;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.create(testDeveloper);
+        final Executable executable = () -> developerDAO.create(testDeveloper);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -87,10 +103,10 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
 
         //when
-        Developer Developer = DeveloperDAO.read(testId);
+        Developer customer = developerDAO.get(testId);
 
         //then
-        assertEquals(testId, Developer.getId());
+        assertEquals(testId, customer.getId());
     }
 
     @Test
@@ -102,10 +118,10 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Developer Developer = DeveloperDAO.read(testId);
+        Developer customer = developerDAO.get(testId);
 
         //then
-        assertEquals(expectedDeveloper, Developer);
+        assertEquals(expectedDeveloper, customer);
     }
 
     @Test
@@ -115,7 +131,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.read(testId);
+        final Executable executable = () -> developerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -128,7 +144,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.read(testId);
+        final Executable executable = () -> developerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -142,7 +158,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.read(testId);
+        final Executable executable = () -> developerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -152,13 +168,12 @@ public class PlainJdbcDeveloperDAOTest {
     void whenReadDeveloperFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
         //given
         long testId = 1L;
-        final int testParametherIndex = 1;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.read(testId);
+        final Executable executable = () -> developerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -173,7 +188,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
-        List<Developer> list = DeveloperDAO.readAll();
+        List<Developer> list = developerDAO.getAll();
 
         //then
         assertFalse(list.isEmpty());
@@ -185,7 +200,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.readAll();
+        final Executable executable = () -> developerDAO.getAll();
 
         //then
         assertThrows(DAOException.class, executable);
@@ -198,12 +213,13 @@ public class PlainJdbcDeveloperDAOTest {
         //given
         long testId = 1L;
         int testCount = 1;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = DeveloperDAO.update(testDeveloper);
+        boolean updated = developerDAO.update(testDeveloper);
 
         //then
         assertEquals(true, updated);
@@ -214,12 +230,13 @@ public class PlainJdbcDeveloperDAOTest {
         //given
         long testId = 1L;
         int testCount = 0;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = DeveloperDAO.update(testDeveloper);
+        boolean updated = developerDAO.update(testDeveloper);
 
         //then
         assertEquals(false, updated);
@@ -229,11 +246,12 @@ public class PlainJdbcDeveloperDAOTest {
     void whenUpdateDeveloperInDbThenThrowException() throws Exception {
         //given
         long testId = 1L;
-        Developer testDeveloper = new Developer(testId, null,null, null);
+        String testName = null;
+        Developer testDeveloper = new Developer(testId, testName);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.update(testDeveloper);
+        final Executable executable = () -> developerDAO.update(testDeveloper);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -250,7 +268,7 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = DeveloperDAO.delete(testId);
+        boolean deleted = developerDAO.delete(testId);
 
         //then
         assertEquals(true, deleted);
@@ -265,20 +283,20 @@ public class PlainJdbcDeveloperDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = DeveloperDAO.delete(testId);
+        boolean deleted = developerDAO.delete(testId);
 
         //then
         assertEquals(false, deleted);
     }
 
     @Test
-    void whenDeleteDeveloperFromDbThenThrowException()throws Exception  {
+    void whenDeleteCustomerFromDbThenThrowException()throws Exception  {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> DeveloperDAO.delete(testId);
+        final Executable executable = () -> developerDAO.delete(testId);
 
         //then
         assertThrows(DAOException.class, executable);
