@@ -5,14 +5,13 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
 
-public enum HikDataSource implements IDataSource {
+public enum HikDataSource {
 
     INSTANCE;
 
     private HikariConfig config = new HikariConfig();
     private HikariDataSource dataSource;
 
-    @Override
     public DataSource get(final String url, final String user, final String pass) {
 
         if (dataSource == null) {

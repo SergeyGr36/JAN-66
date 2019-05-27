@@ -1,21 +1,15 @@
 package com.ra.janus.developersteam.schema;
 
 import com.ra.janus.developersteam.datasources.DataSourceFactory;
-import com.ra.janus.developersteam.datasources.DataSourceType;
-import com.ra.janus.developersteam.utils.PropertyReader;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,7 +57,7 @@ class DBSchemaCreatorTest {
     @Test
     void integrationTest() throws Exception{
         //given
-        DataSource dataSource = new DataSourceFactory().get(DataSourceType.HIKARI);
+        DataSource dataSource = new DataSourceFactory().get();
         Connection connection = dataSource.getConnection();
         int notExpected = 0;
 
