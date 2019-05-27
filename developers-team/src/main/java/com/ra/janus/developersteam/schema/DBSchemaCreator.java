@@ -26,13 +26,12 @@ public enum DBSchemaCreator {
 
     private static final String EXCEPTION_WARN = "An exception occurred!";
     public static final String PROP_KEY = "db.sql_schema_scripts_directories";
-    public static final String DEFAULT_DIRS = "sql_schema_scripts";
     private static final Logger LOGGER = LoggerFactory.getLogger(DBSchemaCreator.class);
 
     transient private String scriptsDirs;
     transient private Connection connection;
 
-    DBSchemaCreator() {
+    public int createSchema(final Connection connection, String... fileNames) {
         Properties properties;
         try {
             properties = PropertyReader.INSTANCE.getProperties();
@@ -41,12 +40,6 @@ public enum DBSchemaCreator {
         }
 
         scriptsDirs = properties.getProperty(PROP_KEY);
-        if (scriptsDirs == null) {
-            scriptsDirs = DEFAULT_DIRS;
-        }
-    }
-
-    public int createSchema(final Connection connection, String... fileNames) {
         this.connection = connection;
         final String[] dirNames = scriptsDirs.split(";");
         int processed = 0;

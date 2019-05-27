@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ public enum FilesContentReader {
 
         final List<FileContent> filesContents = contentMap.get(directoryName);
         final List<String> result = new ArrayList();
-        if (fileNames == null || fileNames.length == 0) {
+        if (fileNames.length == 0) {
             for (FileContent fileContent : filesContents) {
                 result.add(fileContent.content);
             }
@@ -76,23 +76,12 @@ public enum FilesContentReader {
             throw e;
         }
 
-        try {
-            Path path = Paths.get(url.toURI());
-            validatePath(path);
-            return path;
-        } catch (URISyntaxException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new IllegalStateException("An URI Syntax error occurred.");
-        }
+        Path path = Paths.get(URI.create(url.toString()));
+        validatePath(path);
+        return path;
     }
 
     private void validatePath(final Path path) {
-        if (!Files.exists(path)) {
-            final IllegalStateException e = new IllegalStateException("The path doesn't exists: " + path);
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw e;
-        }
-
         if (!Files.isDirectory(path)) {
             final IllegalStateException e = new IllegalStateException("The path is not a directory: " + path);
             LOGGER.error(EXCEPTION_WARN, e);

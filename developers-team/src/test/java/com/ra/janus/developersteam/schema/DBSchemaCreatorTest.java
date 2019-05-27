@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.function.Executable;
 
 import javax.sql.DataSource;
+import java.nio.file.InvalidPathException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,7 +29,7 @@ class DBSchemaCreatorTest {
     }
 
     @Test
-    void whenCreateSchemaUsingDefaultScriptsDirectoryShouldCreateSchema() throws Exception {
+    void whenCreateSchemaForAllFilesShouldCreateSchema() throws Exception {
         //given
         int notExpected = 0;
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenReturn(1);
@@ -41,28 +42,7 @@ class DBSchemaCreatorTest {
     }
 
     @Test
-    void whenCreateSchemaUsingSetScriptsDirectoryShouldCreateSchema() throws Exception {
-        //given
-        int notExpected = 0;
-        Properties properties = PropertyReader.INSTANCE.getProperties();
-        String oldValue = properties.getProperty(DBSchemaCreator.PROP_KEY);
-        properties.setProperty(DBSchemaCreator.PROP_KEY, DBSchemaCreator.DEFAULT_DIRS);
-        Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenReturn(1);
-
-        //when
-        int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(mockConnection);
-        if (oldValue == null) {
-            properties.remove(DBSchemaCreator.PROP_KEY);
-        }{
-            properties.setProperty(DBSchemaCreator.PROP_KEY, oldValue);
-        }
-
-        //then
-        assertNotEquals(notExpected, scriptsProcessed);
-    }
-
-    @Test
-    void whenCreateSchemaUsingDefaultScriptsDirectoryShouldThrowException() throws Exception {
+    void whenCreateSchemaForAllFilesShouldThrowException() throws Exception {
         //given
         int notExpected = 0;
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenThrow(new SQLException());
@@ -74,4 +54,65 @@ class DBSchemaCreatorTest {
         assertThrows(IllegalStateException.class, executable);
     }
 
+    @Test
+    void whenCreateSchemaUsingExistingFileShouldCreateSchema() throws Exception {
+        //given
+        int notExpected = 0;
+        Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenReturn(1);
+
+        //when
+        int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(mockConnection, "CREATE_TABLE_customer.sql");
+
+        //then
+        assertNotEquals(notExpected, scriptsProcessed);
+    }
+
+    @Test
+    void whenCreateSchemaUsingNonExistingFileShouldThrowException() throws Exception {
+        //when
+        final Executable executable = () ->  DBSchemaCreator.INSTANCE.createSchema(mockConnection, "NonExistingFile");
+
+        //then
+        assertThrows(IllegalStateException.class, executable);
+    }
+
+    @Test
+    void whenCreateSchemaUsingNonExistingDirectoryShouldThrowException() throws Exception {
+        //given
+        Properties properties = PropertyReader.INSTANCE.getProperties();
+        String oldValue = properties.getProperty(DBSchemaCreator.PROP_KEY);
+        properties.setProperty(DBSchemaCreator.PROP_KEY, "NonExistingDirectory");
+
+        //when
+        final Executable executable = () ->  DBSchemaCreator.INSTANCE.createSchema(mockConnection);
+
+        //then
+        assertThrows(IllegalStateException.class, executable);
+
+        if (oldValue == null) {
+            properties.remove(DBSchemaCreator.PROP_KEY);
+        } else {
+            properties.setProperty(DBSchemaCreator.PROP_KEY, oldValue);
+        }
+    }
+
+    @Test
+    void whenCreateSchemaUsingFileInsteadOfdirectoryShouldThrowException() throws Exception {
+        //given
+        Properties properties = PropertyReader.INSTANCE.getProperties();
+        String oldValue = properties.getProperty(DBSchemaCreator.PROP_KEY);
+        properties.setProperty(DBSchemaCreator.PROP_KEY, "config.properties");
+
+        //when
+        final Executable executable = () -> DBSchemaCreator.INSTANCE.createSchema(mockConnection);
+
+        //then
+        assertThrows(IllegalStateException.class, executable);
+
+        if (oldValue == null) {
+            properties.remove(DBSchemaCreator.PROP_KEY);
+        } else {
+            properties.setProperty(DBSchemaCreator.PROP_KEY, oldValue);
+        }
+    }
 }
