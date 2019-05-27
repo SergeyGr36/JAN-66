@@ -12,11 +12,11 @@ public class TrainDAO implements IJdbcDao<Train> {
 
     private final DataSource dataSource;
 
-    private final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, QUANTYTI_PLASES, FREE_PLASES) values (?, ?, ?, ?)";
-    private final String SELECT_TRAIN_ID = "SELECT ID, NAME, QUANTYTI_PLASES, FREE_PLASES FROM TRAINS WHERE id = ";
-    private final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, QUANTYTI_PLASES = ?, FREE_PLASES = ? WHERE ID = ?";
+    private final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
+    private final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE id = ";
+    private final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
     private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
-    private final String SELECT_TRAIN_ALL = "SELECT ID, NAME, QUANTYTI_PLASES, FREE_PLASES FROM TRAINS";
+    private final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
     public TrainDAO(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -29,14 +29,14 @@ public class TrainDAO implements IJdbcDao<Train> {
             try(PreparedStatement pr = connection.prepareStatement(INSERT_TRAIN)){
                 pr.setLong(1,train.getId());
                 pr.setString(2,train.getName());
-                pr.setInt(3,train.getQuanyityPlaces());
-                pr.setInt(4,train.getFreePlaces());
+                pr.setInt(3,train.getSeating());
+                pr.setInt(4,train.getFreeSeats());
                 pr.executeUpdate();
                 connection.commit();
                 return train;
             }
         }catch (SQLException e){
-            throw new IllegalArgumentException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -46,8 +46,8 @@ public class TrainDAO implements IJdbcDao<Train> {
             connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN)){
                 ps.setString(1,train.getName());
-                ps.setInt(2,train.getQuanyityPlaces());
-                ps.setInt(3,train.getFreePlaces());
+                ps.setInt(2,train.getSeating());
+                ps.setInt(3,train.getFreeSeats());
                 ps.setLong(4,id);
                 int resultUp = ps.executeUpdate();
                 connection.commit();
@@ -82,7 +82,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                     while (resultSet.next()){
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));
-                        train.setQuanyityPlaces(resultSet.getInt(3));
+                        train.setSeating(resultSet.getInt(3));
                         train.setFreePlaces(resultSet.getInt(4));
                     }
                 }
@@ -103,7 +103,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                         Train train = new Train();
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));
-                        train.setQuanyityPlaces(resultSet.getInt(3));
+                        train.setSeating(resultSet.getInt(3));
                         train.setFreePlaces(resultSet.getInt(4));
                         trainsList.add(train);
                     }return trainsList;

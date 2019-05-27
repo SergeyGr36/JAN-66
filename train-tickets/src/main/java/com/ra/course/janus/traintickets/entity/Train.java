@@ -8,19 +8,19 @@ public class Train  {
 
     private String name;
 
-    private int quanyityPlaces;
+    private int seating;
 
-    private int freePlaces;
+    private int freeSeats;
 
 
     public Train() {
     }
 
-    public Train(long id, String name, int quanyityPlaces, int freePlaces) {
+    public Train(long id, String name, int seating, int freeSeats) {
         this.id = id;
         this.name = name;
-        this.quanyityPlaces = quanyityPlaces;
-        this.freePlaces = freePlaces;
+        this.seating = seating;
+        this.freeSeats = freeSeats;
     }
 
     public long getId() {
@@ -39,19 +39,19 @@ public class Train  {
         this.name = name;
     }
 
-    public int getQuanyityPlaces() {
-        return quanyityPlaces;
+    public int getSeating() {
+        return seating;
     }
 
-    public void setQuanyityPlaces(int quanyityPlaces) {
-        this.quanyityPlaces = quanyityPlaces;
+    public void setSeating(int seating) {
+        this.seating = seating;
     }
 
-    public int getFreePlaces() {
-        return freePlaces;
+    public int getFreeSeats() {
+        return freeSeats;
     }
 
-    public void setFreePlaces(int freePlaces) {
-        this.freePlaces = freePlaces;
+    public void setFreePlaces(int freeSeats) {
+        this.freeSeats = freeSeats;
     }
 }
