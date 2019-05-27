@@ -68,7 +68,6 @@ public enum FilesContentReader {
     }
 
     private Path getDirectoryPath(final String dirName) {
-        //URL url = Thread.currentThread().getContextClassLoader().getResource("/" + dirName);
         URL url = getClass().getClassLoader().getResource(dirName);
         if (url == null) {
             final IllegalStateException e = new IllegalStateException("The directory does not exist: " + dirName);
