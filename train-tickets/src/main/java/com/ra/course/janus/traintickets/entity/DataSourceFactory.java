@@ -1,4 +1,4 @@
-package com.ra.course.janus.traintickets.datasources;
+package com.ra.course.janus.traintickets.entity;
 import org.h2.jdbcx.JdbcDataSource;
 import javax.sql.DataSource;
 
