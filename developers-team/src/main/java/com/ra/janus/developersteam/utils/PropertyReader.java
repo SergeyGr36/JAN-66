@@ -36,7 +36,6 @@ public enum PropertyReader {
         final Properties properties = propMap.get(propertiesFile);
         if (properties.isEmpty()) {
 
-            //try (InputStream inputStream = PropertyReader.class.getClassLoader().getResourceAsStream(propertiesFile)) {
             try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile)) {
                 properties.load(inputStream);
             }
