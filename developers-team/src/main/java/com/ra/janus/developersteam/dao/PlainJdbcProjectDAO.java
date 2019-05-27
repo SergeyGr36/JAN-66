@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcProjectDao implements BaseDao<Project> {
+public class PlainJdbcProjectDAO implements BaseDao<Project> {
 
     private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE projects SET name=?,description=?,status=?,eta=? WHERE id=?";
@@ -18,12 +18,12 @@ public class JdbcProjectDao implements BaseDao<Project> {
     private static final String SELECT_ONE_SQL = "SELECT * FROM projects WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM projects WHERE id=?";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcProjectDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcProjectDAO.class);
     public static final String EXCEPTION_WARN = "An exception occurred!";
 
     transient private final DataSource dataSource;
 
-    public JdbcProjectDao(final DataSource dataSource) {
+    public PlainJdbcProjectDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

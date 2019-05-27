@@ -1,29 +1,28 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.Project;
-import com.ra.janus.developersteam.entity.Qualification;
+import com.ra.janus.developersteam.entity.Manager;
 import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
+
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class PlainJdbcManagerDAOTest {
 
-public class JdbcQualificationDaoTest {
-
-    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE qualifications SET name=?,responsibility=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM qualifications";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";
-    private static final String DELETE_SQL = "DELETE FROM qualifications WHERE id=?";
+    private static final String INSERT_SQL = "INSERT INTO managers (name, email, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE managers SET name=?,email=?,phone=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM managers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM managers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM managers WHERE id=?";
 
     private DataSource mockDataSource;
-    private BaseDao<Qualification> qualificationDAO;
+    private BaseDao<Manager> managerDAO;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
@@ -31,7 +30,7 @@ public class JdbcQualificationDaoTest {
     @BeforeEach
     public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
-        qualificationDAO = new JdbcQualificationDao(mockDataSource);
+        managerDAO = new PlainJdbcManagerDAO(mockDataSource);
 
         mockConnection = Mockito.mock(Connection.class);
         Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
@@ -42,49 +41,49 @@ public class JdbcQualificationDaoTest {
     }
 
     @Test
-    void whenCreateQualificationShouldReturnQualification() throws Exception {
+    void whenCreateManagerShouldReturnManager() throws Exception {
         //given
         long testId = 1L;
         int columnIdIndex = 1;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(true);
         Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
         //when
-        Qualification qualification = qualificationDAO.create(testQualification);
+        Manager manager = managerDAO.create(testManager);
 
         //then
-        assertEquals(testQualification, qualification);
+        assertEquals(testManager, manager);
     }
 
     @Test
-    void whenCreateQualificationShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
+    void whenCreateManagerShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        final Executable executable = () -> qualificationDAO.create(testQualification);
+        final Executable executable = () -> managerDAO.create(testManager);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenCreateQualificationShouldThrowException() throws Exception {
+    void whenCreateManagerShouldThrowException() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.create(testQualification);
+        final Executable executable = () -> managerDAO.create(testManager);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -93,7 +92,7 @@ public class JdbcQualificationDaoTest {
     //==============================
 
     @Test
-    void whenGetQualificationFromDbByIdThenReturnIt() throws Exception {
+    void whenGetManagerFromDbByIdThenReturnIt() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -101,69 +100,69 @@ public class JdbcQualificationDaoTest {
         Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
 
         //when
-        Qualification qualification = qualificationDAO.get(testId);
+        Manager manager = managerDAO.get(testId);
 
         //then
-        assertEquals(testId, qualification.getId());
+        assertEquals(testId, manager.getId());
     }
 
     @Test
-    void whenGetAbsentQualificationFromDbByIdThenReturnNull() throws Exception {
+    void whenGetAbsentManagerFromDbByIdThenReturnNull() throws Exception {
         //given
         long testId = 1L;
-        Qualification expectedQualification = null;
+        Manager expectedManager = null;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Qualification qualification = qualificationDAO.get(testId);
+        Manager manager = managerDAO.get(testId);
 
         //then
-        assertEquals(expectedQualification, qualification);
+        assertEquals(expectedManager, manager);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+    void whenGetManagerFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> managerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
+    void whenGetManagerFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> managerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
+    void whenGetManagerFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> managerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
+    void whenGetManagerFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
         //given
         long testId = 1L;
         final int testParametherIndex = 1;
@@ -172,7 +171,7 @@ public class JdbcQualificationDaoTest {
         Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> managerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -181,25 +180,25 @@ public class JdbcQualificationDaoTest {
     //==============================
 
     @Test
-    void whenGetAllQualificationsFromDbThenReturnNonEmptyList() throws Exception {
+    void whenGetAllManagersFromDbThenReturnNonEmptyList() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
-        List<Qualification> list = qualificationDAO.getAll();
+        List<Manager> list = managerDAO.getAll();
 
         //then
         assertFalse(list.isEmpty());
     }
 
     @Test
-    void whenGetAllQualificationsFromDbThenThrowException() throws Exception {
+    void whenGetAllManagersFromDbThenThrowException() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.getAll();
+        final Executable executable = () -> managerDAO.getAll();
 
         //then
         assertThrows(DAOException.class, executable);
@@ -208,46 +207,46 @@ public class JdbcQualificationDaoTest {
     //==============================
 
     @Test
-    void whenUpdateQualificationInDbThenReturnTrue() throws Exception {
+    void whenUpdateManagerInDbThenReturnTrue() throws Exception {
         //given
         long testId = 1L;
         int testCount = 1;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = qualificationDAO.update(testQualification);
+        boolean updated = managerDAO.update(testManager);
 
         //then
         assertEquals(true, updated);
     }
 
     @Test
-    void whenUpdateQualificationInDbThenReturnFalse() throws Exception {
+    void whenUpdateManagerInDbThenReturnFalse() throws Exception {
         //given
         long testId = 1L;
         int testCount = 0;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = qualificationDAO.update(testQualification);
+        boolean updated = managerDAO.update(testManager);
 
         //then
         assertEquals(false, updated);
     }
 
     @Test
-    void whenUpdateQualificationInDbThenThrowException() throws Exception {
+    void whenUpdateManagerInDbThenThrowException() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Manager testManager = new Manager(testId);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.update(testQualification);
+        final Executable executable = () -> managerDAO.update(testManager);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -256,7 +255,7 @@ public class JdbcQualificationDaoTest {
     //==============================
 
     @Test
-    void whenDeleteQualificationFromDbThenReturnTrue()throws Exception  {
+    void whenDeleteManagerFromDbThenReturnTrue()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 1;
@@ -264,14 +263,14 @@ public class JdbcQualificationDaoTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = qualificationDAO.delete(testId);
+        boolean deleted = managerDAO.delete(testId);
 
         //then
         assertEquals(true, deleted);
     }
 
     @Test
-    void whenDeleteQualificationFromDbThenReturnFalse()throws Exception  {
+    void whenDeleteManagerFromDbThenReturnFalse()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 0;
@@ -279,20 +278,20 @@ public class JdbcQualificationDaoTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = qualificationDAO.delete(testId);
+        boolean deleted = managerDAO.delete(testId);
 
         //then
         assertEquals(false, deleted);
     }
 
     @Test
-    void whenDeleteQualificationFromDbThenThrowException()throws Exception  {
+    void whenDeleteManagerFromDbThenThrowException()throws Exception  {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.delete(testId);
+        final Executable executable = () -> managerDAO.delete(testId);
 
         //then
         assertThrows(DAOException.class, executable);

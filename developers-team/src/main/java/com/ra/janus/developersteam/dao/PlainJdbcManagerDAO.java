@@ -1,6 +1,6 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.Qualification;
+import com.ra.janus.developersteam.entity.Manager;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,35 +10,36 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcQualificationDao implements BaseDao<Qualification> {
+public class PlainJdbcManagerDAO implements BaseDao<Manager> {
 
-    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE qualifications SET name=?,responsibility=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM qualifications";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";
-    private static final String DELETE_SQL = "DELETE FROM qualifications WHERE id=?";
+    private static final String INSERT_SQL = "INSERT INTO managers (name, email, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE managers SET name=?,email=?,phone=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM managers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM managers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM managers WHERE id=?";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcQualificationDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcManagerDAO.class);
     public static final String EXCEPTION_WARN = "An exception occurred!";
 
     transient private final DataSource dataSource;
 
-    public JdbcQualificationDao(final DataSource dataSource) {
+    public PlainJdbcManagerDAO(final DataSource dataSource) {
+
         this.dataSource = dataSource;
     }
 
     @Override
-    public Qualification create(final Qualification qualification) {
+    public Manager create(final Manager manager) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            prepareStatement(ps, qualification);
+            prepareStatement(ps, manager);
             ps.executeUpdate();
             try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
                 if (generatedKeys.next()) {
                     final long id = generatedKeys.getLong(1);
-                    return new Qualification(id, qualification);
+                    return new Manager(id, manager);
                 } else {
-                    throw new DAOException("Could not create a Qualification");
+                    throw new DAOException("Could not create a Manager");
                 }
             }
         } catch (SQLException e) {
@@ -48,14 +49,14 @@ public class JdbcQualificationDao implements BaseDao<Qualification> {
     }
 
     @Override
-    public Qualification get(final long id) {
+    public Manager get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
             final ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
-                    return toQualification(rs);
+                    return toManager(rs);
                 } else {
                     return null;
                 }
@@ -70,16 +71,16 @@ public class JdbcQualificationDao implements BaseDao<Qualification> {
     }
 
     @Override
-    public List<Qualification> getAll() {
+    public List<Manager> getAll() {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
 
-            final List<Qualification> qualifications = new ArrayList<>();
+            final List<Manager> managers = new ArrayList<>();
             while (rs.next()) {
-                qualifications.add(toQualification(rs));
+                managers.add(toManager(rs));
             }
-            return qualifications;
+            return managers;
         } catch (SQLException e) {
             LOGGER.error(EXCEPTION_WARN, e);
             throw new DAOException(e);
@@ -87,10 +88,10 @@ public class JdbcQualificationDao implements BaseDao<Qualification> {
     }
 
     @Override
-    public boolean update(final Qualification qualification) {
+    public boolean update(final Manager manager) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            prepareStatement(ps, qualification);
+            prepareStatement(ps, manager);
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
@@ -113,15 +114,16 @@ public class JdbcQualificationDao implements BaseDao<Qualification> {
         }
     }
 
-    private Qualification toQualification(final ResultSet rs) throws SQLException {
-        return new Qualification(rs.getLong("id"),
+    private Manager toManager(final ResultSet rs) throws SQLException {
+        return new Manager(rs.getLong("id"),
                 rs.getString("name"),
-                rs.getString("responsibility"));
+                rs.getString("email"),
+                rs.getString("phone"));
     }
 
-    private void prepareStatement(final PreparedStatement ps, final Qualification qualification) throws SQLException {
-        ps.setString(1, qualification.getName());
-        ps.setString(2, qualification.getResponsibility());
+    private void prepareStatement(final PreparedStatement ps, final Manager manager) throws SQLException {
+        ps.setString(1, manager.getName());
+        ps.setString(2, manager.getEmail());
+        ps.setString(3, manager.getPhone());
     }
-
 }
