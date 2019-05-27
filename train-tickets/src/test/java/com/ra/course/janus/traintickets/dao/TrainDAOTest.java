@@ -65,12 +65,50 @@ class TrainDAOTest {
     }
 
     @Test
-    void whenTheObjectWasSuccessfullyUpdated() {
-
+    void whenTheObjectWasSuccessfullyUpdated()throws SQLException {
+        when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
+        assertTrue(trainDAO.update(TRAIN_ID,train));
     }
 
     @Test
-    void delete() {
+    void whenItemWasNotSuccessfullyUpdated()throws SQLException{
+        when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
+        assertFalse(trainDAO.update(TRAIN_ID,train));
+    }
+
+    @Test
+    void ifThereIsAnExceptionInUpdate()throws SQLException{
+        when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
+        doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
+        train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
+        assertThrows(RuntimeException.class,()->trainDAO.update(TRAIN_ID,train));
+    }
+
+    @Test
+    void whenTheObjectWasSuccessfullyDelete() throws SQLException{
+        when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        assertTrue(trainDAO.delete(TRAIN_ID));
+    }
+
+    @Test
+    void whenItemWasNotSuccessfullyDelete()throws SQLException{
+        when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        assertFalse(trainDAO.delete(TRAIN_ID));
+    }
+
+    @Test
+    void ifThereIsAnExceptionInDelete()throws SQLException{
+        when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
+        doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class,()->trainDAO.delete(TRAIN_ID));
     }
 
     @Test
