@@ -97,7 +97,7 @@ public class CourseDaoJdbc implements CourseDao {
         } catch (SQLException e) {
            // if (LOGGER.isEnabledFor(LOGGER.getLevel())) {
 
-                LOGGER.debug("SQL Exception during findByTid - ");
+                LOGGER.debug("SQL exception during findByTid - ");
             //}
             throw e;
         }

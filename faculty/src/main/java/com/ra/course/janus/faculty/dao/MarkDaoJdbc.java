@@ -7,6 +7,7 @@ import java.util.List;
 
 import java.util.ArrayList;
 
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.apache.log4j.Logger;
 
 public class MarkDaoJdbc implements MarkDao {
@@ -16,6 +17,8 @@ public class MarkDaoJdbc implements MarkDao {
     private static final String SELECT_ALL_SQL = "SELECT * FROM MARK";
     private static final String SELECT_ONE_SQL = "SELECT * FROM MARK WHERE MARK_TID = ?";
     private static final String DELETE_SQL = "DELETE FROM MARK WHERE MARK_TID=?";
+
+    private static final String INSERT_ERR = "Error inserting Mark";
 
     private final static Logger LOGGER = Logger.getLogger(MarkDao.class);
 
@@ -27,19 +30,24 @@ public class MarkDaoJdbc implements MarkDao {
     }
 
     @Override
-    public Mark insert(final Mark mark) throws SQLException {
-        LOGGER.debug("Going to insert");
-        try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+    public Mark insert(final Mark mark)  {
+        try {
+            try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, mark.getScore());
-            ps.setString(2, mark.getReference());
-            ps.executeUpdate();
+                ps.setInt(1, mark.getScore());
+                ps.setString(2, mark.getReference());
+                ps.executeUpdate();
 
-            try (ResultSet markTid = ps.getGeneratedKeys()) {
-                markTid.next();
-                mark.setTid(markTid.getLong(1));
-                return mark;
+                try (ResultSet markTid = ps.getGeneratedKeys()) {
+                    markTid.next();
+                    mark.setTid(markTid.getLong(1));
+                    return mark;
+                }
             }
+        }
+        catch (SQLException e){
+            LOGGER.error(INSERT_ERR,e);
+            throw new DaoException(INSERT_ERR,e);
         }
     }
 
@@ -64,21 +72,7 @@ public class MarkDaoJdbc implements MarkDao {
         }
     }
 
-   /* @Override
-    public Mark findByTidld(final long tid) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setLong(1, tid);
-            try (ResultSet rs = ps.executeQuery()) {
 
-                if (rs.next()) {
-                    return toMark(rs);
-                } else {
-                    return null;
-                }
-            }
-        }
-    }
-*/
     @Override
     public Mark findByTid(final long tid) throws SQLException {
 
@@ -96,12 +90,7 @@ public class MarkDaoJdbc implements MarkDao {
                 rs.close();
             }
         } catch (SQLException e) {
-//            System.out.println(LOGGER);
-//            System.out.println(LOGGER.getLevel());
-//            if (LOGGER.isEnabledFor(LOGGER.getLevel())) {
-
-                LOGGER.debug("SQL Exception during findByTid - ");
-            //}
+                LOGGER.error("SQL exception during findByTid - ".concat(String.valueOf(tid)),e);
             throw e;
         }
 

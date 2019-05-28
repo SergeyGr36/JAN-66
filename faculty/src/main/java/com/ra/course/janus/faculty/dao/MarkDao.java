@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface MarkDao {
 
-    Mark insert(Mark mark) throws SQLException;
+    Mark insert(Mark mark);
 
     Mark update(Mark mark) throws SQLException;
 
