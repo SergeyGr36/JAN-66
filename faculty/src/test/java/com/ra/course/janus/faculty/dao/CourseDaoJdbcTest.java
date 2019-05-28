@@ -1,7 +1,6 @@
 package com.ra.course.janus.faculty.dao;
 
-import com.ra.course.janus.faculty.entity.Mark;
-import org.apache.log4j.Level;
+import com.ra.course.janus.faculty.entity.Course;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -12,7 +11,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
-import org.apache.log4j.Logger;
 //import java.sql.Connection;
 //import java.sql.PreparedStatement;
 //import java.sql.ResultSet;
@@ -22,33 +20,31 @@ import org.apache.log4j.Logger;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-public class MarkDaoJdbcTest {
+public class CourseDaoJdbcTest {
 
-    private static final String INSERT_SQL = "INSERT INTO MARK ( SCORE, REFERENCE) VALUES (?, ?)";
-    private static final String UPDATE_SQL = "UPDATE MARK SET SCORE=?,REFERENCE=? WHERE MARK_TID=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM MARK";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM MARK WHERE MARK_TID = ?";
-    private static final String DELETE_SQL = "DELETE FROM MARK WHERE MARK_TID=?";
+    private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
+    private static final String UPDATE_SQL = "UPDATE COURSE SET CODE=?,DESCRIPTION=? WHERE COURSE_TID=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM COURSE";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM COURSE WHERE COURSE_TID = ?";
+    private static final String DELETE_SQL = "DELETE FROM COURSE WHERE COURSE_TID=?";
 
-    private static Mark mockMark;
-    private static MarkDaoJdbc markDao;
+
+    private static Course mockCourse;
+    private static CourseDaoJdbc courseDao;
     private DataSource mockDataSource;
     private static Connection mockConnection;
     private static PreparedStatement mockStatement;
     private static ResultSet mockResultSet;
-    private static Mark mark;
-    private static Logger mockLogger;
+    private static Course course;
 
 
     @BeforeEach
     public void before()throws SQLException {
 
-       // mockDataSource = Mockito.mock(DataSource.class);
         mockConnection = Mockito.mock(Connection.class);
-        markDao = new MarkDaoJdbc(mockConnection);
+        courseDao = new CourseDaoJdbc(mockConnection);
         mockStatement = Mockito.mock(PreparedStatement.class);
         mockResultSet = Mockito.mock(ResultSet.class);
-        mockLogger = Mockito.mock(Logger.class);
     }
 
     @Test
@@ -57,9 +53,9 @@ public class MarkDaoJdbcTest {
         when(mockStatement.executeUpdate()).thenReturn(1);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        when(mockResultSet.getLong("MARK_TID")).thenReturn(1L);
+        when(mockResultSet.getLong("COURSE_TID")).thenReturn(1L);
         when(mockResultSet.getLong(1)).thenReturn(1L);
-        assertEquals(1, markDao.insert(new Mark()).getTid());
+        assertEquals(1, courseDao.insert(new Course()).getTid());
     }
 
     @Test
@@ -67,9 +63,9 @@ public class MarkDaoJdbcTest {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
         when(mockResultSet.getLong(1)).thenReturn(2L);
-        Mark m = new Mark();
+        Course m = new Course();
         m.setTid(2);
-        assertEquals(2, markDao.update(m).getTid());
+        assertEquals(2, courseDao.update(m).getTid());
     }
 
     @Test
@@ -77,25 +73,25 @@ public class MarkDaoJdbcTest {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
         when(mockResultSet.getLong(1)).thenReturn(1L);
-        Mark m = new Mark();
+        Course m = new Course();
         m.setTid(2);
-        assertNull(markDao.update(m));
+        assertNull(courseDao.update(m));
     }
 
     @Test
     void deleteWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
-        Mark m = new Mark();
-        assertEquals(true, markDao.delete(m));
+        Course m = new Course();
+        assertEquals(true, courseDao.delete(m));
     }
 
     @Test
     void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
-        Mark m = new Mark();
-        assertEquals(false, markDao.delete(m));
+        Course m = new Course();
+        assertEquals(false, courseDao.delete(m));
 
     }
 
@@ -104,8 +100,8 @@ public class MarkDaoJdbcTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong("MARK_TID")).thenReturn(1L);
-        assertEquals(1, markDao.findByTid(1).getTid());
+        when(mockResultSet.getLong("COURSE_TID")).thenReturn(1L);
+        assertEquals(1, courseDao.findByTid(1).getTid());
     }
 
 
@@ -114,7 +110,7 @@ public class MarkDaoJdbcTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        assertNull(markDao.findByTid(1));
+        assertNull(courseDao.findByTid(1));
     }
 
 
@@ -122,19 +118,17 @@ public class MarkDaoJdbcTest {
     void findByTidWhenException() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(new SQLException ("Test"));
-       // when(mockLogger.getLevel()).thenReturn(Level.ALL);
         assertThrows(SQLException.class, () -> {
-            markDao.findByTid(1) ;
+            courseDao.findByTid(1) ;
         });
     }
-
         @Test
     void findAll()throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);
-        List<Mark> mockList = Mockito.mock(ArrayList.class);
+        List<Course> mockList = Mockito.mock(ArrayList.class);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockList.add(mockMark)).thenReturn(true);
-        assertNotNull(markDao.findAll());
+        when(mockList.add(mockCourse)).thenReturn(true);
+        assertNotNull(courseDao.findAll());
     }
 }
