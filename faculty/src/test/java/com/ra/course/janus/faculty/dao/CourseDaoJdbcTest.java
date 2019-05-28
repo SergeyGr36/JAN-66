@@ -1,6 +1,7 @@
 package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Course;
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -56,6 +57,19 @@ public class CourseDaoJdbcTest {
         when(mockResultSet.getLong("COURSE_TID")).thenReturn(1L);
         when(mockResultSet.getLong(1)).thenReturn(1L);
         assertEquals(1, courseDao.insert(new Course()).getTid());
+    }
+
+    @Test
+    void insertWhenException() throws SQLException {
+        when(mockConnection.prepareStatement(INSERT_SQL,Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
+        when(mockStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        when(mockResultSet.getLong("MARK_TID")).thenReturn(1L);
+        when(mockResultSet.getLong(1)).thenReturn(1L);
+        assertThrows(DaoException.class, () -> {
+            courseDao.insert(new Course()) ;
+        });
     }
 
     @Test
@@ -118,7 +132,7 @@ public class CourseDaoJdbcTest {
     void findByTidWhenException() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(new SQLException ("Test"));
-        assertThrows(SQLException.class, () -> {
+        assertThrows(DaoException.class, () -> {
             courseDao.findByTid(1) ;
         });
     }

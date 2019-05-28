@@ -2,18 +2,17 @@ package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Course;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public interface CourseDao {
 
-    Course insert(Course course) throws SQLException;
+    Course insert(Course course);
 
-    Course update(Course course) throws SQLException;
+    Course update(Course course);
 
-    boolean delete(Course course) throws SQLException;
+    boolean delete(Course course);
 
-    Course findByTid(long tid) throws SQLException;
+    Course findByTid(long tid);
 
-    List<Course> findAll() throws SQLException;
+    List<Course> findAll();
 }

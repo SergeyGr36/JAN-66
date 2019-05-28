@@ -1,6 +1,7 @@
 package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Mark;
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.apache.log4j.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,21 @@ public class MarkDaoJdbcTest {
         when(mockResultSet.getLong(1)).thenReturn(1L);
         assertEquals(1, markDao.insert(new Mark()).getTid());
     }
+
+    @Test
+    void insertWhenException() throws SQLException {
+        when(mockConnection.prepareStatement(INSERT_SQL,Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
+        when(mockStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        when(mockResultSet.getLong("MARK_TID")).thenReturn(1L);
+        when(mockResultSet.getLong(1)).thenReturn(1L);
+        // when(mockLogger.getLevel()).thenReturn(Level.ALL);
+        assertThrows(DaoException.class, () -> {
+            markDao.insert(new Mark()) ;
+        });
+    }
+
 
     @Test
     void updateWhenExists() throws SQLException {
