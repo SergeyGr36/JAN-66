@@ -1,6 +1,5 @@
 package com.ra.course.janus.traintickets.dao;
 
-import com.ra.course.janus.traintickets.dao.IJdbcDao;
 import com.ra.course.janus.traintickets.entity.Train;
 
 import javax.sql.DataSource;
@@ -12,11 +11,11 @@ public class TrainDAO implements IJdbcDao<Train> {
 
     private final DataSource dataSource;
 
-    private final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
-    private final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE id = ";
-    private final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
-    private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
-    private final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
+    private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
+    private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
+    private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
+    private static final String DELETE_TRAIN = "DELETE ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
+    private static final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
     public TrainDAO(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -64,7 +63,7 @@ public class TrainDAO implements IJdbcDao<Train> {
             connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(DELETE_TRAIN)){
                 ps.setLong(1,id);
-               int resultUP = ps.executeUpdate();
+                int resultUP = ps.executeUpdate();
                 connection.commit();
                 return resultUP == 1;
             }
@@ -77,9 +76,10 @@ public class TrainDAO implements IJdbcDao<Train> {
     public Train findById(Long id) {
         Train train = new Train();
         try(Connection connection = dataSource.getConnection()){
-            try(Statement statement = connection.createStatement()){
-                try(ResultSet resultSet = statement.executeQuery(SELECT_TRAIN_ID + id)){
-                    while (resultSet.next()){
+            try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ID)){
+                pr.setLong(1,id);
+                try(ResultSet resultSet = pr.executeQuery()){
+                    if (resultSet.next()){
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));
                         train.setSeating(resultSet.getInt(3));
@@ -97,9 +97,9 @@ public class TrainDAO implements IJdbcDao<Train> {
     public List<Train> findAll() {
         ArrayList <Train> trainsList = new ArrayList<>();
         try(Connection connection = dataSource.getConnection()){
-            try(Statement statement = connection.createStatement()){
-                try(ResultSet resultSet = statement.executeQuery(SELECT_TRAIN_ALL)){
-                    while (resultSet.next()){
+            try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL)){
+                try(ResultSet resultSet = pr.executeQuery()){
+                    if (resultSet.next()){
                         Train train = new Train();
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));

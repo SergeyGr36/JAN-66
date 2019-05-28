@@ -1,6 +1,7 @@
 package com.ra.course.janus.traintickets.entity;
 
 
+import java.util.Objects;
 
 public class Train  {
 
@@ -54,4 +55,5 @@ public class Train  {
     public void setFreePlaces(int freeSeats) {
         this.freeSeats = freeSeats;
     }
+
 }

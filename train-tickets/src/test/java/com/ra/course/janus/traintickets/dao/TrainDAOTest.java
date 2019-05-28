@@ -6,17 +6,18 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TrainDAOTest {
 
-    private final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
-    private final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE id = ";
-    private final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
-    private final String DELETE_TRAIN = "DELETE * FROM TRAINS WHERE id = ?";
-    private final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
+    private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
+    private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
+    private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
+    private static final String DELETE_TRAIN = "DELETE ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
+    private static final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
     private static final long TRAIN_ID = 10L;
     private static final long TRAIN_TEST_ID = 2L;
@@ -29,7 +30,6 @@ class TrainDAOTest {
     private Train train;
     private TrainDAO trainDAO;
     private Connection mockConn;
-    private Statement mockStatement;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
 
@@ -38,7 +38,6 @@ class TrainDAOTest {
         final DataSource mockDataSourse = mock(DataSource.class);
         trainDAO = new TrainDAO(mockDataSourse);
         mockConn = mock(Connection.class);
-        mockStatement = mock(Statement.class);
         mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
         when(mockDataSourse.getConnection()).thenReturn(mockConn);
@@ -112,10 +111,79 @@ class TrainDAOTest {
     }
 
     @Test
-    void findById() {
+    void whenItemWasSuccessfullySelect()throws SQLException {
+        when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+        mockMapTrain(mockResultSet);
+        train = trainDAO.findById(TRAIN_ID);
+      //  assertEquals(TEST_TRAIN,train);//<----------
     }
 
     @Test
-    void findAll() {
+    void whenItemWasNotSuccessfullySelect()throws SQLException{
+        when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false);
+        mockMapTrain(mockResultSet);
+        train = trainDAO.findById(TRAIN_ID);
+        //assertNull(train);
+    }
+
+    @Test
+    void ifThereIsAnExceptionInFindById()throws SQLException{
+        when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockResultSet.next()).thenReturn(true);
+        mockMapTrain(mockResultSet);
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> trainDAO.findById(TRAIN_ID));
+    }
+
+
+    @Test
+    void whenItemWasSuccessfullySelectFindAll() throws SQLException {
+        when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockResultSet.getLong("id")).thenReturn(TRAIN_ID);
+        when(mockResultSet.getString("name")).thenReturn(TRAIN_NAME);
+        when(mockResultSet.getInt("seating")).thenReturn(SEATING);
+        when(mockResultSet.getInt("freeSeats")).thenReturn(FREE_SEATS);
+        List<Train> users = trainDAO.findAll();
+        assertTrue(users.size() == 1);
+        //assertTrue(users.contains(TEST_TRAIN));
+    }
+
+    @Test
+    void whenItemWasNotSuccessfullySelectFindAll() throws SQLException{
+        when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false);
+        when(mockResultSet.getLong("id")).thenReturn(TRAIN_ID);
+        when(mockResultSet.getString("name")).thenReturn(TRAIN_NAME);
+        when(mockResultSet.getInt("seating")).thenReturn(SEATING);
+        when(mockResultSet.getInt("freeSeats")).thenReturn(FREE_SEATS);
+        List<Train> users = trainDAO.findAll();
+        assertTrue(users.size() == 0);
+    }
+
+    @Test
+    void ifThereIsAnExceptionInFindAll()throws SQLException{
+        when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(RuntimeException.class, () -> trainDAO.findAll());
+    }
+
+    private void mockMapTrain(ResultSet mockRS) throws SQLException {
+        when(mockRS.getLong("id")).thenReturn(TRAIN_ID);
+        when(mockRS.getString("name")).thenReturn(TRAIN_NAME);
+        when(mockRS.getInt("seating")).thenReturn(SEATING);
+        when(mockRS.getInt("freeSeats")).thenReturn(FREE_SEATS);
     }
 }
