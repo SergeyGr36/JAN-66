@@ -8,4 +8,7 @@
         <Package name="~com\.ra\.hotel[.a-zA-Z0-9]*\.configuration.*"/>
         <Bug pattern="RV_EXCEPTION_NOT_THROWN"/>
     </Match>
+    <Match>
+        <Bug category="EXPERIMENTAL"/>
+    </Match>
 </FindBugsFilter>
