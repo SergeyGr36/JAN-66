@@ -46,9 +46,28 @@ wrapper {
 }
 
 project(":hotel") {
+
     dependencies {
         compile db.h2
+        compile hibernate.hikari
+        compileOnly utils.lombok
+        annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        testCompile testing.mockito
+        compile log.slf4jSimple
     }
+
+    spotbugsMain {
+
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+
+    }
+}
+
+project(':hotel-integration') {
+    dependencies {
+        compile project(':hotel')
+    }
+
     spotbugsMain {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
     }

@@ -1,4 +1,4 @@
-package com.ra.janus.hotel.enums;
+package com.ra.hotel.entity.enums;
 
 public enum StatusOrder {
 
