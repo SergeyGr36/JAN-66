@@ -76,15 +76,21 @@ public class UserDAO implements IJdbcDao<User> {
 
     @Override
     public User findById(Long id) {
-        try (Connection conn = dataSource.getConnection();
-            PreparedStatement userStatement = conn.prepareStatement(FIND_BY_ID)) {
-            userStatement.setLong(PARAM_1, id);
-            try(ResultSet rs = userStatement.executeQuery()) {
+        try {
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement findStmt = conn.prepareStatement(FIND_BY_ID);
+            findStmt.setLong(PARAM_1, id);
+            ResultSet rs = findStmt.executeQuery();
+            try {
                 if (rs.next()) {
                     return toUser(rs);
                 } else {
                     return null;
                 }
+            } finally {
+                rs.close();
+                findStmt.close();
+                conn.close();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
