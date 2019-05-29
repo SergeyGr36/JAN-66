@@ -22,6 +22,10 @@ public class Customer {
         this.id = id;
     }
 
+    public Customer(long id, Customer customer) {
+        this(id, customer.getName(), customer.getAddress(), customer.getPhone());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,10 +37,6 @@ public class Customer {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public Customer(long id, Customer customer) {
-        this(id, customer.getName(), customer.getAddress(), customer.getPhone());
     }
 
     public String getPhone() {

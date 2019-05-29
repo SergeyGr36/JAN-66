@@ -92,6 +92,7 @@ public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             prepareStatement(ps, developer);
+            ps.setLong(2, developer.getId());
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {

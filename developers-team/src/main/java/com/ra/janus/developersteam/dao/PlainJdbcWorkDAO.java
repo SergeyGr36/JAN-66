@@ -48,10 +48,12 @@ public class PlainJdbcWorkDAO implements BaseDao<Work> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public Work get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ps.setLong(1, id);
             final ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
@@ -91,6 +93,7 @@ public class PlainJdbcWorkDAO implements BaseDao<Work> {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             prepareStatement(ps, work);
+            ps.setLong(3, work.getId());
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {

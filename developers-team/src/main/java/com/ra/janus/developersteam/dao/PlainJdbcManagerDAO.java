@@ -49,10 +49,12 @@ public class PlainJdbcManagerDAO implements BaseDao<Manager> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public Manager get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ps.setLong(1, id);
             final ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
@@ -92,6 +94,7 @@ public class PlainJdbcManagerDAO implements BaseDao<Manager> {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             prepareStatement(ps, manager);
+            ps.setLong(4, manager.getId());
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {

@@ -47,10 +47,12 @@ public class PlainJdbcTechnicalTaskDAO implements BaseDao<TechnicalTask> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public TechnicalTask get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ps.setLong(1, id);
             final ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
@@ -90,6 +92,7 @@ public class PlainJdbcTechnicalTaskDAO implements BaseDao<TechnicalTask> {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             prepareStatement(ps, task);
+            ps.setLong(3, task.getId());
             final int rowCount = ps.executeUpdate();
             return rowCount != 0;
         } catch (SQLException e) {
