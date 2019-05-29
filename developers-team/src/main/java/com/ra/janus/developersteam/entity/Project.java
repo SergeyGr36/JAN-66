@@ -1,5 +1,6 @@
 package com.ra.janus.developersteam.entity;
 
+import java.sql.Date;
 import java.util.Objects;
 
 public class Project {
@@ -8,16 +9,16 @@ public class Project {
     private String name;
     private String description;
     private String status;
-    private String eta;
+    private Date eta;
 
-    public Project(String name, String description, String status, String eta) {
+    public Project(String name, String description, String status, Date eta) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.eta = eta;
     }
 
-    public Project(long id, String name, String description, String status, String eta) {
+    public Project(long id, String name, String description, String status, Date eta) {
         this(name, description, status, eta);
         this.id = id;
     }
@@ -75,11 +76,11 @@ public class Project {
         this.status = status;
     }
 
-    public String getEta() {
+    public Date getEta() {
         return eta;
     }
 
-    public void setEta(String eta) {
+    public void setEta(Date eta) {
         this.eta = eta;
     }
 }
