@@ -1,4 +1,4 @@
-package com.ra.course.janus.traintickets.dao.datasources;
+package com.ra.course.janus.traintickets.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
