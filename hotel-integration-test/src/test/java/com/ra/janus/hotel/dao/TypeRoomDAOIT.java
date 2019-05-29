@@ -56,7 +56,7 @@ class TypeRoomDAOIT {
     void testMethodDeleteTypeRoomFromDB() throws DaoException {
         TypeRoom typeRoom = new TypeRoom(1L,2,150,"test","lux");
         typeRoomDAO.save(typeRoom);
-        typeRoomDAO.delete(1L);
+        assertDoesNotThrow (() -> typeRoomDAO.delete(1L));
         assertNull(typeRoomDAO.findById(1L));
     }
     @Test

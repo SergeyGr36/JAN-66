@@ -99,7 +99,7 @@ class TypeRoomDAOTest {
     void whenCallDeleteThenNothingDeleted () throws SQLException {
         when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DaoException.class,()-> typeRoomDAO.delete(1L));
+        assertEquals(typeRoomDAO.delete(1L),0);
     }
     @Test
     void whenCallDeleteThenReturnException() throws SQLException {
@@ -107,11 +107,7 @@ class TypeRoomDAOTest {
         when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()-> typeRoomDAO.delete(1L));
     }
-    @Test
-    void whenCallSaveDeleteConnectionError() throws SQLException {
-        when(mockDataSource.getConnection()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class,()->typeRoomDAO.delete(1L));
-    }
+
 
     @Test
     void whenCallFindByIdThenReturnTypeRoom() throws SQLException, DaoException {

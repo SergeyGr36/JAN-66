@@ -17,7 +17,7 @@ public class TypeRoomDAO implements GenericDao<TypeRoom>{
     private static final Logger LOGGER = LogManager.getLogger(TypeRoomDAO.class);
     private static final String SAVE_ERR_MSG = "record not saved";
     private static final String UPDATE_ERR_MSG = "record not updated";
-    private static final String DELETE_ERR_MSG = "record not deleted";
+    //private static final String DELETE_ERR_MSG = "record not deleted";
 
     private final static String INSERT_BY_ID = "INSERT INTO TYPE_ROOM (COUNT_PLACES, PRISE, DESCRIPTION, CLASS_OF_ROOM, ID) VALUES (?, ?, ?, ?, ?)";
     private final static String UPDATE_BY_ID = "UPDATE TYPE_ROOM SET COUNT_PLACES = ?, PRISE = ?, DESCRIPTION = ?, CLASS_OF_ROOM = ? WHERE ID = ?";
@@ -44,15 +44,11 @@ public class TypeRoomDAO implements GenericDao<TypeRoom>{
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setLong(1, id);
-            if (statement.executeUpdate() == 0){
-                LOGGER.error(DELETE_ERR_MSG);
-                throw new DaoException(DELETE_ERR_MSG);
-            }
+            return statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
             throw new DaoException(e.getMessage(), e);
         }
-        return 0;
     }
 
     @Override
