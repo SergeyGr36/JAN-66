@@ -17,10 +17,10 @@ public final class H2ConnectionTypeRoom {
     private static final Properties PROP = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionTypeRoom.class);
 
-    public static DataSource getDefaultDataSource() {
-        final HikariDataSource hikariDataSource;
+    private H2ConnectionTypeRoom(){}
 
-        try (final InputStream stream = Thread.currentThread()
+    public static DataSource getDefaultDataSource() {
+        try (InputStream stream = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("type_room_connection.properties")){
             if (stream != null){
@@ -31,6 +31,7 @@ public final class H2ConnectionTypeRoom {
         }catch (IOException e) {
             LOGGER.info(e.getMessage());
         }
+        final HikariDataSource hikariDataSource;
         final HikariConfig config = new HikariConfig();
         config.setJdbcUrl(PROP.getProperty("db.url"));
         config.setUsername(PROP.getProperty("db.user"));
