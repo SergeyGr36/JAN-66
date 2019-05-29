@@ -51,6 +51,7 @@ public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
         try {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ps.setLong(1, id);
             final ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
