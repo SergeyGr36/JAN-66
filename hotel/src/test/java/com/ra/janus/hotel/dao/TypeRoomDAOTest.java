@@ -2,20 +2,15 @@ package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.TypeRoom;
 import com.ra.janus.hotel.exception.DaoException;
-import jdk.jfr.DataAmount;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import javax.sql.DataSource;
-import java.io.DataOutput;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,20 +19,14 @@ import static org.mockito.Mockito.when;
 class TypeRoomDAOTest {
 
     private TypeRoomDAO typeRoomDAO;
-    @Mock
-    private TypeRoom mockTypeRoom;
-    @Mock
     private DataSource mockDataSource;
-    @Mock
     private Connection mockConnection;
-    @Mock
     private PreparedStatement mockPreparedStatement;
-    @Mock
     private ResultSet mockResultSet;
 
     private final static String INSERT_BY_ID = "INSERT INTO TYPE_ROOM (COUNT_PLACES, PRISE, DESCRIPTION, CLASS_OF_ROOM, ID) VALUES (?, ?, ?, ?, ?)";
     private final static String UPDATE_BY_ID = "UPDATE TYPE_ROOM SET COUNT_PLACES = ?, PRISE = ?, DESCRIPTION = ?, CLASS_OF_ROOM = ? WHERE ID = ?";
-    private final static String DELETE_BY_ID = "DELETE FROM TYPE+ROOM WHERE ID = ?";
+    private final static String DELETE_BY_ID = "DELETE FROM TYPE_ROOM WHERE ID = ?";
     private final static String SELECT_BY_ID = "SELECT * FROM TYPE_ROOM WHERE ID = ?";
     private final static String SELECT_ALL = "SELECT * FROM TYPE_ROOM";
 
@@ -49,7 +38,6 @@ class TypeRoomDAOTest {
         Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
         mockPreparedStatement = Mockito.mock(PreparedStatement.class);
         mockResultSet = Mockito.mock(ResultSet.class);
-        mockTypeRoom = Mockito.mock(TypeRoom.class);
         Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         }
 

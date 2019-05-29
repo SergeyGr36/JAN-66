@@ -21,7 +21,7 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
 
     private final static String INSERT_BY_ID = "INSERT INTO TYPE_ROOM (COUNT_PLACES, PRISE, DESCRIPTION, CLASS_OF_ROOM, ID) VALUES (?, ?, ?, ?, ?)";
     private final static String UPDATE_BY_ID = "UPDATE TYPE_ROOM SET COUNT_PLACES = ?, PRISE = ?, DESCRIPTION = ?, CLASS_OF_ROOM = ? WHERE ID = ?";
-    private final static String DELETE_BY_ID = "DELETE FROM TYPE+ROOM WHERE ID = ?";
+    private final static String DELETE_BY_ID = "DELETE FROM TYPE_ROOM WHERE ID = ?";
     private final static String SELECT_BY_ID = "SELECT * FROM TYPE_ROOM WHERE ID = ?";
     private final static String SELECT_ALL = "SELECT * FROM TYPE_ROOM";
 
@@ -109,7 +109,7 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
 
     private TypeRoom typeRoomRS(final ResultSet resultSet) throws SQLException {
         return new TypeRoom(resultSet.getLong("ID"),
-                resultSet.getInt("COUNT_PLACE"),
+                resultSet.getInt("COUNT_PLACES"),
                 resultSet.getInt("PRISE"),
                 resultSet.getString("DESCRIPTION"),
                 resultSet.getString("CLASS_OF_ROOM"));

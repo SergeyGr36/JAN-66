@@ -57,3 +57,15 @@ project(":hotel") {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
     }
 }
+
+project(":hotel-integration-test") {
+    dependencies {
+        compile project(":hotel")
+    }
+    spotbugsMain {
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+    }
+    spotbugsTest {
+        excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml")
+    }
+}
