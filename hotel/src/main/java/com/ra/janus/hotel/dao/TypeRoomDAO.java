@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
+public class TypeRoomDAO implements GenericDao<TypeRoom>{
 
     private final transient DataSource dataSource;
 
@@ -30,17 +30,17 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
     }
 
     @Override
-    public TypeRoom save(final TypeRoom typeRoom) throws DaoException {
+    public TypeRoom save(final TypeRoom typeRoom) {
         return saveUpdate(typeRoom, INSERT_BY_ID, SAVE_ERR_MSG);
     }
 
     @Override
-    public TypeRoom update(final TypeRoom typeRoom) throws DaoException {
+    public TypeRoom update(final TypeRoom typeRoom) {
         return saveUpdate(typeRoom, UPDATE_BY_ID, UPDATE_ERR_MSG);
     }
 
     @Override
-    public void delete(final long id) throws DaoException {
+    public int delete(final long id) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
             statement.setLong(1, id);
@@ -52,10 +52,11 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
             LOGGER.error(e.getMessage(), e);
             throw new DaoException(e.getMessage(), e);
         }
+        return 0;
     }
 
     @Override
-    public TypeRoom findById(final long id) throws DaoException {
+    public TypeRoom findById(final long id) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setLong(1, id);
@@ -76,7 +77,7 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
 
 
     @Override
-    public List<TypeRoom> findAll() throws DaoException {
+    public List<TypeRoom> findAll() {
         final List<TypeRoom> typeRoom = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
@@ -92,7 +93,7 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
         }
     }
 
-    private TypeRoom saveUpdate(final TypeRoom typeRoom, final String insertById, final String saveErrMsg) throws DaoException {
+    private TypeRoom saveUpdate(final TypeRoom typeRoom, final String insertById, final String saveErrMsg) {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(insertById)) {
             typeRoomSTM(statement, typeRoom);

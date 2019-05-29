@@ -1,6 +1,6 @@
 package com.ra.janus.hotel.exception;
 
-public class DaoException extends Exception {
+public class DaoException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
