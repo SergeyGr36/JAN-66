@@ -1,5 +1,6 @@
 package com.ra.course.janus.traintickets.configuration;
 
+import com.ra.course.janus.traintickets.exception.ConfigException;
 import com.zaxxer.hikari.HikariDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 
@@ -13,7 +14,7 @@ public enum DataSourceFactory {
     H2_IN_MEMORY {
         @Override
         protected DataSource createDataSource() {
-            JdbcDataSource ds = new JdbcDataSource();
+            final JdbcDataSource ds = new JdbcDataSource();
             ds.setUrl(props.getProperty("db.h2_in_memory.url"));
             ds.setUser(props.getProperty("db.h2_in_memory.user"));
             ds.setPassword(props.getProperty("db.h2_in_memory.password"));
@@ -24,7 +25,7 @@ public enum DataSourceFactory {
     HIKARY_H2_IN_MEMORY {
         @Override
         protected DataSource createDataSource() {
-            HikariDataSource ds = new HikariDataSource();
+            final HikariDataSource ds = new HikariDataSource();
             ds.setJdbcUrl(props.getProperty("db.h2_in_memory.url"));
             ds.setUsername(props.getProperty("db.h2_in_memory.user"));
             ds.setPassword(props.getProperty("db.h2_in_memory.password"));
@@ -38,7 +39,7 @@ public enum DataSourceFactory {
         try {
             props.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties")));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ConfigException(e);
         }
     }
 
