@@ -110,6 +110,18 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
+    void deleteWhenException() throws SQLException {
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockStatement);
+        when(mockStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
+        assertThrows(DaoException.class, () -> {
+            courseDao.delete(new Course()) ;
+        });
+
+    }
+
+
+
+    @Test
     void findByTidWhenFound() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);
@@ -136,7 +148,7 @@ public class CourseDaoJdbcTest {
             courseDao.findByTid(1) ;
         });
     }
-        @Test
+    @Test
     void findAll()throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(mockResultSet);

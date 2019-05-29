@@ -2,7 +2,6 @@ package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Mark;
 import com.ra.course.janus.faculty.exception.DaoException;
-import org.apache.log4j.Level;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -114,6 +113,7 @@ public class MarkDaoJdbcTest {
         assertEquals(false, markDao.delete(m));
 
     }
+
 
     @Test
     void findByTidWhenFound() throws SQLException {
