@@ -26,7 +26,7 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
     private final static String SELECT_ALL = "SELECT * FROM TYPE_ROOM";
 
     public TypeRoomDAO(final DataSource dataSource) {
-        this.dataSource = dataSource; //H2ConnectionFactory.getInstance().getDataSource();
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -57,38 +57,42 @@ public class TypeRoomDAO implements IEntityDAO<TypeRoom>{
     @Override
     public TypeRoom findById(final long id) throws DaoException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)){
+             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
             statement.setLong(1, id);
-            try (ResultSet resultSet = statement.executeQuery()){
+            final TypeRoom typeRoom;
+            try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return typeRoomRS(resultSet);
+                    typeRoom = typeRoomRS(resultSet);
+                } else {
+                    typeRoom = null;
                 }
+                return typeRoom;
             }
-            return null;
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
             throw new DaoException(e.getMessage(), e);
         }
     }
 
+
     @Override
     public List<TypeRoom> findAll() throws DaoException {
-        final List<TypeRoom> orders = new ArrayList<>();
+        final List<TypeRoom> typeRoom = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
             try (ResultSet resultSet = statement.executeQuery()){
                 while (resultSet.next()) {
-                    orders.add(typeRoomRS(resultSet));
+                    typeRoom.add(typeRoomRS(resultSet));
                 }
             }
-            return orders;
+            return typeRoom;
         } catch (SQLException e) {
             LOGGER.error(e.getMessage(), e);
             throw new DaoException(e.getMessage(), e);
         }
     }
 
-    private TypeRoom saveUpdate(TypeRoom typeRoom, String insertById, String saveErrMsg) throws DaoException {
+    private TypeRoom saveUpdate(final TypeRoom typeRoom, final String insertById, final String saveErrMsg) throws DaoException {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(insertById)) {
             typeRoomSTM(statement, typeRoom);
