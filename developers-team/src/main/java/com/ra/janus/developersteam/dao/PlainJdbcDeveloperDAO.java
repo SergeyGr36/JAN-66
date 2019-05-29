@@ -47,6 +47,7 @@ public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public Developer get(final long id) {
         try {
             final Connection conn = dataSource.getConnection();

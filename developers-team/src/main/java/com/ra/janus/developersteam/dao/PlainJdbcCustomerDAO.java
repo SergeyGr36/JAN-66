@@ -53,6 +53,7 @@ public class PlainJdbcCustomerDAO implements BaseDao<Customer> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public Customer get(final long id) {
         try  {
             final Connection conn = dataSource.getConnection();
