@@ -25,12 +25,13 @@ public class PlainJdbcCustomerDAOIntegrationTest {
     void whenCreateCustomerShouldReturnCustomer() throws Exception {
         //given
         long testId = 1L;
-        Customer testCustomer = new Customer(testId, null,null, null);
-        try(Connection connection = dataSource.getConnection()) {
-            //DBSchemaCreator.INSTANCE.createSchema(connection);
+        Customer testCustomer = new Customer(testId, "John",null, null);
+        try (Connection connection = dataSource.getConnection();){
 
-            //Customer customer = customerDAO.create(testCustomer);
-            //assertEquals(testCustomer, customer);
+            DBSchemaCreator.createSchema(connection);
+
+            Customer customer = customerDAO.create(testCustomer);
+            assertEquals(testCustomer, customer);
         }
     }
 }

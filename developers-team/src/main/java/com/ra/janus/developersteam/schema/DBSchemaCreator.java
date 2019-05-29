@@ -12,12 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public enum DBSchemaCreator {
-    INSTANCE;
+public final class DBSchemaCreator {
 
     private static final String SQL_SCRIPT_PATH = "sql_schema_scripts";
 
-    public int createSchema(final Connection connection) {
+    private DBSchemaCreator() {
+    }
+
+    public static int createSchema(final Connection connection) {
         try {
             final String script = readAllScripts().collect(Collectors.joining());
             processScript(connection, script);
@@ -27,7 +29,7 @@ public enum DBSchemaCreator {
         }
     }
 
-    private Stream<String> readAllScripts() throws IOException, URISyntaxException {
+    private static Stream<String> readAllScripts() throws IOException, URISyntaxException {
         return Files.walk(Paths.get(ClassLoader.getSystemResource(SQL_SCRIPT_PATH).toURI()))
                 .filter(path -> path.toString().endsWith(".sql"))
                 .flatMap((Function<Path, Stream<String>>) path -> {
@@ -40,7 +42,7 @@ public enum DBSchemaCreator {
     }
 
 
-    private void processScript(final Connection connection, final String script) throws SQLException {
+    private static void processScript(final Connection connection, final String script) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(script);
         }

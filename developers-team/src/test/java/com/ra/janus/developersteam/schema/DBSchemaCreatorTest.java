@@ -35,7 +35,7 @@ class DBSchemaCreatorTest {
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenReturn(1);
 
         //when
-        int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(mockConnection);
+        int scriptsProcessed = DBSchemaCreator.createSchema(mockConnection);
 
         //then
         assertNotEquals(notExpected, scriptsProcessed);
@@ -47,7 +47,7 @@ class DBSchemaCreatorTest {
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () ->  DBSchemaCreator.INSTANCE.createSchema(mockConnection);
+        final Executable executable = () ->  DBSchemaCreator.createSchema(mockConnection);
 
         //then
         assertThrows(IllegalStateException.class, executable);
@@ -62,7 +62,7 @@ class DBSchemaCreatorTest {
         int notExpected = 0;
 
         //when
-        int scriptsProcessed = DBSchemaCreator.INSTANCE.createSchema(connection);
+        int scriptsProcessed = DBSchemaCreator.createSchema(connection);
 
 //        DatabaseMetaData md = connection.getMetaData();
 //        ResultSet rs = md.getTables(null, null, "%", null);
