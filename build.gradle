@@ -48,6 +48,7 @@ wrapper {
 project(':train-tickets') {
     dependencies {
         compile db.h2
+        testCompile testing.mockito
         compile hibernate.hikari
         compile log.slf4jSimple
         compile testing.mockito

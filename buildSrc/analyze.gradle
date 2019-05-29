@@ -8,6 +8,12 @@ jacoco {
     toolVersion = '0.8.4'
 }
 
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = 'max'
+    reportLevel = 'high'
+}
+
 pmd {
     toolVersion = "6.14.0"
     consoleOutput = true
@@ -30,7 +36,7 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(
                     dir: it,
-                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**', '**/api/**']
+                    exclude: ['**/dto/**', '**/entity/**', '**/*Main*/**', '**/exception/**', '**/configuration/**']
             )
         })
     }
