@@ -118,7 +118,7 @@ class TrainDAOTest {
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
         train = trainDAO.findById(TRAIN_ID);
-      //  assertEquals(TEST_TRAIN,train);//<----------
+       // assertEquals(TEST_TRAIN,train);//<----------
     }
 
     @Test

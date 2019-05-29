@@ -11,7 +11,7 @@ public class Train  {
 
     private int seating;
 
-    private int freeSeats;
+    private transient int freeSeats;
 
 
     public Train() {

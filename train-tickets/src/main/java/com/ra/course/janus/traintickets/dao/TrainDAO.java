@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TrainDAO implements IJdbcDao<Train> {
 
-    private final DataSource dataSource;
+    private final transient DataSource dataSource;
 
     private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
@@ -17,12 +17,12 @@ public class TrainDAO implements IJdbcDao<Train> {
     private static final String DELETE_TRAIN = "DELETE ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
     private static final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
-    public TrainDAO(DataSource dataSource) {
+    public  TrainDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     @Override
-    public Train save(Train train) {
+    public Train save(final Train train) {
         try(Connection connection = dataSource.getConnection()){
             connection.setAutoCommit(false);
             try(PreparedStatement pr = connection.prepareStatement(INSERT_TRAIN)){
@@ -40,7 +40,7 @@ public class TrainDAO implements IJdbcDao<Train> {
     }
 
     @Override
-    public boolean update(Long id, Train train) {
+    public boolean update(final Long id, final Train train) {
         try(Connection connection = dataSource.getConnection()){
             connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN)){
@@ -48,9 +48,9 @@ public class TrainDAO implements IJdbcDao<Train> {
                 ps.setInt(2,train.getSeating());
                 ps.setInt(3,train.getFreeSeats());
                 ps.setLong(4,id);
-                int resultUp = ps.executeUpdate();
+                //final int resultUp = ps.executeUpdate();
                 connection.commit();
-                return  resultUp == 1;
+                return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
             throw new RuntimeException(e);
@@ -58,14 +58,14 @@ public class TrainDAO implements IJdbcDao<Train> {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(final Long id) {
         try(Connection connection = dataSource.getConnection()){
             connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(DELETE_TRAIN)){
                 ps.setLong(1,id);
-                int resultUP = ps.executeUpdate();
+               // int resultUP = ps.executeUpdate();
                 connection.commit();
-                return resultUP == 1;
+                return ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
             throw new RuntimeException(e);
@@ -73,8 +73,8 @@ public class TrainDAO implements IJdbcDao<Train> {
     }
 
     @Override
-    public Train findById(Long id) {
-        Train train = new Train();
+    public Train findById(final Long id) {
+       final Train train = new Train();
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ID)){
                 pr.setLong(1,id);
@@ -95,12 +95,12 @@ public class TrainDAO implements IJdbcDao<Train> {
 
     @Override
     public List<Train> findAll() {
-        ArrayList <Train> trainsList = new ArrayList<>();
+      final  ArrayList <Train> trainsList = new ArrayList<>();
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL)){
                 try(ResultSet resultSet = pr.executeQuery()){
                     if (resultSet.next()){
-                        Train train = new Train();
+                       final Train train = new Train();
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));
                         train.setSeating(resultSet.getInt(3));
