@@ -47,7 +47,7 @@ class DBSchemaCreatorMockTest {
         Mockito.when(mockStatement.executeUpdate(Mockito.anyString())).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () ->  DBSchemaCreator.createSchema(mockConnection);
+        final Executable executable = () ->  DBSchemaCreator.createSchema(mockConnection, "Test");
 
         //then
         assertThrows(IllegalStateException.class, executable);

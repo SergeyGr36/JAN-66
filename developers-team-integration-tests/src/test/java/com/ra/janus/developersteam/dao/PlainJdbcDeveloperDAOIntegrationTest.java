@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class PlainJdbcDeveloperDAOIntegrationTest {
-    private static final DataSource dataSource = new DataSourceFactory().get();
+    private static final DataSource dataSource = DataSourceFactory.get();
     private static final BaseDao<Developer> developerDAO = new PlainJdbcDeveloperDAO(dataSource);
 
     private static Developer developerToCreate = new Developer(1L, "Nick");
@@ -23,7 +23,7 @@ public class PlainJdbcDeveloperDAOIntegrationTest {
     @BeforeEach
     public void beforeEach() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection);
+            DBSchemaCreator.createSchema(connection, "DEVELOPERS");
         }
     }
 
@@ -33,7 +33,7 @@ public class PlainJdbcDeveloperDAOIntegrationTest {
         Developer developer = developerDAO.create(developerToCreate);
 
         //then
-        assertEquals(developerToCreate, developer);
+        assertEquals(developer, developerDAO.get(developer.getId()));
     }
 
     @Test
