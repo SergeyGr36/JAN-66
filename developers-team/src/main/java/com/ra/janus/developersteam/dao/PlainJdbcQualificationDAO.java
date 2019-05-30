@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PlainJdbcQualificationDAO implements BaseDao<Qualification> {
 
-    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?, ?)";
+    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE qualifications SET name=?,responsibility=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM qualifications";
     private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";

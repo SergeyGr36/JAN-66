@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PlainJdbcProjectDAO implements BaseDao<Project> {
 
-    private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?)";
+    private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE projects SET name=?,description=?,status=?,eta=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM projects";
     private static final String SELECT_ONE_SQL = "SELECT * FROM projects WHERE id = ?";
