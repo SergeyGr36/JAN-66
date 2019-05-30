@@ -1,6 +1,7 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.User;
+import com.ra.course.janus.traintickets.exception.DAOException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -28,72 +29,72 @@ public class UserDAO implements IJdbcDao<User> {
     }
 
     @Override
-    public User save(User user) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement saveStmt = conn.prepareStatement(SAVE_USER)) {
-            prepareStatementWithUser(saveStmt, user);
-            saveStmt.executeUpdate();
-            try (ResultSet generatedKeys = saveStmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    final long id = generatedKeys.getLong("id");
-                    return new User(
-                            id,
-                            user.getName(),
-                            user.getEmail(),
-                            user.getPassword()
-                    );
-                } else {
-                    throw new RuntimeException("failed to save user");
-                }
+    public User save(final User user) {
+        try (Connection conn = dataSource.getConnection()) {
+             try(PreparedStatement saveStmt = conn.prepareStatement(SAVE_USER)) {
+                 prepareStatementWithUser(saveStmt, user);
+                 saveStmt.executeUpdate();
+                 try (ResultSet generatedKeys = saveStmt.getGeneratedKeys()) {
+                     if (generatedKeys.next()) {
+                         final long id = generatedKeys.getLong("id");
+                         return new User(
+                                 id,
+                                 user.getName(),
+                                 user.getEmail(),
+                                 user.getPassword()
+                         );
+                     } else {
+                         throw new DAOException();
+                     }
+                 }
+             }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public boolean update(final Long id, final User user) {
+        try (Connection conn = dataSource.getConnection()) {
+             try (PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER)) {
+                 prepareStatementWithUser(updateStmt, user);
+                 updateStmt.setLong(PARAM_4, id);
+                 return updateStmt.executeUpdate() > 0;
+             }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public boolean delete(final Long id) {
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement deleteStmt = conn.prepareStatement(DELETE_USER)) {
+                deleteStmt.setLong(PARAM_1, id);
+                return deleteStmt.executeUpdate() > 0;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("failed to save user", e);
+            throw new DAOException(e);
         }
     }
 
     @Override
-    public boolean update(Long id, User user) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER)) {
-            prepareStatementWithUser(updateStmt, user);
-            updateStmt.setLong(PARAM_4, id);
-            return updateStmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public boolean delete(Long id) {
-        try (Connection conn = dataSource.getConnection();
-            PreparedStatement deleteStmt = conn.prepareStatement(DELETE_USER)) {
-            deleteStmt.setLong(PARAM_1, id);
-            return deleteStmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public User findById(Long id) {
-        try {
-            final Connection conn = dataSource.getConnection();
-            final PreparedStatement findStmt = conn.prepareStatement(FIND_BY_ID);
-            findStmt.setLong(PARAM_1, id);
-            ResultSet rs = findStmt.executeQuery();
-            try {
-                if (rs.next()) {
-                    return toUser(rs);
-                } else {
-                    return null;
+    public User findById(final Long id) {
+        final User user;
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement findStmt = conn.prepareStatement(FIND_BY_ID)) {
+                findStmt.setLong(PARAM_1, id);
+                try (ResultSet rs = findStmt.executeQuery()) {
+                    if (rs.next()) {
+                        user = toUser(rs);
+                    } else {
+                        user = null;
+                    }
                 }
-            } finally {
-                rs.close();
-                findStmt.close();
-                conn.close();
             }
+            return user;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
@@ -102,13 +103,13 @@ public class UserDAO implements IJdbcDao<User> {
         try (Connection conn = dataSource.getConnection();
             PreparedStatement userStatement = conn.prepareStatement(FIND_ALL);
             ResultSet rs = userStatement.executeQuery()) {
-            List<User> users = new ArrayList();
+            final List<User> users = new ArrayList();
             if (rs.next()) {
                 users.add(toUser(rs));
             }
             return users;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
