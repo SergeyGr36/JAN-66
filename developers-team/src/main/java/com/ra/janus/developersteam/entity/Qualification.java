@@ -26,6 +26,9 @@ public class Qualification {
         this(id, null, null);
     }
 
+    public Qualification() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

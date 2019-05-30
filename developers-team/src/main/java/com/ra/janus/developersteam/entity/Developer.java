@@ -3,46 +3,49 @@ package com.ra.janus.developersteam.entity;
 import java.util.Objects;
 
 public class Developer {
-	long id;
-	String name;
+    long id;
+    String name;
 
-	public Developer(final long id, final String name) {
+    public Developer(final long id, final String name) {
 
-		this.id = id;
-		this.name = name;
-	}
+        this.id = id;
+        this.name = name;
+    }
 
-	public Developer(long id, Developer developer) {
-		this.id = id;
-		this.name = developer.getName();
-	}
+    public Developer() {
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Developer developer = (Developer) o;
-		return id == developer.id;
-	}
+    public Developer(long id, Developer developer) {
+        this.id = id;
+        this.name = developer.getName();
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Developer developer = (Developer) o;
+        return id == developer.id;
+    }
 
-	public long getId() {
-		return id;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

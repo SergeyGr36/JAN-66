@@ -30,6 +30,9 @@ public class Manager {
         this.id = id;
     }
 
+    public Manager() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

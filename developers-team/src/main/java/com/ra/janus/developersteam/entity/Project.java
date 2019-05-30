@@ -31,6 +31,9 @@ public class Project {
         this(id, null, null, null, null);
     }
 
+    public Project() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
