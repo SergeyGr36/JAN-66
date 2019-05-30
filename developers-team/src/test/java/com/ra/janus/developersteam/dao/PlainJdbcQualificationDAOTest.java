@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PlainJdbcQualificationDAOTest {
 
-    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?, ?)";
+    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE qualifications SET name=?,responsibility=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM qualifications";
     private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";
