@@ -12,12 +12,11 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PlainJdbcBillDAOIntegrationTest {
 
-    private static final DataSource dataSource = new DataSourceFactory().get();
+    private static final DataSource dataSource = DataSourceFactory.get();
     private static final BaseDao<Bill> billDAO = new PlainJdbcBillDAO(dataSource);
 
     private static Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
@@ -25,7 +24,7 @@ public class PlainJdbcBillDAOIntegrationTest {
     @BeforeEach
     public void beforeEach() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection);
+            DBSchemaCreator.createSchema(connection, "BILLS");
         }
     }
 
@@ -35,7 +34,7 @@ public class PlainJdbcBillDAOIntegrationTest {
         Bill bill = billDAO.create(billToCreate);
 
         //then
-        assertEquals(billToCreate, bill);
+        assertEquals(bill, billDAO.get(bill.getId()));
     }
 
     @Test

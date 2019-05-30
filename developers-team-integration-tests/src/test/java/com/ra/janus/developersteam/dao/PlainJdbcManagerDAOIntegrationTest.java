@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class PlainJdbcManagerDAOIntegrationTest {
 
-    private static final DataSource dataSource = new DataSourceFactory().get();
+    private static final DataSource dataSource = DataSourceFactory.get();
     private static final BaseDao<Manager> managerDAO = new PlainJdbcManagerDAO(dataSource);
 
     private static Manager managerToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
@@ -24,7 +24,7 @@ public class PlainJdbcManagerDAOIntegrationTest {
     @BeforeEach
     public void beforeEach() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection);
+            DBSchemaCreator.createSchema(connection, "MANAGERS");
         }
     }
 
@@ -34,7 +34,7 @@ public class PlainJdbcManagerDAOIntegrationTest {
         Manager manager = managerDAO.create(managerToCreate);
 
         //then
-        assertEquals(managerToCreate, manager);
+        assertEquals(manager, managerDAO.get(manager.getId()));
     }
 
     @Test

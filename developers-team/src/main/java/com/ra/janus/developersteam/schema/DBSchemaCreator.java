@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,18 +21,23 @@ public final class DBSchemaCreator {
     }
 
     public static int createSchema(final Connection connection) {
-        try {
-            final String script = readAllScripts().collect(Collectors.joining());
-            processScript(connection, script);
-            return 1;
-        } catch (IOException | URISyntaxException | SQLException e) {
-            throw new IllegalStateException("Could not read the application properties file.", e);
-        }
+        return createSchema(connection, "");
     }
 
-    private static Stream<String> readAllScripts() throws IOException, URISyntaxException {
+    public static int createSchema(final Connection connection, final String... scripts) {
+            Arrays.asList(scripts).forEach(s -> {
+                try {
+                    processScript(connection, readAllScripts(s).collect(Collectors.joining()));
+                } catch (IOException | URISyntaxException | SQLException e) {
+                    throw new IllegalStateException("Could not read the application properties file.", e);
+                }
+            });
+            return 1;
+    }
+
+    private static Stream<String> readAllScripts(final String script) throws IOException, URISyntaxException {
         return Files.walk(Paths.get(ClassLoader.getSystemResource(SQL_SCRIPT_PATH).toURI()))
-                .filter(path -> path.toString().endsWith(".sql"))
+                .filter(path -> path.toString().endsWith(script + ".sql"))
                 .flatMap((Function<Path, Stream<String>>) path -> {
                     try {
                         return Files.lines(path);

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class PlainJdbcQualificationDAOIntegrationTest {
 
-    private static final DataSource dataSource = new DataSourceFactory().get();
+    private static final DataSource dataSource = DataSourceFactory.get();
     private static final BaseDao<Qualification> qualificationDAO = new PlainJdbcQualificationDAO(dataSource);
 
     private static Qualification qualificationToCreate = new Qualification(1L, "Web Developer", "Front End");
@@ -24,7 +24,7 @@ public class PlainJdbcQualificationDAOIntegrationTest {
     @BeforeEach
     public void beforeEach() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection);
+            DBSchemaCreator.createSchema(connection, "QUALIFICATIONS");
         }
     }
 
@@ -34,7 +34,7 @@ public class PlainJdbcQualificationDAOIntegrationTest {
         Qualification qualification = qualificationDAO.create(qualificationToCreate);
 
         //then
-        assertEquals(qualificationToCreate, qualification);
+        assertEquals(qualification, qualificationDAO.get(qualification.getId()));
     }
 
     @Test
