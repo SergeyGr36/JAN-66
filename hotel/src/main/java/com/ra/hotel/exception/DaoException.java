@@ -1,4 +1,4 @@
-package com.ra.janus.hotel.exception;
+package com.ra.hotel.exception;
 
 public class DaoException extends Exception {
 

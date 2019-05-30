@@ -1,4 +1,4 @@
 rootProject.name = 'janus'
 include 'hotel'
-include 'hotel'
+include 'hotel-integration'
 
