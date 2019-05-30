@@ -38,6 +38,9 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
+
+        testCompile testing.mockito
+
     }
 }
 
@@ -60,5 +63,20 @@ project(':faculty') {
     spotbugsMain {
         excludeFilter = file("$rootProject.projectDir/buildSrc/findbugs/exclude.xml") 
     }
+
+}
+project(':faculty-integration-tests') {
+    dependencies {
+
+
+        compile log.log4jDependency
+        compile log.log4jExtras
+        compile log.log4j2Api
+        compile log.log4jCore
+        compile log.disruptor
+
+        compile project(':faculty')
+        
+   }
 
 }
