@@ -1,6 +1,7 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.Train;
+import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +61,7 @@ class TrainDAOTest {
         train = new Train(TRAIN_TEST_ID,TRAIN_NAME,SEATING,FREE_SEATS);
         when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
-        assertThrows(RuntimeException.class, ()-> trainDAO.save(train));
+        assertThrows(DAOException.class, ()-> trainDAO.save(train));
     }
 
     @Test
@@ -85,7 +86,7 @@ class TrainDAOTest {
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
         doThrow(new SQLException()).when(mockConn).close();
         train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
-        assertThrows(RuntimeException.class,()->trainDAO.update(TRAIN_ID,train));
+        assertThrows(DAOException.class,()->trainDAO.update(TRAIN_ID,train));
     }
 
     @Test
@@ -107,7 +108,7 @@ class TrainDAOTest {
         when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
         doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(RuntimeException.class,()->trainDAO.delete(TRAIN_ID));
+        assertThrows(DAOException.class,()->trainDAO.delete(TRAIN_ID));
     }
 
     @Test
@@ -118,7 +119,6 @@ class TrainDAOTest {
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
         train = trainDAO.findById(TRAIN_ID);
-       // assertEquals(TEST_TRAIN,train);//<----------
     }
 
     @Test
@@ -129,7 +129,6 @@ class TrainDAOTest {
         when(mockResultSet.next()).thenReturn(false);
         mockMapTrain(mockResultSet);
         train = trainDAO.findById(TRAIN_ID);
-        //assertNull(train);
     }
 
     @Test
@@ -140,7 +139,7 @@ class TrainDAOTest {
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
         doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(RuntimeException.class, () -> trainDAO.findById(TRAIN_ID));
+        assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
     }
 
 
@@ -155,7 +154,6 @@ class TrainDAOTest {
         when(mockResultSet.getInt("freeSeats")).thenReturn(FREE_SEATS);
         List<Train> users = trainDAO.findAll();
         assertTrue(users.size() == 1);
-        //assertTrue(users.contains(TEST_TRAIN));
     }
 
     @Test
@@ -177,7 +175,7 @@ class TrainDAOTest {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(RuntimeException.class, () -> trainDAO.findAll());
+        assertThrows(DAOException.class, () -> trainDAO.findAll());
     }
 
     private void mockMapTrain(ResultSet mockRS) throws SQLException {

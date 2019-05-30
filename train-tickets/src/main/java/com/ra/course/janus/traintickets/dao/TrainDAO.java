@@ -1,6 +1,7 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.Train;
+import com.ra.course.janus.traintickets.exception.DAOException;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -35,7 +36,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return train;
             }
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
@@ -53,7 +54,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
@@ -68,7 +69,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
@@ -89,7 +90,7 @@ public class TrainDAO implements IJdbcDao<Train> {
             }
             return train;
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 
@@ -110,7 +111,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 }
             }
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            throw new DAOException(e);
         }
     }
 }
