@@ -1,5 +1,4 @@
 rootProject.name = 'janus'
 include 'faculty'
-include 'TestModule'
 include 'faculty-integration-tests'
 
