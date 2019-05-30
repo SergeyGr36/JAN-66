@@ -1,9 +1,11 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.Qualification;
+import com.ra.janus.developersteam.entity.Customer;
 import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
@@ -11,18 +13,15 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-public class PlainJdbcQualificationDAOTest {
-
-    private static final String INSERT_SQL = "INSERT INTO qualifications (name, responsibility) VALUES (?, ?)";
-    private static final String UPDATE_SQL = "UPDATE qualifications SET name=?,responsibility=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM qualifications";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";
-    private static final String DELETE_SQL = "DELETE FROM qualifications WHERE id=?";
-
+class PlainJdbcCustomerDAOMockTest {
+    private static final String INSERT_SQL = "INSERT INTO customers (name, address, phone) VALUES (?, ?, ?)";
+    private static final String UPDATE_SQL = "UPDATE customers SET name=?,address=?,phone=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM customers";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM customers WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM customers WHERE id=?";
     private DataSource mockDataSource;
-    private BaseDao<Qualification> qualificationDAO;
+
+    private PlainJdbcCustomerDAO customerDAO;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
@@ -30,7 +29,7 @@ public class PlainJdbcQualificationDAOTest {
     @BeforeEach
     public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
-        qualificationDAO = new PlainJdbcQualificationDAO(mockDataSource);
+        customerDAO = new PlainJdbcCustomerDAO(mockDataSource);
 
         mockConnection = Mockito.mock(Connection.class);
         Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
@@ -41,49 +40,49 @@ public class PlainJdbcQualificationDAOTest {
     }
 
     @Test
-    void whenCreateQualificationShouldReturnQualification() throws Exception {
+    void whenCreateCustomerShouldReturnCustomer() throws Exception {
         //given
         long testId = 1L;
         int columnIdIndex = 1;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(true);
         Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
         //when
-        Qualification qualification = qualificationDAO.create(testQualification);
+        Customer customer = customerDAO.create(testCustomer);
 
         //then
-        assertEquals(testQualification, qualification);
+        assertEquals(testCustomer, customer);
     }
 
     @Test
-    void whenCreateQualificationShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
+    void whenCreateCustomerShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        final Executable executable = () -> qualificationDAO.create(testQualification);
+        final Executable executable = () -> customerDAO.create(testCustomer);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenCreateQualificationShouldThrowException() throws Exception {
+    void whenCreateCustomerShouldThrowException() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.create(testQualification);
+        final Executable executable = () -> customerDAO.create(testCustomer);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -92,7 +91,7 @@ public class PlainJdbcQualificationDAOTest {
     //==============================
 
     @Test
-    void whenGetQualificationFromDbByIdThenReturnIt() throws Exception {
+    void whenReadCustomerFromDbByIdThenReturnIt() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -100,69 +99,69 @@ public class PlainJdbcQualificationDAOTest {
         Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
 
         //when
-        Qualification qualification = qualificationDAO.get(testId);
+        Customer customer = customerDAO.get(testId);
 
         //then
-        assertEquals(testId, qualification.getId());
+        assertEquals(testId, customer.getId());
     }
 
     @Test
-    void whenGetAbsentQualificationFromDbByIdThenReturnNull() throws Exception {
+    void whenReadAbsentCustomerFromDbByIdThenReturnNull() throws Exception {
         //given
         long testId = 1L;
-        Qualification expectedQualification = null;
+        Customer expectedCustomer = null;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Qualification qualification = qualificationDAO.get(testId);
+        Customer customer = customerDAO.get(testId);
 
         //then
-        assertEquals(expectedQualification, qualification);
+        assertEquals(expectedCustomer, customer);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> customerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> customerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> customerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetQualificationFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
+    void whenReadCustomerFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
         //given
         long testId = 1L;
         final int testParametherIndex = 1;
@@ -171,7 +170,7 @@ public class PlainJdbcQualificationDAOTest {
         Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.get(testId);
+        final Executable executable = () -> customerDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -180,25 +179,25 @@ public class PlainJdbcQualificationDAOTest {
     //==============================
 
     @Test
-    void whenGetAllQualificationsFromDbThenReturnNonEmptyList() throws Exception {
+    void whenReadAllCustomersFromDbThenReturnNonEmptyList() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
-        List<Qualification> list = qualificationDAO.getAll();
+        List<Customer> list = customerDAO.getAll();
 
         //then
         assertFalse(list.isEmpty());
     }
 
     @Test
-    void whenGetAllQualificationsFromDbThenThrowException() throws Exception {
+    void whenReadAllCustomersFromDbThenThrowException() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.getAll();
+        final Executable executable = () -> customerDAO.getAll();
 
         //then
         assertThrows(DAOException.class, executable);
@@ -207,46 +206,46 @@ public class PlainJdbcQualificationDAOTest {
     //==============================
 
     @Test
-    void whenUpdateQualificationInDbThenReturnTrue() throws Exception {
+    void whenUpdateCustomerInDbThenReturnTrue() throws Exception {
         //given
         long testId = 1L;
         int testCount = 1;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = qualificationDAO.update(testQualification);
+        boolean updated = customerDAO.update(testCustomer);
 
         //then
         assertEquals(true, updated);
     }
 
     @Test
-    void whenUpdateQualificationInDbThenReturnFalse() throws Exception {
+    void whenUpdateCustomerInDbThenReturnFalse() throws Exception {
         //given
         long testId = 1L;
         int testCount = 0;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = qualificationDAO.update(testQualification);
+        boolean updated = customerDAO.update(testCustomer);
 
         //then
         assertEquals(false, updated);
     }
 
     @Test
-    void whenUpdateQualificationInDbThenThrowException() throws Exception {
+    void whenUpdateCustomerInDbThenThrowException() throws Exception {
         //given
         long testId = 1L;
-        Qualification testQualification = new Qualification(testId);
+        Customer testCustomer = new Customer(testId, null,null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.update(testQualification);
+        final Executable executable = () -> customerDAO.update(testCustomer);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -255,7 +254,7 @@ public class PlainJdbcQualificationDAOTest {
     //==============================
 
     @Test
-    void whenDeleteQualificationFromDbThenReturnTrue()throws Exception  {
+    void whenDeleteCustomerFromDbThenReturnTrue()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 1;
@@ -263,14 +262,14 @@ public class PlainJdbcQualificationDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = qualificationDAO.delete(testId);
+        boolean deleted = customerDAO.delete(testId);
 
         //then
         assertEquals(true, deleted);
     }
 
     @Test
-    void whenDeleteQualificationFromDbThenReturnFalse()throws Exception  {
+    void whenDeleteCustomerFromDbThenReturnFalse()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 0;
@@ -278,20 +277,20 @@ public class PlainJdbcQualificationDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = qualificationDAO.delete(testId);
+        boolean deleted = customerDAO.delete(testId);
 
         //then
         assertEquals(false, deleted);
     }
 
     @Test
-    void whenDeleteQualificationFromDbThenThrowException()throws Exception  {
+    void whenDeleteCustomerFromDbThenThrowException()throws Exception  {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> qualificationDAO.delete(testId);
+        final Executable executable = () -> customerDAO.delete(testId);
 
         //then
         assertThrows(DAOException.class, executable);

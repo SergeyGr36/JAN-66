@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
-class PlainJdbcDeveloperDAOTest {
+class PlainJdbcDeveloperDAOMockTest {
     private static final String INSERT_SQL = "INSERT INTO developers (name) VALUES (?)";
     private static final String UPDATE_SQL = "UPDATE developers SET name=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM developers";

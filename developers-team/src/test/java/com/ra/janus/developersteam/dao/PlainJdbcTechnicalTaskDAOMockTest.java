@@ -1,9 +1,11 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.Bill;
+import com.ra.janus.developersteam.entity.TechnicalTask;
 import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 
@@ -11,17 +13,16 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+class PlainJdbcTechnicalTaskDAOMockTest {
+    private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
+    private static final String UPDATE_SQL = "UPDATE tasks SET title=?,description=? WHERE id=?";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM tasks";
+    private static final String SELECT_ONE_SQL = "SELECT * FROM tasks WHERE id = ?";
+    private static final String DELETE_SQL = "DELETE FROM tasks WHERE id=?";
 
-class PlainJdbcBillDAOTest {
-    private static final String INSERT_SQL = "INSERT INTO bills (docDate) VALUES (?)";
-    private static final String UPDATE_SQL = "UPDATE bills SET docDate=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT * FROM bills";
-    private static final String SELECT_ONE_SQL = "SELECT * FROM bills WHERE id = ?";
-    private static final String DELETE_SQL = "DELETE FROM bills WHERE id=?";
     private DataSource mockDataSource;
 
-    private PlainJdbcBillDAO billDAO;
+    private PlainJdbcTechnicalTaskDAO taskDAO;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
@@ -29,7 +30,7 @@ class PlainJdbcBillDAOTest {
     @BeforeEach
     public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
-        billDAO = new PlainJdbcBillDAO(mockDataSource);
+        taskDAO = new PlainJdbcTechnicalTaskDAO(mockDataSource);
 
         mockConnection = Mockito.mock(Connection.class);
         Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
@@ -40,52 +41,49 @@ class PlainJdbcBillDAOTest {
     }
 
     @Test
-    void whenCreateBillShouldReturnBill() throws Exception {
+    void whenCreateTaskShouldReturnTask() throws Exception {
         //given
         long testId = 1L;
         int columnIdIndex = 1;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask testTask = new TechnicalTask(testId, null,null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(true);
         Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
 
         //when
-        Bill bill = billDAO.create(testBill);
+        TechnicalTask task = taskDAO.create(testTask);
 
         //then
-        assertEquals(testBill, bill);
+        assertEquals(testTask, task);
     }
 
     @Test
-    void whenCreateBillShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
+    void whenCreateTaskShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
         long testId = 1L;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask testTask = new TechnicalTask(testId, null,null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        final Executable executable = () -> billDAO.create(testBill);
+        final Executable executable = () -> taskDAO.create(testTask);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenCreateBillShouldThrowException() throws Exception {
+    void whenCreateTaskShouldThrowException() throws Exception {
         //given
         long testId = 1L;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask testTask = new TechnicalTask(testId, null, null);
         Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.create(testBill);
+        final Executable executable = () -> taskDAO.create(testTask);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -94,7 +92,7 @@ class PlainJdbcBillDAOTest {
     //==============================
 
     @Test
-    void whenReadBillFromDbByIdThenReturnIt() throws Exception {
+    void whenReadTaskFromDbByIdThenReturnIt() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -102,69 +100,69 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
 
         //when
-        Bill bill = billDAO.get(testId);
+        TechnicalTask task = taskDAO.get(testId);
 
         //then
-        assertEquals(testId, bill.getId());
+        assertEquals(testId, task.getId());
     }
 
     @Test
-    void whenReadAbsentBillFromDbByIdThenReturnNull() throws Exception {
+    void whenReadAbsentTaskFromDbByIdThenReturnNull() throws Exception {
         //given
         long testId = 1L;
-        Bill expectedBill = null;
+        TechnicalTask expectedTask = null;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Bill bill = billDAO.get(testId);
+        TechnicalTask task = taskDAO.get(testId);
 
         //then
-        assertEquals(expectedBill, bill);
+        assertEquals(expectedTask, task);
     }
 
     @Test
-    void whenReadBillFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+    void whenReadTaskFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.get(testId);
+        final Executable executable = () -> taskDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenReadBillFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
+    void whenReadTaskFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.get(testId);
+        final Executable executable = () -> taskDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenReadBillFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
+    void whenReadTaskFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.get(testId);
+        final Executable executable = () -> taskDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenReadBillFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
+    void whenReadTaskFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -172,7 +170,7 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.get(testId);
+        final Executable executable = () -> taskDAO.get(testId);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -181,25 +179,25 @@ class PlainJdbcBillDAOTest {
     //==============================
 
     @Test
-    void whenReadAllBillsFromDbThenReturnNonEmptyList() throws Exception {
+    void whenReadAllTasksFromDbThenReturnNonEmptyList() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
-        List<Bill> list = billDAO.getAll();
+        List<TechnicalTask> list = taskDAO.getAll();
 
         //then
         assertFalse(list.isEmpty());
     }
 
     @Test
-    void whenReadAllBillsFromDbThenThrowException() throws Exception {
+    void whenReadAllTasksFromDbThenThrowException() throws Exception {
         //given
         Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.getAll();
+        final Executable executable = () -> taskDAO.getAll();
 
         //then
         assertThrows(DAOException.class, executable);
@@ -208,49 +206,46 @@ class PlainJdbcBillDAOTest {
     //==============================
 
     @Test
-    void whenUpdateBillInDbThenReturnTrue() throws Exception {
+    void whenUpdateTaskInDbThenReturnTrue() throws Exception {
         //given
         long testId = 1L;
         int testCount = 1;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask task = new TechnicalTask(testId, null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = billDAO.update(testBill);
+        boolean updated = taskDAO.update(task);
 
         //then
         assertEquals(true, updated);
     }
 
     @Test
-    void whenUpdateBillInDbThenReturnFalse() throws Exception {
+    void whenUpdateTaskInDbThenReturnFalse() throws Exception {
         //given
         long testId = 1L;
         int testCount = 0;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask testCustomer = new TechnicalTask(testId, null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean updated = billDAO.update(testBill);
+        boolean updated = taskDAO.update(testCustomer);
 
         //then
         assertEquals(false, updated);
     }
 
     @Test
-    void whenUpdateBillInDbThenThrowException() throws Exception {
+    void whenUpdateTaskInDbThenThrowException() throws Exception {
         //given
         long testId = 1L;
-        Date testDate = null;
-        Bill testBill = new Bill(testId, testDate);
+        TechnicalTask testTask = new TechnicalTask(testId, null, null);
         Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.update(testBill);
+        final Executable executable = () -> taskDAO.update(testTask);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -259,7 +254,7 @@ class PlainJdbcBillDAOTest {
     //==============================
 
     @Test
-    void whenDeleteBillFromDbThenReturnTrue()throws Exception  {
+    void whenDeleteTaskFromDbThenReturnTrue()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 1;
@@ -267,14 +262,14 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = billDAO.delete(testId);
+        boolean deleted = taskDAO.delete(testId);
 
         //then
         assertEquals(true, deleted);
     }
 
     @Test
-    void whenDeleteBillFromDbThenReturnFalse()throws Exception  {
+    void whenDeleteTaskFromDbThenReturnFalse()throws Exception  {
         //given
         long testId = 1L;
         int testCount = 0;
@@ -282,20 +277,20 @@ class PlainJdbcBillDAOTest {
         Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
 
         //when
-        boolean deleted = billDAO.delete(testId);
+        boolean deleted = taskDAO.delete(testId);
 
         //then
         assertEquals(false, deleted);
     }
 
     @Test
-    void whenDeleteBillFromDbThenThrowException()throws Exception  {
+    void whenDeleteTaskFromDbThenThrowException()throws Exception  {
         //given
         long testId = 1L;
         Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> billDAO.delete(testId);
+        final Executable executable = () -> taskDAO.delete(testId);
 
         //then
         assertThrows(DAOException.class, executable);
