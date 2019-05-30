@@ -1,7 +1,7 @@
 package com.ra.janus.developersteam.datasources;
 
 import com.ra.janus.developersteam.exception.DataSourceException;
-import com.ra.janus.developersteam.utils.PropertyReader;
+import com.ra.janus.developersteam.utils.PropertyReaderUtils;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class DataSourceFactory {
     public DataSource get() {
 
         try {
-            final Properties properties = PropertyReader.INSTANCE.getProperties("config.properties");
+            final Properties properties = PropertyReaderUtils.getProperties("config.properties");
 
             return HikDataSource.INSTANCE.get(properties.getProperty(DB_URL), properties.getProperty(DB_USER), properties.getProperty(DB_PASS));
 

@@ -1,6 +1,6 @@
 package com.ra.janus.developersteam.datasources;
 
-import com.ra.janus.developersteam.utils.PropertyReader;
+import com.ra.janus.developersteam.utils.PropertyReaderUtils;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class HikDataSourceTest {
     @BeforeEach
     public void before() throws IOException {
 
-        Properties properties = PropertyReader.INSTANCE.getProperties("config.properties");
+        Properties properties = PropertyReaderUtils.getProperties("config.properties");
         url = properties.getProperty("db.url");
         user = properties.getProperty("db.username");
         pass = properties.getProperty("db.password");
