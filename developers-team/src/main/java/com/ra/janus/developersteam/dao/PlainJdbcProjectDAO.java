@@ -121,13 +121,13 @@ public class PlainJdbcProjectDAO implements BaseDao<Project> {
                 rs.getString("name"),
                 rs.getString("description"),
                 rs.getString("status"),
-                rs.getString("eta"));
+                rs.getDate("eta"));
     }
 
     private void prepareStatement(final PreparedStatement ps, final Project project) throws SQLException {
         ps.setString(1, project.getName());
         ps.setString(2, project.getDescription());
         ps.setString(3, project.getStatus());
-        ps.setString(4, project.getEta());
+        ps.setDate(4, project.getEta());
     }
 }
