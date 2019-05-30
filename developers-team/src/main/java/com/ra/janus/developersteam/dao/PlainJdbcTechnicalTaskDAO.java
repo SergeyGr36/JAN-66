@@ -37,7 +37,9 @@ public class PlainJdbcTechnicalTaskDAO implements BaseDao<TechnicalTask> {
                     final long id = generatedKeys.getLong(1);
                     return new TechnicalTask(id, task);
                 } else {
-                    throw new DAOException("Could not create a task");
+                    final DAOException e = new DAOException("Could not create a Technical task");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

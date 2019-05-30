@@ -38,7 +38,9 @@ public class PlainJdbcQualificationDAO implements BaseDao<Qualification> {
                     final long id = generatedKeys.getLong(1);
                     return new Qualification(id, qualification);
                 } else {
-                    throw new DAOException("Could not create a Qualification");
+                    final DAOException e = new DAOException("Could not create a Qualification");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

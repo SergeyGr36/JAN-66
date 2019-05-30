@@ -38,7 +38,9 @@ public class PlainJdbcWorkDAO implements BaseDao<Work> {
                     final long id = generatedKeys.getLong(1);
                     return new Work(id, work);
                 } else {
-                    throw new DAOException("Could not create a work");
+                    final DAOException e = new DAOException("Could not create a Work");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

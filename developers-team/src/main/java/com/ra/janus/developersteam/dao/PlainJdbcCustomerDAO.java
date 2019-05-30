@@ -43,7 +43,9 @@ public class PlainJdbcCustomerDAO implements BaseDao<Customer> {
                     final long id = generatedKeys.getLong(1);
                     return new Customer(id, customer);
                 } else {
-                    throw new DAOException("Could not create a Customer");
+                    final DAOException e = new DAOException("Could not create a Customer");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

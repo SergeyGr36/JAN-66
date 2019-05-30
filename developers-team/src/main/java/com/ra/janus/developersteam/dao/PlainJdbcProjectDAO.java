@@ -38,7 +38,9 @@ public class PlainJdbcProjectDAO implements BaseDao<Project> {
                     final long id = generatedKeys.getLong(1);
                     return new Project(id, project);
                 } else {
-                    throw new DAOException("Could not create a Project");
+                    final DAOException e = new DAOException("Could not create a Project");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

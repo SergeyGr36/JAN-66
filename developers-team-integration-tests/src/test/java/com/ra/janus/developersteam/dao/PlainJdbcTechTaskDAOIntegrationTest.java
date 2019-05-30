@@ -75,10 +75,9 @@ public class PlainJdbcTechTaskDAOIntegrationTest {
         //when
         TechnicalTask createdTechnicalTask = technicalTaskDAO.create(technicalTaskToCreate);
         technicalTaskDAO.delete(createdTechnicalTask.getId());
-        TechnicalTask expected = null;
         TechnicalTask actual = technicalTaskDAO.get(createdTechnicalTask.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

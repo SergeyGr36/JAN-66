@@ -39,7 +39,9 @@ public class PlainJdbcManagerDAO implements BaseDao<Manager> {
                     final long id = generatedKeys.getLong(1);
                     return new Manager(id, manager);
                 } else {
-                    throw new DAOException("Could not create a Manager");
+                    final DAOException e = new DAOException("Could not create a Manager");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

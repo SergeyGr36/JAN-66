@@ -37,7 +37,9 @@ public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
                     final long id = generatedKeys.getLong(1);
                     return new Developer(id, developer);
                 } else {
-                    throw new DAOException("Could not create a Developer");
+                    final DAOException e = new DAOException("Could not create a Developer");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {

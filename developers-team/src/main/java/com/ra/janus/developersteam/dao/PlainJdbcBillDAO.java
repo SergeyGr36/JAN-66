@@ -38,7 +38,9 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
                     final long id = generatedKeys.getLong(1);
                     return new Bill(id, bill);
                 } else {
-                    throw new DAOException("Could not create a bill");
+                    final DAOException e = new DAOException("Could not create a Bill");
+                    LOGGER.error(EXCEPTION_WARN, e);
+                    throw e;
                 }
             }
         } catch (SQLException e) {
