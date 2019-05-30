@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DataSourceFactoryTest {
+public class DataSourceFactoryMockTest {
 
     DataSource mockDataSource;
     DataSourceFactory mockDataSourceFactory;

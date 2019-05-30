@@ -8,7 +8,7 @@ import org.junit.jupiter.api.function.Executable;
 import java.io.IOException;
 import java.util.Properties;
 
-public class PropertyReaderUtilsTest {
+public class PropertyReaderUtilsMockTest {
 
     @BeforeEach
     public void before() {

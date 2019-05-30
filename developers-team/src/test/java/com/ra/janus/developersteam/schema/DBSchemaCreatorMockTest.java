@@ -14,7 +14,7 @@ import java.sql.Statement;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class DBSchemaCreatorTest {
+class DBSchemaCreatorMockTest {
     private DataSource mockDataSource;
     private Connection mockConnection;
     private Statement mockStatement;
@@ -51,26 +51,5 @@ class DBSchemaCreatorTest {
 
         //then
         assertThrows(IllegalStateException.class, executable);
-    }
-
-
-    @Test
-    void integrationTest() throws Exception{
-        //given
-        DataSource dataSource = new DataSourceFactory().get();
-        Connection connection = dataSource.getConnection();
-        int notExpected = 0;
-
-        //when
-        int scriptsProcessed = DBSchemaCreator.createSchema(connection);
-
-//        DatabaseMetaData md = connection.getMetaData();
-//        ResultSet rs = md.getTables(null, null, "%", null);
-//        while (rs.next()) {
-//            System.out.println(rs.getString(3));
-//        }
-
-        //then
-        assertNotEquals(notExpected, scriptsProcessed);
     }
 }
