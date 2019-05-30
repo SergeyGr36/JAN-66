@@ -76,10 +76,9 @@ public class PlainJdbcQualificationDAOIntegrationTest {
         //when
         Qualification createdQualification = qualificationDAO.create(qualificationToCreate);
         qualificationDAO.delete(createdQualification.getId());
-        Qualification expected = null;
         Qualification actual = qualificationDAO.get(createdQualification.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

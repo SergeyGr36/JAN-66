@@ -78,10 +78,9 @@ public class PlainJdbcProjectDAOIntegrationTest {
         //when
         Project createdProject = projectDAO.create(projectToCreate);
         projectDAO.delete(createdProject.getId());
-        Project expected = null;
         Project actual = projectDAO.get(createdProject.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

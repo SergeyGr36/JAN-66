@@ -76,11 +76,10 @@ public class PlainJdbcCustomerDAOIntegrationTest {
         //when
         Customer createdCustomer = customerDAO.create(customerToCreate);
         customerDAO.delete(createdCustomer.getId());
-        Customer expected = null;
         Customer actual = customerDAO.get(createdCustomer.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 
 }

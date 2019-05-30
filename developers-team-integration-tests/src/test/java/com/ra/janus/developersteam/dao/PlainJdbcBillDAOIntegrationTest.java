@@ -76,10 +76,9 @@ public class PlainJdbcBillDAOIntegrationTest {
         //when
         Bill createdBill = billDAO.create(billToCreate);
         billDAO.delete(createdBill.getId());
-        Bill expected = null;
         Bill actual = billDAO.get(createdBill.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

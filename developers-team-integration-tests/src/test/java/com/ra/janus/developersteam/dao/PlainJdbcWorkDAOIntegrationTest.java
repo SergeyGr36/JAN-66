@@ -76,10 +76,9 @@ public class PlainJdbcWorkDAOIntegrationTest {
         //when
         Work createdWork = workDAO.create(workToCreate);
         workDAO.delete(createdWork.getId());
-        Work expected = null;
         Work actual = workDAO.get(createdWork.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

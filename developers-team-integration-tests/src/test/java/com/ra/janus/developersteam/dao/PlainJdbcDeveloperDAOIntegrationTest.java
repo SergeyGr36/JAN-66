@@ -74,10 +74,9 @@ public class PlainJdbcDeveloperDAOIntegrationTest {
         //when
         Developer createdDeveloper = developerDAO.create(developerToCreate);
         developerDAO.delete(createdDeveloper.getId());
-        Developer expected = null;
         Developer actual = developerDAO.get(createdDeveloper.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }

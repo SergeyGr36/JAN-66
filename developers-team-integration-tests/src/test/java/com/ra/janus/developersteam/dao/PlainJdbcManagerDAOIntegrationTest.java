@@ -77,10 +77,9 @@ public class PlainJdbcManagerDAOIntegrationTest {
         //when
         Manager createdManager = managerDAO.create(managerToCreate);
         managerDAO.delete(createdManager.getId());
-        Manager expected = null;
         Manager actual = managerDAO.get(createdManager.getId());
 
         //then
-        assertEquals(expected, actual);
+        assertEquals(null, actual);
     }
 }
