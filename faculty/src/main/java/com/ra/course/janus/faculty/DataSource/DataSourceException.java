@@ -1,4 +1,4 @@
-package DataSource;
+package com.ra.course.janus.faculty.DataSource;
 
 public class DataSourceException extends RuntimeException{
     private static final long serialVersionUID = 1L;

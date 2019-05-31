@@ -1,20 +1,21 @@
 
-package Entity;
+package com.ra.course.janus.faculty.entity;
 
 public class Student {
     private static int id;
     private String name;
     private String surname;
-
-
+private String code;
+private String description;
     public Student() {
     }
 
-    public Student(String name, String surname, int id) {
+    public Student(String name, String surname, int id, String code, String description) {
         this.name = name;
         this.surname = surname;
         this.id = id;
-
+        this.code = code;
+        this.description = description;
     }
 
     public String getName() {
@@ -41,6 +42,21 @@ public class Student {
         this.id = id;
     }
 
+    public String getCode(){
+        return code;
+    }
+
+    public void setCode(String code){
+        this.code = code;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
 
     @Override
     public String toString() {
