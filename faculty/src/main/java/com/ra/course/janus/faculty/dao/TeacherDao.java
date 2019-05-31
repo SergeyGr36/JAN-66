@@ -1,17 +1,13 @@
 package com.ra.course.janus.faculty.dao;
 
-import com.ra.course.janus.faculty.entity.TeacherEntity;
-
 import java.util.List;
 
-public interface TeacherDao {
+public interface TeacherDao<T> {
+    T insert(T teacher);
 
-    void insert(TeacherEntity teacherEntity);
+    boolean update(T teacher);
 
-    void update(TeacherEntity teacherEntity);
+    List<T> select();
 
-    List<TeacherEntity> select();
-
-    void delete(TeacherEntity teacherEntity);
-
+    boolean delete();
 }

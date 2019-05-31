@@ -47,6 +47,22 @@ wrapper {
 
 project(':faculty') {
     dependencies {
-        compile db.mysql
+        compile group: 'org.springframework', name: 'spring-context', version: '5.1.7.RELEASE'
+        compile group: 'log4j', name: 'log4j', version: '1.2.17'
+        compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+        compile db.h2
+        compile testing.junit5Platform
+        compile testing.mockito
+        compile testing.easymock
+        compile testing.jmock
+        compile testing.hamcrestCore
+        compile testing.hamcrestLib
+        compile testing.hamcrestAll
+        compile testing.dbunit
+        compile testing.assertJ
     }
+}
+
+project(':facultyIntegrationTests') {
+
 }
