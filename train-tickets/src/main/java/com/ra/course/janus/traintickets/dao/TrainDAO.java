@@ -3,6 +3,9 @@ package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.entity.Train;
 import com.ra.course.janus.traintickets.exception.DAOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +14,8 @@ import java.util.List;
 public class TrainDAO implements IJdbcDao<Train> {
 
     private final transient DataSource dataSource;
+
+    private static final Logger LOG = LoggerFactory.getLogger(TrainDAO.class.getName());
 
     private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
@@ -36,6 +41,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return train;
             }
         }catch (SQLException e){
+           LOG.info("Exception in SAVE :",e);
             throw new DAOException(e);
         }
     }
@@ -49,11 +55,11 @@ public class TrainDAO implements IJdbcDao<Train> {
                 ps.setInt(2,train.getSeating());
                 ps.setInt(3,train.getFreeSeats());
                 ps.setLong(4,id);
-                //final int resultUp = ps.executeUpdate();
                 connection.commit();
                 return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
+            LOG.info("Exception in UPDATE:",e);
             throw new DAOException(e);
         }
     }
@@ -64,11 +70,11 @@ public class TrainDAO implements IJdbcDao<Train> {
             connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(DELETE_TRAIN)){
                 ps.setLong(1,id);
-               // int resultUP = ps.executeUpdate();
                 connection.commit();
                 return ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
+            LOG.info("Exception in DELETE:",e);
             throw new DAOException(e);
         }
     }
@@ -90,27 +96,29 @@ public class TrainDAO implements IJdbcDao<Train> {
             }
             return train;
         }catch (SQLException e){
+            LOG.info("Exception in FIND_BY_ID:",e);
             throw new DAOException(e);
         }
     }
 
     @Override
     public List<Train> findAll() {
-      final  ArrayList <Train> trainsList = new ArrayList<>();
+        final  ArrayList <Train> trainsList = new ArrayList<>();
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL)){
                 try(ResultSet resultSet = pr.executeQuery()){
                     if (resultSet.next()){
-                       final Train train = new Train();
+                        final Train train = new Train();
                         train.setId(resultSet.getLong(1));
                         train.setName(resultSet.getString(2));
                         train.setSeating(resultSet.getInt(3));
                         train.setFreePlaces(resultSet.getInt(4));
                         trainsList.add(train);
-                    }return trainsList;
+                    }
                 }
-            }
+            }return trainsList;
         }catch (SQLException e){
+            LOG.info("Exception in FIND_ALL:",e);
             throw new DAOException(e);
         }
     }
