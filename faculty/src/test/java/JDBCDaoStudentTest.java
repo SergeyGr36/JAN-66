@@ -1,5 +1,11 @@
+
 import Dao.DaoStudent;
-import Entity.Student;
+import entity.Student;
+
+/*import dao.DaoStudent;
+import entity.Student;*/
+import com.ra.course.janus.faculty.dao.DaoStudent;
+
 import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +56,7 @@ public class JDBCDaoStudentTest  {
         when(resSet.getString("STUDENT_ID")).thenReturn(testNumber);
         var student = DaoStudent.findByStudentId(testNumber);
 
-       /* assertThat(student.getId()).isEqualTo(testNumber);*/
+
         assertThrows(RuntimeException.class, () -> studentDao.findByStudentId(testNumber));
 
     }

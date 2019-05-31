@@ -1,7 +1,9 @@
 
-package Dao;
+package com.ra.course.janus.faculty.dao;
 
-import Entity.Student;
+
+import com.ra.course.janus.faculty.entity.Student;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

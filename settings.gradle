@@ -1,1 +1,7 @@
+<<<<<<< Updated upstream
 rootProject.name = 'janus'
+=======
+rootProject.name = 'janus'
+include 'faculty'
+include 'faculty-integration-tests'
+>>>>>>> Stashed changes
