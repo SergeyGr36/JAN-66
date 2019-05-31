@@ -107,13 +107,8 @@ public class TrainDAO implements IJdbcDao<Train> {
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL)){
                 try(ResultSet resultSet = pr.executeQuery()){
-                    if (resultSet.next()){
-                        final Train train = new Train();
-                        train.setId(resultSet.getLong(1));
-                        train.setName(resultSet.getString(2));
-                        train.setSeating(resultSet.getInt(3));
-                        train.setFreePlaces(resultSet.getInt(4));
-                        trainsList.add(train);
+                    while (resultSet.next()){
+                        trainsList.add(createTrainForList(resultSet));
                     }
                 }
             }return trainsList;
@@ -122,5 +117,11 @@ public class TrainDAO implements IJdbcDao<Train> {
             throw new DAOException(e);
         }
     }
+
+    private Train createTrainForList(final ResultSet rs)throws SQLException{
+    return new Train(rs.getLong(1), rs.getString(2),
+            rs.getInt(3),rs.getInt(4));
+    }
+
 }
 
