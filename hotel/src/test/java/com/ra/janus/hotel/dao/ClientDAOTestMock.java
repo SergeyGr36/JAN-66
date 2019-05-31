@@ -3,7 +3,6 @@ package com.ra.janus.hotel.dao;
 import com.ra.janus.hotel.entity.Client;
 import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.exception.DaoException;
-import com.ra.janus.hotel.dao.ClientDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,9 +17,9 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class ClientDaoTestMock {
+public class ClientDAOTestMock {
     private static Client mockClient;
-    private static ClientDao clientDao;
+    private static ClientDAO clientDao;
     private static DataSource mockDataSource;
     private static Connection mockConnection;
     private static PreparedStatement mockStatement;
@@ -30,7 +29,7 @@ public class ClientDaoTestMock {
     @BeforeEach
     public void init() throws SQLException {
         mockDataSource = Mockito.mock(DataSource.class);
-        clientDao = new ClientDao(mockDataSource);
+        clientDao = new ClientDAO(mockDataSource);
         mockConnection = Mockito.mock(Connection.class);
         mockStatement = Mockito.mock(PreparedStatement.class);
         mockResultSet = Mockito.mock(ResultSet.class);

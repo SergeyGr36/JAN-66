@@ -24,11 +24,11 @@ public final class H2ConnectionUtils {
         try {
             final InputStream resourceAsStream = Thread.currentThread()
                     .getContextClassLoader()
-                    .getResourceAsStream("database.properties");
+                    .getResourceAsStream("connect.properties");
             if (resourceAsStream != null) {
                 PROPS.load(resourceAsStream);
             } else {
-                throw new MissingResourceException("database.properties not found", H2ConnectionUtils.class.getName(), "");
+                throw new MissingResourceException("connect.properties not found", H2ConnectionUtils.class.getName(), "");
             }
         } catch (IOException e) {
             LOGGER.info(e.getMessage());
@@ -41,9 +41,9 @@ public final class H2ConnectionUtils {
     public static DataSource getDefaultDataSource() {
         final HikariDataSource hikariDataSource;
         final HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(PROPS.getProperty("database.url"));
-        config.setUsername(PROPS.getProperty("database.username"));
-        config.setPassword(PROPS.getProperty("database.password"));
+        config.setJdbcUrl(PROPS.getProperty("db.url"));
+        config.setUsername(PROPS.getProperty("db.user"));
+        config.setPassword(PROPS.getProperty("db.pass"));
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "150");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "1000");
@@ -54,7 +54,7 @@ public final class H2ConnectionUtils {
 
     public static void initDatabase(final HikariDataSource dataSource) {
         try (Connection connection = dataSource.getConnection()) {
-            connection.createStatement().execute(new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("sql/Client.sql"), "UTF-8").useDelimiter("\\Z").next());
+            connection.createStatement().execute(new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("sql/create-tables.sql"), "UTF-8").useDelimiter("\\Z").next());
         } catch (SQLException e) {
             LOGGER.info(e.getMessage());
         }

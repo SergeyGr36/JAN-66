@@ -1,6 +1,6 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.database.H2ConnectionFactory;
+import com.ra.janus.hotel.configuration.H2ConnectionUtils;
 import com.ra.janus.hotel.entity.Order;
 import com.ra.janus.hotel.enums.StatusOrder;
 import com.ra.janus.hotel.exception.DaoException;
@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.io.*;
-import java.nio.charset.Charset;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,47 +19,23 @@ class OrderDAOTestIT {
     private OrderDAO orderDAO;
 
     @BeforeEach
-    private void init() throws IOException, SQLException {
-        DataSource dataSource = H2ConnectionFactory.getInstance().getDataSource();
-        createDB(dataSource);
+    private void init() throws SQLException {
+        DataSource dataSource = H2ConnectionUtils.getDefaultDataSource();
         orderDAO = new OrderDAO(dataSource);
-    }
-
-    private void createDB(final DataSource dataSource) throws SQLException, IOException {
-        Connection connection = dataSource.getConnection();
-        Statement statement = connection.createStatement();
-        File file = new File(ClassLoader.getSystemResource("create_databases.sql").getFile());
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file, Charset.defaultCharset()));
-        String sqlScript;
-        while ((sqlScript = bufferedReader.readLine()) != null) {
-            statement.execute(sqlScript);
-        }
-        bufferedReader.close();
-        statement.close();
-        connection.close();
+        dataSource.getConnection().createStatement().executeUpdate("delete from T_ORDER");
     }
 
     @Test
     void whenCallSaveThenReturnOrder() throws DaoException {
         Order order = new Order();
-        order.setId(3L);
         order.setIdClient(1L);
         order.setStatus(StatusOrder.NEW);
         assertNotNull(orderDAO.save(order));
     }
 
     @Test
-    void whenCallSaveAndSavedZeroRecordsThrowException() {
-        Order order = new Order();
-        order.setId(1L);
-        order.setStatus(StatusOrder.NEW);
-        assertThrows(DaoException.class, () -> orderDAO.save(order));
-    }
-
-    @Test
     void whenCallUpdateThenReturnOrder() throws DaoException {
-        Order order = new Order();
-        order.setId(1L);
+        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
         order.setStatus(StatusOrder.BOOKED);
         assertNotNull(orderDAO.update(order));
     }
@@ -81,7 +54,8 @@ class OrderDAOTestIT {
 
     @Test
     void whenCallDeleteThenDeletedOneRecord() {
-        assertDoesNotThrow (() -> orderDAO.delete(1L));
+        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
+        assertDoesNotThrow (() -> orderDAO.delete(order.getId()));
     }
 
     @Test
@@ -91,9 +65,8 @@ class OrderDAOTestIT {
 
     @Test
     void whenCallFindByIdThenReturnOrder() throws DaoException {
-        final long id = 1L;
-        Order order = orderDAO.findById(id);
-        assertEquals(order.getId(), id);
+        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
+        assertEquals(orderDAO.findById(order.getId()).hashCode(), order.hashCode());
     }
 
     @Test
@@ -104,6 +77,8 @@ class OrderDAOTestIT {
 
     @Test
     void whenCallFindAllThenReturnListOrder() throws DaoException {
+        orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
+        orderDAO.save(new Order(2L, 1L, null, null, StatusOrder.NEW, null, null, null));
         List<Order> orders = orderDAO.findAll();
         assertEquals(orders.size(), 2);
     }

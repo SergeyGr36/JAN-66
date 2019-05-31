@@ -12,12 +12,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientDao implements GenericDao<Client> {
+public class ClientDAO implements GenericDAO<Client> {
 
     private final transient DataSource dataSource;
     private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionUtils.class);
 
-    public ClientDao(final DataSource dataSource) {
+    public ClientDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

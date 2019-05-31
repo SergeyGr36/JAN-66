@@ -18,14 +18,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClientDaoTest {
+public class ClientDAOTest {
     private static DataSource dataSource;
-    private static ClientDao clientDao;
+    private static ClientDAO clientDao;
 
     @BeforeEach
     public void init() throws SQLException {
         dataSource = H2ConnectionUtils.getDefaultDataSource();
-        clientDao = new ClientDao(dataSource);
+        clientDao = new ClientDAO(dataSource);
         Connection c = dataSource.getConnection();
         Statement statement = c.createStatement();
         statement.execute("TRUNCATE TABLE client");

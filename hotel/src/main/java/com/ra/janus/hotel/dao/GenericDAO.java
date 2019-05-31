@@ -2,7 +2,7 @@ package com.ra.janus.hotel.dao;
 
 import java.util.List;
 
-public interface GenericDao<T> {
+public interface GenericDAO<T> {
 
     T save(T t);
 

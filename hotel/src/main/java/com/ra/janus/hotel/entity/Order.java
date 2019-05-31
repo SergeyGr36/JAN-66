@@ -25,19 +25,16 @@ public class Order implements Serializable {
 
     public Order() {}
 
-/*
-    public Order(long id, Client client, TypeRoom typeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Room room) {
-        this.id = id;
-        this.client = client;
-        this.typeRoom = typeRoom;
+    public Order(long idClient, long idTypeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Long idRoom) {
+        this.idClient = idClient;
+        this.idTypeRoom = idTypeRoom;
         this.dateIn = dateIn != null ? (Date) dateIn.clone() : null;
         this.dateOut = dateOut != null ? (Date) dateOut.clone() : null;
         this.status = status;
         this.dateCreate = dateCreate != null ? (Date) dateCreate.clone() : null;
         this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
-        this.room = room;
+        this.idRoom = idRoom;
     }
-*/
 
     public Order(long id, long idClient, long idTypeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Long idRoom) {
         this.id = id;
@@ -129,15 +126,18 @@ public class Order implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
         return id == order.id &&
-                dateIn.equals(order.dateIn) &&
-                dateOut.equals(order.dateOut) &&
+                idClient == order.idClient &&
+                idTypeRoom == order.idTypeRoom &&
+                Objects.equals(dateIn, order.dateIn) &&
+                Objects.equals(dateOut, order.dateOut) &&
                 status == order.status &&
-                dateCreate.equals(order.dateCreate) &&
-                Objects.equals(dateUpdate, order.dateUpdate);
+                Objects.equals(dateCreate, order.dateCreate) &&
+                Objects.equals(dateUpdate, order.dateUpdate) &&
+                Objects.equals(idRoom, order.idRoom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dateIn, dateOut, status, dateCreate, dateUpdate);
+        return Objects.hash(id, idClient, idTypeRoom, dateIn, dateOut, status, dateCreate, dateUpdate, idRoom);
     }
 }

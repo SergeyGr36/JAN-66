@@ -72,9 +72,9 @@
             <AppenderRef ref="roll-by-time-and-size"/>
         </Logger>
 
-        <AsyncRoot level="DEBUG">
+        <Root level="DEBUG">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="fout"/>
-        </AsyncRoot>
+        </Root>
     </Loggers>
 </Configuration>

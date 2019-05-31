@@ -1,6 +1,7 @@
 package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.Order;
+import com.ra.janus.hotel.enums.StatusOrder;
 import com.ra.janus.hotel.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,10 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import javax.sql.DataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,22 +21,15 @@ class OrderDAOTest {
     private final static String SELECT_BY_ID = "select * from T_ORDER where ID = ?";
     private final static String SELECT_ALL = "select * from T_ORDER";
     private final static String DELETE_BY_ID = "delete from T_ORDER where ID = ?";
-    private final static String INSERT = "insert into T_ORDER (ID_CLIENT, ID_TYPE_ROOM, DATE_IN, DATE_OUT, STATUS, DATE_CREATE, DATE_UPDATE, ID_ROOM, ID) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final static String INSERT = "insert into T_ORDER (ID_CLIENT, ID_TYPE_ROOM, DATE_IN, DATE_OUT, STATUS, DATE_CREATE, DATE_UPDATE, ID_ROOM) values (?, ?, ?, ?, ?, ?, ?, ?)";
     private final static String UPDATE_BY_ID = "update T_ORDER set ID_CLIENT = ?, ID_TYPE_ROOM = ?, DATE_IN = ?, DATE_OUT = ?, STATUS = ?, DATE_CREATE = ?, DATE_UPDATE = ?, ID_ROOM = ? where ID = ?";
 
     private OrderDAO orderDAO;
 
-    @Mock
-    private DataSource mockDataSource;
-
-    @Mock
-    private Connection mockConnection;
-
-    @Mock
-    private PreparedStatement mockStatement;
-
-    @Mock
-    private ResultSet resultSet;
+    @Mock private DataSource mockDataSource;
+    @Mock private Connection mockConnection;
+    @Mock private PreparedStatement mockStatement;
+    @Mock private ResultSet resultSet;
 
     @BeforeEach
     private void init() throws SQLException {
@@ -49,50 +40,53 @@ class OrderDAOTest {
 
     @Test
     void whenCallSaveThenReturnOrder() throws SQLException, DaoException {
-        Order order = new Order();
-        when(mockConnection.prepareStatement(INSERT)).thenReturn(mockStatement);
+        when(mockConnection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
+        when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getLong(1)).thenReturn(1L);
         when(mockStatement.executeUpdate()).thenReturn(1);
-        assertNotNull(orderDAO.save(order));
+        assertNotNull(orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L)));
     }
 
     @Test
     void whenCallSaveAndSavedZeroRecordsThrowException() throws SQLException {
-        Order order = new Order();
-        when(mockConnection.prepareStatement(INSERT)).thenReturn(mockStatement);
+        when(mockConnection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
+        when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getLong(1)).thenReturn(1L);
         when(mockStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DaoException.class, () -> orderDAO.save(order));
+        assertThrows(DaoException.class, () -> orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null)));
     }
 
     @Test
     void whenCallSaveThrowException() throws SQLException {
-        Order order = new Order();
-        when(mockConnection.prepareStatement(INSERT)).thenReturn(mockStatement);
+        when(mockConnection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
+        when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getLong(1)).thenReturn(1L);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> orderDAO.save(order));
+        assertThrows(DaoException.class, () -> orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null)));
     }
 
     @Test
     void whenCallUpdateThenReturnOrder() throws SQLException, DaoException {
-        Order order = new Order();
         when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
-        assertNotNull(orderDAO.update(order));
+        assertNotNull(orderDAO.update(new Order()));
     }
 
     @Test
     void whenCallUpdateThenUpdatedZeroRecordsAndThrowException() throws SQLException {
-        Order order = new Order();
         when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DaoException.class, () -> orderDAO.update(order));
+        assertThrows(DaoException.class, () -> orderDAO.update(new Order()));
     }
 
     @Test
     void whenCallUpdateThrowException() throws SQLException {
-        Order order = new Order();
         when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> orderDAO.update(order));
+        assertThrows(DaoException.class, () -> orderDAO.update(new Order()));
     }
 
     @Test

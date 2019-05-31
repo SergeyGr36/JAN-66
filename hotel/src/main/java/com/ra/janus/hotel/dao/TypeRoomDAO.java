@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeRoomDAO implements GenericDao<TypeRoom>{
+public class TypeRoomDAO implements GenericDAO<TypeRoom> {
 
     private final transient DataSource dataSource;
 
