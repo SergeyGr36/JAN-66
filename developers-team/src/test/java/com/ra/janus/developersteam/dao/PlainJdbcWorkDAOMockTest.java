@@ -2,16 +2,22 @@ package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Work;
 import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PlainJdbcWorkDAOMockTest {
     private static final String INSERT_SQL = "INSERT INTO works (name, price) VALUES (?, ?)";
@@ -19,55 +25,46 @@ class PlainJdbcWorkDAOMockTest {
     private static final String SELECT_ALL_SQL = "SELECT * FROM works";
     private static final String SELECT_ONE_SQL = "SELECT * FROM works WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM works WHERE id=?";
-    private DataSource mockDataSource;
+    private static final long TEST_ID = 1L;
+    private static final Work TEST_WORK = new Work(TEST_ID, "name", new BigDecimal(7));
+
+    private DataSource mockDataSource = mock(DataSource.class);
 
     private PlainJdbcWorkDAO workDAO;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
+    private Connection mockConnection = mock(Connection.class);
+    private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+    private ResultSet mockResultSet = mock(ResultSet.class);
 
     @BeforeEach
-    public void before() throws Exception {
-        mockDataSource = Mockito.mock(DataSource.class);
+    void before() throws Exception {
         workDAO = new PlainJdbcWorkDAO(mockDataSource);
-
-        mockConnection = Mockito.mock(Connection.class);
-        Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
-
-        mockPreparedStatement = Mockito.mock(PreparedStatement.class);
-        mockResultSet = Mockito.mock(ResultSet.class);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockResultSet.next()).thenReturn(false);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
     }
 
     @Test
     void whenCreateWorkShouldReturnWork() throws Exception {
         //given
-        long testId = 1L;
-        int columnIdIndex = 1;
-        Work testCustomer = new Work(testId, null, null);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenReturn(true);
-        Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getLong(1)).thenReturn(TEST_ID);
 
         //when
-        Work work = workDAO.create(testCustomer);
+        Work work = workDAO.create(TEST_WORK);
 
         //then
-        assertEquals(testCustomer, work);
+        assertEquals(TEST_WORK, work);
     }
 
     @Test
     void whenCreateWorkShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
-        long testId = 1L;
-        Work testWork = new Work(testId, null, null);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenReturn(false);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
 
         //when
-        final Executable executable = () -> workDAO.create(testWork);
+        final Executable executable = () -> workDAO.create(TEST_WORK);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -76,13 +73,11 @@ class PlainJdbcWorkDAOMockTest {
     @Test
     void whenCreateWorkShouldThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Work testWork = new Work(testId, null, null);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> workDAO.create(testWork);
+        final Executable executable = () -> workDAO.create(TEST_WORK);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -93,95 +88,47 @@ class PlainJdbcWorkDAOMockTest {
     @Test
     void whenReadWorkFromDbByIdThenReturnIt() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockResultSet.getLong("id")).thenReturn(TEST_ID);
 
         //when
-        Work work = workDAO.get(testId);
+        Work work = workDAO.get(TEST_ID);
 
         //then
-        assertEquals(testId, work.getId());
+        assertEquals(TEST_ID, work.getId());
     }
 
     @Test
     void whenReadAbsentWorkFromDbByIdThenReturnNull() throws Exception {
         //given
-        long testId = 1L;
-        Work expectedCustomer = null;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(false);
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Work work = workDAO.get(testId);
+        Work work = workDAO.get(TEST_ID);
 
         //then
-        assertEquals(expectedCustomer, work);
-    }
-
-    @Test
-    void whenReadWorkFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
-        //given
-        long testId = 1L;
-        Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> workDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
+        assertNull(work);
     }
 
     @Test
     void whenReadWorkFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> workDAO.get(testId);
+        final Executable executable = () -> workDAO.get(TEST_ID);
 
         //then
         assertThrows(DAOException.class, executable);
     }
-
-    @Test
-    void whenReadWorkFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
-        //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> workDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    void whenReadWorkFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
-        //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> workDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    //==============================
 
     @Test
     void whenReadAllWorksFromDbThenReturnNonEmptyList() throws Exception {
         //given
-        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
         List<Work> list = workDAO.getAll();
@@ -193,7 +140,7 @@ class PlainJdbcWorkDAOMockTest {
     @Test
     void whenReadAllWorksFromDbThenThrowException() throws Exception {
         //given
-        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
         final Executable executable = () -> workDAO.getAll();
@@ -202,94 +149,77 @@ class PlainJdbcWorkDAOMockTest {
         assertThrows(DAOException.class, executable);
     }
 
-    //==============================
-
     @Test
     void whenUpdateWorkInDbThenReturnTrue() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 1;
-        Work testCustomer = new Work(testId, null,null);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         //when
-        boolean updated = workDAO.update(testCustomer);
+        boolean updated = workDAO.update(TEST_WORK);
 
         //then
-        assertEquals(true, updated);
+        assertTrue(updated);
     }
 
     @Test
     void whenUpdateWorkInDbThenReturnFalse() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 0;
-        Work testWork = new Work(testId, null, null);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
         //when
-        boolean updated = workDAO.update(testWork);
+        boolean updated = workDAO.update(TEST_WORK);
 
         //then
-        assertEquals(false, updated);
+        assertFalse(updated);
     }
 
     @Test
     void whenUpdateWorkInDbThenThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Work testWork = new Work(testId, null, null);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> workDAO.update(testWork);
+        final Executable executable = () -> workDAO.update(TEST_WORK);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
-    //==============================
-
     @Test
-    void whenDeleteWorkFromDbThenReturnTrue()throws Exception  {
+    void whenDeleteWorkFromDbThenReturnTrue() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 1;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         //when
-        boolean deleted = workDAO.delete(testId);
+        boolean deleted = workDAO.delete(TEST_ID);
 
         //then
-        assertEquals(true, deleted);
+        assertTrue(deleted);
     }
 
     @Test
-    void whenDeleteWorkFromDbThenReturnFalse()throws Exception  {
+    void whenDeleteWorkFromDbThenReturnFalse() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 0;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
         //when
-        boolean deleted = workDAO.delete(testId);
+        boolean deleted = workDAO.delete(TEST_ID);
 
         //then
-        assertEquals(false, deleted);
+        assertFalse(deleted);
     }
 
     @Test
-    void whenDeleteWorkFromDbThenThrowException()throws Exception  {
+    void whenDeleteWorkFromDbThenThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> workDAO.delete(testId);
+        final Executable executable = () -> workDAO.delete(TEST_ID);
 
         //then
         assertThrows(DAOException.class, executable);

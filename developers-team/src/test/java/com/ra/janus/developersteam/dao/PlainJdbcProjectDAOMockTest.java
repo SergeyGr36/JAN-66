@@ -5,70 +5,65 @@ import com.ra.janus.developersteam.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class PlainJdbcProjectDAOMockTest {
-
+class PlainJdbcProjectDAOMockTest {
     private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE projects SET name=?,description=?,status=?,eta=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM projects";
     private static final String SELECT_ONE_SQL = "SELECT * FROM projects WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM projects WHERE id=?";
+    private static final long TEST_ID = 1L;
+    private static final Project TEST_PROJECT = new Project(TEST_ID);
 
-    private DataSource mockDataSource;
-    private BaseDao<Project> projectDAO;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
+    private DataSource mockDataSource = mock(DataSource.class);
+
+    private PlainJdbcProjectDAO projectDAO;
+    private Connection mockConnection = mock(Connection.class);
+    private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+    private ResultSet mockResultSet = mock(ResultSet.class);
 
     @BeforeEach
-    public void before() throws Exception {
-        mockDataSource = Mockito.mock(DataSource.class);
+    void before() throws Exception {
         projectDAO = new PlainJdbcProjectDAO(mockDataSource);
-
-        mockConnection = Mockito.mock(Connection.class);
-        Mockito.when(mockDataSource.getConnection()).thenReturn(mockConnection);
-
-        mockPreparedStatement = Mockito.mock(PreparedStatement.class);
-        mockResultSet = Mockito.mock(ResultSet.class);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockResultSet.next()).thenReturn(false);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
     }
 
     @Test
     void whenCreateProjectShouldReturnProject() throws Exception {
         //given
-        long testId = 1L;
-        int columnIdIndex = 1;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenReturn(true);
-        Mockito.when(mockResultSet.getLong(columnIdIndex)).thenReturn(testId);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getLong(1)).thenReturn(TEST_ID);
 
         //when
-        Project project = projectDAO.create(testProject);
+        Project project = projectDAO.create(TEST_PROJECT);
 
         //then
-        assertEquals(testProject, project);
+        assertEquals(TEST_PROJECT, project);
     }
 
     @Test
     void whenCreateProjectShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
         //given
-        long testId = 1L;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenReturn(false);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
 
         //when
-        final Executable executable = () -> projectDAO.create(testProject);
+        final Executable executable = () -> projectDAO.create(TEST_PROJECT);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -77,13 +72,11 @@ public class PlainJdbcProjectDAOMockTest {
     @Test
     void whenCreateProjectShouldThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> projectDAO.create(testProject);
+        final Executable executable = () -> projectDAO.create(TEST_PROJECT);
 
         //then
         assertThrows(DAOException.class, executable);
@@ -92,98 +85,49 @@ public class PlainJdbcProjectDAOMockTest {
     //==============================
 
     @Test
-    void whenGetProjectFromDbByIdThenReturnIt() throws Exception {
+    void whenReadProjectFromDbByIdThenReturnIt() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        Mockito.when(mockResultSet.getLong("id")).thenReturn(testId);
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockResultSet.getLong("id")).thenReturn(TEST_ID);
 
         //when
-        Project project = projectDAO.get(testId);
+        Project project = projectDAO.get(TEST_ID);
 
         //then
-        assertEquals(testId, project.getId());
+        assertEquals(TEST_ID, project.getId());
     }
 
     @Test
-    void whenGetAbsentProjectFromDbByIdThenReturnNull() throws Exception {
+    void whenReadAbsentProjectFromDbByIdThenReturnNull() throws Exception {
         //given
-        long testId = 1L;
-        Project expectedProject = null;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(false);
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(false);
 
         //when
-        Project project = projectDAO.get(testId);
+        Project project = projectDAO.get(TEST_ID);
 
         //then
-        assertEquals(expectedProject, project);
+        assertNull(project);
     }
 
     @Test
-    void whenGetProjectFromDbByIdThenThrowExceptionOnGettingConnection() throws Exception {
+    void whenReadProjectFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockDataSource.getConnection()).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> projectDAO.get(testId);
+        final Executable executable = () -> projectDAO.get(TEST_ID);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
     @Test
-    void whenGetProjectFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
+    void whenReadAllProjectsFromDbThenReturnNonEmptyList() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    void whenGetProjectFromDbByIdThenThrowExceptionOnExecutingOfQuery() throws Exception {
-        //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    void whenGetProjectFromDbByIdThenThrowExceptionOnIteratingOverResultSet() throws Exception {
-        //given
-        long testId = 1L;
-        final int testParametherIndex = 1;
-        Mockito.when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        Mockito.when(mockResultSet.next()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.get(testId);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    //==============================
-
-    @Test
-    void whenGetAllProjectsFromDbThenReturnNonEmptyList() throws Exception {
-        //given
-        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         //when
         List<Project> list = projectDAO.getAll();
@@ -193,9 +137,9 @@ public class PlainJdbcProjectDAOMockTest {
     }
 
     @Test
-    void whenGetAllProjectsFromDbThenThrowException() throws Exception {
+    void whenReadAllProjectsFromDbThenThrowException() throws Exception {
         //given
-        Mockito.when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
 
         //when
         final Executable executable = () -> projectDAO.getAll();
@@ -204,94 +148,77 @@ public class PlainJdbcProjectDAOMockTest {
         assertThrows(DAOException.class, executable);
     }
 
-    //==============================
-
     @Test
     void whenUpdateProjectInDbThenReturnTrue() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 1;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         //when
-        boolean updated = projectDAO.update(testProject);
+        boolean updated = projectDAO.update(TEST_PROJECT);
 
         //then
-        assertEquals(true, updated);
+        assertTrue(updated);
     }
 
     @Test
     void whenUpdateProjectInDbThenReturnFalse() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 0;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
         //when
-        boolean updated = projectDAO.update(testProject);
+        boolean updated = projectDAO.update(TEST_PROJECT);
 
         //then
-        assertEquals(false, updated);
+        assertFalse(updated);
     }
 
     @Test
     void whenUpdateProjectInDbThenThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Project testProject = new Project(testId);
-        Mockito.when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> projectDAO.update(testProject);
+        final Executable executable = () -> projectDAO.update(TEST_PROJECT);
 
         //then
         assertThrows(DAOException.class, executable);
     }
 
-    //==============================
-
     @Test
-    void whenDeleteProjectFromDbThenReturnTrue()throws Exception  {
+    void whenDeleteProjectFromDbThenReturnTrue() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 1;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
         //when
-        boolean deleted = projectDAO.delete(testId);
+        boolean deleted = projectDAO.delete(TEST_ID);
 
         //then
-        assertEquals(true, deleted);
+        assertTrue(deleted);
     }
 
     @Test
-    void whenDeleteProjectFromDbThenReturnFalse()throws Exception  {
+    void whenDeleteProjectFromDbThenReturnFalse() throws Exception {
         //given
-        long testId = 1L;
-        int testCount = 0;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        Mockito.when(mockPreparedStatement.executeUpdate()).thenReturn(testCount);
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
         //when
-        boolean deleted = projectDAO.delete(testId);
+        boolean deleted = projectDAO.delete(TEST_ID);
 
         //then
-        assertEquals(false, deleted);
+        assertFalse(deleted);
     }
 
     @Test
-    void whenDeleteProjectFromDbThenThrowException()throws Exception  {
+    void whenDeleteProjectFromDbThenThrowException() throws Exception {
         //given
-        long testId = 1L;
-        Mockito.when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
+        when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
 
         //when
-        final Executable executable = () -> projectDAO.delete(testId);
+        final Executable executable = () -> projectDAO.delete(TEST_ID);
 
         //then
         assertThrows(DAOException.class, executable);
