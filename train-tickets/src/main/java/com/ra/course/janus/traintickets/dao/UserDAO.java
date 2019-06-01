@@ -19,10 +19,10 @@ public class UserDAO implements IJdbcDao<User> {
     private static final String DELETE_USER = "delete from USERS where id=?";
     private static final String FIND_BY_ID = "select * from USERS where id=?";
     private static final String FIND_ALL = "select * from USERS";
-    private static final int PARAM_1 = 1;
-    private static final int PARAM_2 = 2;
-    private static final int PARAM_3 = 3;
-    private static final int PARAM_4 = 4;
+    private static final int COL_INDEX_ID = 1;
+    private static final int COL_INDEX_NAME = 2;
+    private static final int COL_INDEX_EMAIL = 3;
+    private static final int COL_INDEX_PASSWORD = 4;
 
     public UserDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -36,7 +36,7 @@ public class UserDAO implements IJdbcDao<User> {
                  saveStmt.executeUpdate();
                  try (ResultSet generatedKeys = saveStmt.getGeneratedKeys()) {
                      if (generatedKeys.next()) {
-                         final long id = generatedKeys.getLong("id");
+                         final long id = generatedKeys.getLong(COL_INDEX_ID);
                          return new User(
                                  id,
                                  user.getName(),
@@ -58,7 +58,7 @@ public class UserDAO implements IJdbcDao<User> {
         try (Connection conn = dataSource.getConnection()) {
              try (PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER)) {
                  prepareStatementWithUser(updateStmt, user);
-                 updateStmt.setLong(PARAM_4, id);
+                 updateStmt.setLong(4, id);
                  return updateStmt.executeUpdate() > 0;
              }
         } catch (SQLException e) {
@@ -70,7 +70,7 @@ public class UserDAO implements IJdbcDao<User> {
     public boolean delete(final Long id) {
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement deleteStmt = conn.prepareStatement(DELETE_USER)) {
-                deleteStmt.setLong(PARAM_1, id);
+                deleteStmt.setLong(1, id);
                 return deleteStmt.executeUpdate() > 0;
             }
         } catch (SQLException e) {
@@ -83,7 +83,7 @@ public class UserDAO implements IJdbcDao<User> {
         final User user;
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement findStmt = conn.prepareStatement(FIND_BY_ID)) {
-                findStmt.setLong(PARAM_1, id);
+                findStmt.setLong(1, id);
                 try (ResultSet rs = findStmt.executeQuery()) {
                     if (rs.next()) {
                         user = toUser(rs);
@@ -114,9 +114,9 @@ public class UserDAO implements IJdbcDao<User> {
     }
 
     private void prepareStatementWithUser(final PreparedStatement ps, final User user) throws SQLException {
-        ps.setString(PARAM_1, user.getName());
-        ps.setString(PARAM_2, user.getEmail());
-        ps.setString(PARAM_3, user.getPassword());
+        ps.setString(1, user.getName());
+        ps.setString(2, user.getEmail());
+        ps.setString(3, user.getPassword());
     }
 
     private User toUser(final ResultSet rs) throws SQLException {
