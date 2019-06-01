@@ -26,6 +26,9 @@ class OrderDAOTestMock {
     @Mock private PreparedStatement mockStatement;
     @Mock private ResultSet resultSet;
 
+    private final static long ONE = 1L;
+    private Order order = new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L);
+
     @BeforeEach
     private void init() throws SQLException {
         MockitoAnnotations.initMocks(this);
@@ -35,130 +38,173 @@ class OrderDAOTestMock {
 
     @Test
     void whenCallSaveThenReturnOrder() throws SQLException, DaoException {
+        //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong(1)).thenReturn(1L);
+        when(resultSet.getLong(1)).thenReturn(ONE);
         when(mockStatement.executeUpdate()).thenReturn(1);
-        assertNotNull(orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L)));
+
+        //then
+        assertNotNull(orderDAO.save(order));
     }
 
     @Test
     void whenCallSaveAndSavedZeroRecordsThrowException() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong(1)).thenReturn(1L);
+        when(resultSet.getLong(1)).thenReturn(ONE);
         when(mockStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DaoException.class, () -> orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null)));
+
+        //then
+        assertThrows(DaoException.class, () -> orderDAO.save(order));
     }
 
     @Test
     void whenCallSaveThrowException() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getLong(1)).thenReturn(1L);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null)));
+
+        //then
+        assertThrows(DaoException.class, () -> orderDAO.save(order));
     }
 
     @Test
     void whenCallUpdateThenReturnOrder() throws SQLException, DaoException {
+        //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
-        assertNotNull(orderDAO.update(new Order()));
+
+        //then
+        assertNotNull(orderDAO.update(order));
     }
 
     @Test
     void whenCallUpdateThenUpdatedZeroRecordsAndThrowException() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DaoException.class, () -> orderDAO.update(new Order()));
+
+        //then
+        assertThrows(DaoException.class, () -> orderDAO.update(order));
     }
 
     @Test
     void whenCallUpdateThrowException() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
+
+        //then
         assertThrows(DaoException.class, () -> orderDAO.update(new Order()));
     }
 
     @Test
     void whenCallDeleteThenDeletedOneRecord() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
+
+        //then
         assertDoesNotThrow (() -> orderDAO.delete(1L));
     }
 
     @Test
     void whenCallDeleteThenNotDeletedRecord() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
+
+        //then
         assertEquals(orderDAO.delete(1L), 0);
     }
 
     @Test
     void whenCallDeleteThenThrowException() throws SQLException {
+        //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
+
+        //then
         assertThrows(DaoException.class, () -> orderDAO.delete(1L));
     }
 
     @Test
     void whenCallFindByIdThenReturnOrder() throws SQLException, DaoException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong("id")).thenReturn(id);
+        when(resultSet.getLong("id")).thenReturn(ONE);
         when(resultSet.getString("status")).thenReturn("NEW");
-        Order order = orderDAO.findById(id);
-        assertEquals(order.getId(), id);
+
+        //call test method
+        Order order = orderDAO.findById(ONE);
+
+        //then
+        assertEquals(order.getId(), ONE);
     }
 
     @Test
     void whenCallFindByIdThenReturnNull() throws SQLException, DaoException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
-        assertNull(orderDAO.findById(id));
+
+        //then
+        assertNull(orderDAO.findById(ONE));
     }
 
     @Test
     void whenCallFindByIdThenReturnException() throws SQLException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> orderDAO.findById(id));
+
+        //then
+        assertThrows(DaoException.class, () -> orderDAO.findById(ONE));
     }
 
     @Test
     void whenCallFindAllThenReturnListOrder() throws SQLException, DaoException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
-        when(resultSet.getLong("id")).thenReturn(id);
+        when(resultSet.getLong("id")).thenReturn(ONE);
+
+        //call test mothod
         List<Order> orders = orderDAO.findAll();
+
+        //then
         assertEquals(orders.size(), 2);
     }
 
     @Test
     void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(false);
+
+        //then
         assertEquals(orderDAO.findAll().size(), 0);
     }
 
     @Test
     void whenCallFindAllThenReturnException() throws SQLException {
-        final long id = 1L;
+        //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(SQLException.class);
+
+        //then
         assertThrows(DaoException.class, () -> orderDAO.findAll());
     }
 }

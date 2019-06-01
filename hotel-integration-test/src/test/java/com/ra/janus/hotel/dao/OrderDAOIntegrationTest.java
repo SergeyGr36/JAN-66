@@ -16,44 +16,29 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrderDAOIntegrationTest {
 
     private OrderDAO orderDAO;
+    private Order order;
 
     @BeforeEach
     public void init() throws SQLException {
         DataSource dataSource = ConnectionUtils.getDefaultDataSource();
         orderDAO = new OrderDAO(dataSource);
         dataSource.getConnection().createStatement().executeUpdate("delete from T_ORDER");
+        order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L));
     }
 
     @Test
     void whenCallSaveThenReturnOrder() throws DaoException {
-        Order order = new Order();
-        order.setIdClient(1L);
-        order.setStatus(StatusOrder.NEW);
         assertNotNull(orderDAO.save(order));
     }
 
     @Test
     void whenCallUpdateThenReturnOrder() throws DaoException {
-        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
-        order.setStatus(StatusOrder.BOOKED);
-        assertNotNull(orderDAO.update(order));
-    }
-
-    @Test
-    void whenCallUpdateThenUpdatedZeroRecordsAndThrowException() {
-        Order order = new Order();
-        assertThrows(DaoException.class, () -> orderDAO.update(order));
-    }
-
-    @Test
-    void whenCallUpdateThrowException() {
-        Order order = new Order();
-        assertThrows(DaoException.class, () -> orderDAO.update(order));
+       order.setStatus(StatusOrder.BOOKED);
+       assertNotNull(orderDAO.update(order));
     }
 
     @Test
     void whenCallDeleteThenDeletedOneRecord() {
-        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
         assertDoesNotThrow (() -> orderDAO.delete(order.getId()));
     }
 
@@ -64,20 +49,17 @@ class OrderDAOIntegrationTest {
 
     @Test
     void whenCallFindByIdThenReturnOrder() throws DaoException {
-        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L));
         assertEquals(orderDAO.findById(order.getId()), order);
     }
 
     @Test
     void whenCallFindByIdThenReturnNull() throws DaoException {
-        final long id = 9L;
-        assertNull(orderDAO.findById(id));
+        assertNull(orderDAO.findById(9L));
     }
 
     @Test
     void whenCallFindAllThenReturnListOrder() throws DaoException {
-        orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
-        orderDAO.save(new Order(2L, 1L, null, null, StatusOrder.NEW, null, null, null));
+        orderDAO.save(new Order(2L, 1L, null, null, StatusOrder.NEW, null, null, 1L));
         List<Order> orders = orderDAO.findAll();
         assertEquals(orders.size(), 2);
     }

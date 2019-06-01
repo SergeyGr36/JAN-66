@@ -1,9 +1,7 @@
 package com.ra.janus.hotel.entity;
 
 import com.ra.janus.hotel.enums.StatusOrder;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -23,7 +21,7 @@ public class Order implements Serializable {
     private StatusOrder status = StatusOrder.NEW;
     private Date dateCreate;
     private Date dateUpdate;
-    private Long idRoom;
+    private long idRoom;
 
     public Order(long idClient, long idTypeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Long idRoom) {
         this.idClient = idClient;

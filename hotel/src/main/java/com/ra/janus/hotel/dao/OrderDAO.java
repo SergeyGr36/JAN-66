@@ -132,11 +132,7 @@ public class OrderDAO implements GenericDAO<Order> {
         statement.setString(5, order.getStatus().name());
         statement.setDate(6, order.getDateCreate());
         statement.setDate(7, order.getDateUpdate());
-        if (order.getIdRoom() == null) {
-            statement.setNull(8, Types.BIGINT);
-        } else {
-            statement.setLong(8, order.getIdRoom());
-        }
+        statement.setLong(8, order.getIdRoom());
     }
 
     private void setValueStatementUpdate(final PreparedStatement statement, final Order order) throws SQLException {
