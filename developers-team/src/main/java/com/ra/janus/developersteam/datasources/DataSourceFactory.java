@@ -20,7 +20,6 @@ final public class DataSourceFactory {
     }
 
     public static DataSource get() {
-
             initConfig();
             return new HikariDataSource(CONFIG);
     }
