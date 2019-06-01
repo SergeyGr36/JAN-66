@@ -110,7 +110,7 @@ ext {
             instrument: "org.springframework:spring-instrument:$springVersion",
             data: "org.springframework.data:spring-data-jpa:$springDataVersion",
             securityWeb: "org.springframework.security:spring-security-web:$springSecurityVersion",
-            securityConfig: "org.springframework.security:spring-security-configuration:$springSecurityVersion",
+            securityConfig: "org.springframework.security:spring-security-config:$springSecurityVersion",
             securityTaglibs: "org.springframework.security:spring-security-taglibs:$springSecurityVersion",
             springSecurityTest: "org.springframework.security:spring-security-test:$springSecurityVersion",
             rabbit: "org.springframework.amqp:spring-rabbit:$springAmqpVersion",

@@ -1,6 +1,7 @@
 package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.TypeRoom;
+import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,19 +17,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-class TypeRoomDAOTest {
+class TypeRoomDAOTestMock {
 
     private TypeRoomDAO typeRoomDAO;
     private DataSource mockDataSource;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
-
-    private final static String INSERT_BY_ID = "INSERT INTO TYPE_ROOM (COUNT_PLACES, PRISE, DESCRIPTION, CLASS_OF_ROOM, ID) VALUES (?, ?, ?, ?, ?)";
-    private final static String UPDATE_BY_ID = "UPDATE TYPE_ROOM SET COUNT_PLACES = ?, PRISE = ?, DESCRIPTION = ?, CLASS_OF_ROOM = ? WHERE ID = ?";
-    private final static String DELETE_BY_ID = "DELETE FROM TYPE_ROOM WHERE ID = ?";
-    private final static String SELECT_BY_ID = "SELECT * FROM TYPE_ROOM WHERE ID = ?";
-    private final static String SELECT_ALL = "SELECT * FROM TYPE_ROOM";
 
     @BeforeEach
     void before() throws Exception {
@@ -45,21 +40,21 @@ class TypeRoomDAOTest {
     @Test
     void whenCallSaveThenReturnTypeRoom() throws SQLException, DaoException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(INSERT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.INSERT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         assertNotNull(typeRoomDAO.save(typeRoom));
     }
     @Test
     void whenCallSaveThenReturnNothingSaved() throws SQLException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(INSERT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.INSERT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertThrows(DaoException.class,()-> typeRoomDAO.save(typeRoom));
     }
     @Test
     void whenCallSaveThenReturnException() throws SQLException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(INSERT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.INSERT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()-> typeRoomDAO.save(typeRoom));
     }
@@ -68,21 +63,21 @@ class TypeRoomDAOTest {
     @Test
     void whenCallUpdateThenReturnTypeRoom() throws SQLException, DaoException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.UPDATE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         assertNotNull(typeRoomDAO.update(typeRoom));
     }
     @Test
     void whenCallUpdateThenReturnNothingUpdated () throws SQLException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.UPDATE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertThrows(DaoException.class,()-> typeRoomDAO.update(typeRoom));
     }
     @Test
     void whenCallUpdateThenReturnException() throws SQLException {
         TypeRoom typeRoom = new TypeRoom();
-        when(mockConnection.prepareStatement(UPDATE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.UPDATE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()-> typeRoomDAO.update(typeRoom));
     }
@@ -91,19 +86,19 @@ class TypeRoomDAOTest {
 
     @Test
     void whenCallDeleteThenDeleted () throws SQLException {
-        when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         assertDoesNotThrow(()->typeRoomDAO.delete(1L));
     }
     @Test
     void whenCallDeleteThenNothingDeleted () throws SQLException {
-        when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertEquals(typeRoomDAO.delete(1L),0);
     }
     @Test
     void whenCallDeleteThenReturnException() throws SQLException {
-        when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()-> typeRoomDAO.delete(1L));
     }
@@ -112,7 +107,7 @@ class TypeRoomDAOTest {
     @Test
     void whenCallFindByIdThenReturnTypeRoom() throws SQLException, DaoException {
         final long id = 1L;
-        when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         when(mockResultSet.getLong("ID")).thenReturn(id);
@@ -122,7 +117,7 @@ class TypeRoomDAOTest {
     @Test
     void whenCallFindByIdThenReturnNothing() throws SQLException, DaoException {
         final long id = 1L;
-        when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         assertNull(typeRoomDAO.findById(id));
@@ -130,7 +125,7 @@ class TypeRoomDAOTest {
     @Test
     void whenCallFindByIdThenReturnException() throws SQLException {
         final long id = 1L;
-        when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()->typeRoomDAO.findById(id));
     }
@@ -139,7 +134,7 @@ class TypeRoomDAOTest {
 
     @Test
     void whenCallFindAllThenReturnList() throws SQLException, DaoException {
-        when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_ALL_TYPES.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
         List <TypeRoom> typeRooms = typeRoomDAO.findAll();
@@ -147,7 +142,7 @@ class TypeRoomDAOTest {
     }
     @Test
     void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
-        when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_ALL_TYPES.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         List <TypeRoom> typeRooms = typeRoomDAO.findAll();
@@ -155,7 +150,7 @@ class TypeRoomDAOTest {
     }
     @Test
     void whenCallFindAllThenReturnException() throws SQLException {
-        when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
+        when(mockConnection.prepareStatement(Query.SELECT_ALL_TYPES.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenThrow(SQLException.class);
         assertThrows(DaoException.class,()->typeRoomDAO.findAll());
     }

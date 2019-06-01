@@ -2,7 +2,7 @@ package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.Client;
 import com.ra.janus.hotel.exception.DaoException;
-import com.ra.janus.hotel.configuration.H2ConnectionUtils;
+import com.ra.janus.hotel.configuration.ConnectionUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,13 +18,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClientDAOTest {
+public class ClientDAOIntegrationTest {
     private static DataSource dataSource;
     private static ClientDAO clientDao;
 
     @BeforeEach
     public void init() throws SQLException {
-        dataSource = H2ConnectionUtils.getDefaultDataSource();
+        dataSource = ConnectionUtils.getDefaultDataSource();
         clientDao = new ClientDAO(dataSource);
         Connection c = dataSource.getConnection();
         Statement statement = c.createStatement();

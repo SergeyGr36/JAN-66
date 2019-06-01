@@ -14,10 +14,10 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.Scanner;
 
-public final class H2ConnectionUtils {
+public final class ConnectionUtils {
 
     private final static Properties PROPS = new Properties();
-    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionUtils.class);
 
 
     static {
@@ -28,14 +28,14 @@ public final class H2ConnectionUtils {
             if (resourceAsStream != null) {
                 PROPS.load(resourceAsStream);
             } else {
-                throw new MissingResourceException("connect.properties not found", H2ConnectionUtils.class.getName(), "");
+                throw new MissingResourceException("connect.properties not found", ConnectionUtils.class.getName(), "");
             }
         } catch (IOException e) {
             LOGGER.info(e.getMessage());
         }
     }
 
-    private H2ConnectionUtils() {
+    private ConnectionUtils() {
     }
 
     public static DataSource getDefaultDataSource() {

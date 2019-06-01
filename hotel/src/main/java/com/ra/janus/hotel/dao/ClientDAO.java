@@ -1,6 +1,6 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.configuration.H2ConnectionUtils;
+import com.ra.janus.hotel.configuration.ConnectionUtils;
 import com.ra.janus.hotel.entity.Client;
 import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.exception.DaoException;
@@ -15,7 +15,7 @@ import java.util.List;
 public class ClientDAO implements GenericDAO<Client> {
 
     private final transient DataSource dataSource;
-    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionUtils.class);
 
     public ClientDAO(final DataSource dataSource) {
         this.dataSource = dataSource;

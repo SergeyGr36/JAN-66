@@ -1,6 +1,6 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.configuration.H2ConnectionUtils;
+import com.ra.janus.hotel.configuration.ConnectionUtils;
 import com.ra.janus.hotel.entity.Order;
 import com.ra.janus.hotel.enums.StatusOrder;
 import com.ra.janus.hotel.exception.DaoException;
@@ -8,19 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
-import java.io.*;
 import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class OrderDAOTestIT {
+class OrderDAOIntegrationTest {
 
     private OrderDAO orderDAO;
 
     @BeforeEach
-    private void init() throws SQLException {
-        DataSource dataSource = H2ConnectionUtils.getDefaultDataSource();
+    public void init() throws SQLException {
+        DataSource dataSource = ConnectionUtils.getDefaultDataSource();
         orderDAO = new OrderDAO(dataSource);
         dataSource.getConnection().createStatement().executeUpdate("delete from T_ORDER");
     }
@@ -65,8 +64,8 @@ class OrderDAOTestIT {
 
     @Test
     void whenCallFindByIdThenReturnOrder() throws DaoException {
-        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, null));
-        assertEquals(orderDAO.findById(order.getId()).hashCode(), order.hashCode());
+        Order order = orderDAO.save(new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L));
+        assertEquals(orderDAO.findById(order.getId()), order);
     }
 
     @Test

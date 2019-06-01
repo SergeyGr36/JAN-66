@@ -2,6 +2,7 @@
 package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.Order;
+import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.enums.StatusOrder;
 import com.ra.janus.hotel.exception.DaoException;
 import org.apache.logging.log4j.LogManager;
@@ -18,14 +19,6 @@ public class OrderDAO implements GenericDAO<Order> {
 
     private final transient DataSource dataSource;
 
-    private final static String MSG_ERR_SAVE = "record not saved";
-    private final static String MSG_ERR_UPDATE = "record not updated";
-
-    private final static String SELECT_BY_ID = "select * from T_ORDER where ID = ?";
-    private final static String SELECT_ALL = "select * from T_ORDER";
-    private final static String DELETE_BY_ID = "delete from T_ORDER where ID = ?";
-    private final static String INSERT = "insert into T_ORDER (ID_CLIENT, ID_TYPE_ROOM, DATE_IN, DATE_OUT, STATUS, DATE_CREATE, DATE_UPDATE, ID_ROOM) values (?, ?, ?, ?, ?, ?, ?, ?)";
-    private final static String UPDATE_BY_ID = "update T_ORDER set ID_CLIENT = ?, ID_TYPE_ROOM = ?, DATE_IN = ?, DATE_OUT = ?, STATUS = ?, DATE_CREATE = ?, DATE_UPDATE = ?, ID_ROOM = ? where ID = ?";
 
     public OrderDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -34,11 +27,11 @@ public class OrderDAO implements GenericDAO<Order> {
     @Override
     public Order save(final Order order) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = connection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)) {
             setValueStatementInsert(statement, order);
             if (statement.executeUpdate() == 0) {
-                LOG.error(MSG_ERR_SAVE);
-                throw new DaoException(MSG_ERR_SAVE);
+                LOG.error(Query.MSG_ERR_SAVE.get());
+                throw new DaoException(Query.MSG_ERR_SAVE.get());
             } else {
                 try (ResultSet genKey = statement.getGeneratedKeys()) {
                     genKey.next();
@@ -55,11 +48,11 @@ public class OrderDAO implements GenericDAO<Order> {
     @Override
     public Order update(final Order order) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())) {
             setValueStatementUpdate(statement, order);
             if (statement.executeUpdate() == 0) {
-                LOG.error(MSG_ERR_UPDATE);
-                throw new DaoException(MSG_ERR_UPDATE);
+                LOG.error(Query.MSG_ERR_UPDATE.get());
+                throw new DaoException(Query.MSG_ERR_UPDATE.get());
             }
         } catch (SQLException e) {
             LOG.error(e.getMessage(), e);
@@ -71,7 +64,7 @@ public class OrderDAO implements GenericDAO<Order> {
     @Override
     public int delete(final long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())) {
             statement.setLong(1, id);
             return statement.executeUpdate();
         } catch (SQLException e) {
@@ -83,7 +76,7 @@ public class OrderDAO implements GenericDAO<Order> {
     @Override
     public Order findById(final long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())) {
             statement.setLong(1, id);
             final Order order;
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -103,7 +96,7 @@ public class OrderDAO implements GenericDAO<Order> {
     @Override
     public List<Order> findAll() {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
+             PreparedStatement statement = connection.prepareStatement(Query.SELECT_ALL_ORDERS.get())){
             final List<Order> orders = new ArrayList<>();
             try(ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {

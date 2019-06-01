@@ -1,9 +1,8 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.configuration.H2ConnectionUtils;
+import com.ra.janus.hotel.configuration.ConnectionUtils;
 import com.ra.janus.hotel.entity.Room;
 import com.ra.janus.hotel.exception.DaoException;
-import com.ra.janus.hotel.dao.RoomDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,16 +13,17 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class RoomDAOTest {
+class RoomDAOIntegrationTest {
 
     private static DataSource dataSource;
     private static RoomDAO roomDao;
 
     @BeforeEach
     public void init() throws SQLException {
-        dataSource = H2ConnectionUtils.getDefaultDataSource();
+        dataSource = ConnectionUtils.getDefaultDataSource();
         roomDao = new RoomDAO(dataSource);
         Connection c = dataSource.getConnection();
         Statement statement = c.createStatement();

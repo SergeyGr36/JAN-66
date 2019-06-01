@@ -1,6 +1,7 @@
 package com.ra.janus.hotel.dao;
 
 import com.ra.janus.hotel.entity.TypeRoom;
+import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.exception.DaoException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,15 +16,7 @@ public class TypeRoomDAO implements GenericDAO<TypeRoom> {
     private final transient DataSource dataSource;
 
     private static final Logger LOGGER = LogManager.getLogger(TypeRoomDAO.class);
-    private static final String SAVE_ERR_MSG = "record not saved";
-    private static final String UPDATE_ERR_MSG = "record not updated";
-    //private static final String DELETE_ERR_MSG = "record not deleted";
 
-    private final static String INSERT_BY_ID = "INSERT INTO TYPE_ROOM (COUNT_PLACES, PRISE, DESCRIPTION, CLASS_OF_ROOM, ID) VALUES (?, ?, ?, ?, ?)";
-    private final static String UPDATE_BY_ID = "UPDATE TYPE_ROOM SET COUNT_PLACES = ?, PRISE = ?, DESCRIPTION = ?, CLASS_OF_ROOM = ? WHERE ID = ?";
-    private final static String DELETE_BY_ID = "DELETE FROM TYPE_ROOM WHERE ID = ?";
-    private final static String SELECT_BY_ID = "SELECT * FROM TYPE_ROOM WHERE ID = ?";
-    private final static String SELECT_ALL = "SELECT * FROM TYPE_ROOM";
 
     public TypeRoomDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -31,18 +24,18 @@ public class TypeRoomDAO implements GenericDAO<TypeRoom> {
 
     @Override
     public TypeRoom save(final TypeRoom typeRoom) {
-        return saveUpdate(typeRoom, INSERT_BY_ID, SAVE_ERR_MSG);
+        return saveUpdate(typeRoom, Query.INSERT_TYPE_BY_ID.get(), Query.SAVE_ERR_MSG.get());
     }
 
     @Override
     public TypeRoom update(final TypeRoom typeRoom) {
-        return saveUpdate(typeRoom, UPDATE_BY_ID, UPDATE_ERR_MSG);
+        return saveUpdate(typeRoom, Query.UPDATE_TYPE_BY_ID.get(), Query.UPDATE_ERR_MSG.get());
     }
 
     @Override
     public int delete(final long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())) {
             statement.setLong(1, id);
             return statement.executeUpdate();
         } catch (SQLException e) {
@@ -54,7 +47,7 @@ public class TypeRoomDAO implements GenericDAO<TypeRoom> {
     @Override
     public TypeRoom findById(final long id) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+             PreparedStatement statement = connection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())) {
             statement.setLong(1, id);
             final TypeRoom typeRoom;
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -76,8 +69,8 @@ public class TypeRoomDAO implements GenericDAO<TypeRoom> {
     public List<TypeRoom> findAll() {
         final List<TypeRoom> typeRoom = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_ALL)){
-            try (ResultSet resultSet = statement.executeQuery()){
+             PreparedStatement statement = connection.prepareStatement(Query.SELECT_ALL_TYPES.get())) {
+            try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     typeRoom.add(typeRoomRS(resultSet));
                 }
@@ -117,5 +110,6 @@ public class TypeRoomDAO implements GenericDAO<TypeRoom> {
         statement.setInt(2, typeRoom.getPrise());
         statement.setString(3, typeRoom.getDescription());
         statement.setString(4, typeRoom.getClassOfRoom());
-        statement.setLong(5, typeRoom.getId());}
+        statement.setLong(5, typeRoom.getId());
+    }
 }

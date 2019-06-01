@@ -1,26 +1,25 @@
 package com.ra.janus.hotel.dao;
 
-import com.ra.janus.hotel.configuration.H2ConnectionTypeRoom;
-
-import com.ra.janus.hotel.configuration.H2ConnectionUtils;
+import com.ra.janus.hotel.configuration.ConnectionUtils;
 import com.ra.janus.hotel.entity.TypeRoom;
 import com.ra.janus.hotel.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-class TypeRoomDAOIT {
+import static org.junit.jupiter.api.Assertions.*;
+
+class TypeRoomDAOIntegrationTest {
     private static DataSource dataSource;
     private static TypeRoomDAO typeRoomDAO;
 
     @BeforeEach
-    void before() throws SQLException {
-        dataSource = H2ConnectionUtils.getDefaultDataSource();
+    public void before() throws SQLException {
+        dataSource = ConnectionUtils.getDefaultDataSource();
         typeRoomDAO = new TypeRoomDAO(dataSource);
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
