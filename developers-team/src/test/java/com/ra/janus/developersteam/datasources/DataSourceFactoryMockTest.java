@@ -16,13 +16,6 @@ public class DataSourceFactoryMockTest {
     DataSource mockDataSource;
     DataSourceFactory mockDataSourceFactory;
 
-//    @BeforeEach
-//    public void before() throws IOException {
-//
-//        mockDataSourceFactory = Mockito.mock(DataSourceFactory.class);
-//        mockDataSource = Mockito.mock(DataSource.class);
-//    }
-
     @Test
     public void whenAskHikariDataSourceFactoryReturnsThat() {
 
@@ -30,15 +23,4 @@ public class DataSourceFactoryMockTest {
 
         assertEquals(true, dataSource instanceof HikariDataSource);
     }
-
-//    @Test
-//
-//    public void whenAskHikariDataSourceFactoryThrowException() {
-//
-//        Mockito.when(mockDataSourceFactory.get()).thenThrow(new DataSourceException());
-//
-//        final Executable executable = () ->  mockDataSourceFactory.get();
-//
-//        assertThrows(DataSourceException.class, executable);
-//    }
 }
