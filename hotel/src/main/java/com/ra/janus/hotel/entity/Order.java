@@ -26,11 +26,11 @@ public class Order implements Serializable {
     public Order(long idClient, long idTypeRoom, Date dateIn, Date dateOut, StatusOrder status, Date dateCreate, Date dateUpdate, Long idRoom) {
         this.idClient = idClient;
         this.idTypeRoom = idTypeRoom;
-        this.dateIn = dateIn != null ? (Date) dateIn.clone() : null;
-        this.dateOut = dateOut != null ? (Date) dateOut.clone() : null;
+        this.dateIn = dateIn;
+        this.dateOut = dateOut;
         this.status = status;
-        this.dateCreate = dateCreate != null ? (Date) dateCreate.clone() : null;
-        this.dateUpdate = dateUpdate != null ? (Date) dateUpdate.clone() : null;
+        this.dateCreate = dateCreate;
+        this.dateUpdate = dateUpdate;
         this.idRoom = idRoom;
     }
 }
