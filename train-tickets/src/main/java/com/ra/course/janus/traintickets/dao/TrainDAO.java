@@ -20,7 +20,7 @@ public class TrainDAO implements IJdbcDao<Train> {
     private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
     private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
-    private static final String DELETE_TRAIN = "DELETE ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
+    private static final String DELETE_TRAIN = "DELETE FROM TRAINS WHERE ID = ?";
     private static final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
     public  TrainDAO(final DataSource dataSource) {
@@ -49,13 +49,11 @@ public class TrainDAO implements IJdbcDao<Train> {
     @Override
     public boolean update(final Long id, final Train train) {
         try(Connection connection = dataSource.getConnection()){
-            connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN)){
                 ps.setString(1,train.getName());
                 ps.setInt(2,train.getSeating());
                 ps.setInt(3,train.getFreeSeats());
                 ps.setLong(4,id);
-                connection.commit();
                 return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
