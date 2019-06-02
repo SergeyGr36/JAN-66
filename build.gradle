@@ -41,6 +41,9 @@ configure(allprojects) { project ->
         testCompile testing.mockito
         compile log.log4j2Api
         compile log.log4jCore
+        compile log.logbackCore
+        compile log.logbackClassic
+        compile log.slf4jApi
     }
 }
 
@@ -49,18 +52,29 @@ wrapper {
 }
 
 project(":hotel") {
-
     dependencies {
         compile db.h2
         compileOnly utils.lombok
         annotationProcessor 'org.projectlombok:lombok:1.18.8'
         compile hibernate.hikari
     }
+}
 
+project(":hotel-integration-test") {
+    dependencies {
+        compile project(":hotel")
+    }
+}
 
-    project(":hotel-integration-test") {
-        dependencies {
-            compile project(":hotel")
-        }
+project(':developers-team') {
+    dependencies {
+        compile db.h2
+        compile hibernate.hikari
+    }
+}
+
+project(':developers-team-integration-tests') {
+    dependencies {
+        compile project(':developers-team')
     }
 }
