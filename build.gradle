@@ -58,6 +58,8 @@ project(':faculty') {
 
            compile db.mysql
            compile db.h2
+           compile hibernate.hikari
+           
            testCompile testing.mockito
        }
     spotbugsMain {
