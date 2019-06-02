@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-class UserDAOTest {
+class UserDAOMockTest {
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set (name,email,password) values (?,?,?) WHERE id=?";
