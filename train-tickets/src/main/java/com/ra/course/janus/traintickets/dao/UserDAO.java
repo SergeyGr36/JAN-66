@@ -121,10 +121,10 @@ public class UserDAO implements IJdbcDao<User> {
 
     private User toUser(final ResultSet rs) throws SQLException {
         return new User(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("password")
+                rs.getLong(COL_INDEX_ID),
+                rs.getString(COL_INDEX_NAME),
+                rs.getString(COL_INDEX_EMAIL),
+                rs.getString(COL_INDEX_PASSWORD)
         );
     }
 }
