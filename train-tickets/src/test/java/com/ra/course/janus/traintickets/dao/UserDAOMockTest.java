@@ -121,24 +121,6 @@ class UserDAOMockTest {
         assertThrows(DAOException.class, () -> userDAO.update(USER_ID, user));
     }
 
-    @Test
-    void updateUserWhenThrowsOnConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
-        doThrow(new SQLException()).when(mockConn).close();
-        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        assertThrows(DAOException.class, () -> userDAO.update(USER_ID, user));
-    }
-
-
-    @Test
-    void updateUserWhenThrowsOnExequteStmtAndConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
-        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
-        doThrow(new SQLException()).when(mockConn).close();
-        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        assertThrows(DAOException.class, () -> userDAO.update(USER_ID, user));
-    }
-
     // Test delete-----------------------------------------------------
 
     @Test
@@ -155,19 +137,10 @@ class UserDAOMockTest {
         assertFalse(userDAO.delete(USER_ID));
     }
 
-
     @Test
     void deleteUserWhenThrowsOnExequteStmtThenThrowsDAOException() throws SQLException {
         when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
-        assertThrows(DAOException.class, () -> userDAO.delete(USER_ID));
-    }
-
-    @Test
-    void deleteUserWhenThrowsOnExequteStmtAndConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
-        doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
-        doThrow(new SQLException()).when(mockConn).close();
         assertThrows(DAOException.class, () -> userDAO.delete(USER_ID));
     }
 
@@ -193,66 +166,11 @@ class UserDAOMockTest {
         assertNull(user);
     }
 
-    @Test
-    void findUserByIdWhenThrowsOnResSetCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        when(mockResSet.next()).thenReturn(true);
-        mockMapUser(mockResSet);
-        doThrow(new SQLException()).when(mockResSet).close();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
-
-    @Test
-    void findUserByIdWhenThrowsOnResSetNextThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        doThrow(new SQLException()).when(mockResSet).next();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
-
-    @Test
-    void findUserByIdWhenThrowsOnResSetNextAndCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        doThrow(new SQLException()).when(mockResSet).next();
-        doThrow(new SQLException()).when(mockResSet).close();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
 
     @Test
     void findUserByIdWhenThrowsOnExecuteStmtThenThrowsDAOException() throws SQLException {
         when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeQuery();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
-
-    @Test
-    void findUserByIdWhenThrowsOnExecuteStmtAndConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        doThrow(new SQLException()).when(mockPrepSt).setLong(anyInt(), anyLong());
-        doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
-
-    @Test
-    void findUserByIdWhenThrowsOnConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        when(mockResSet.next()).thenReturn(true);
-        mockMapUser(mockResSet);
-        doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
-    }
-
-    @Test
-    void findUserByIdWhenThrowsOnResSetAndConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        when(mockResSet.next()).thenReturn(true);
-        mockMapUser(mockResSet);
-        doThrow(new SQLException()).when(mockResSet).close();
-        doThrow(new SQLException()).when(mockConn).close();
         assertThrows(DAOException.class, () -> userDAO.findById(USER_ID));
     }
 
@@ -279,38 +197,10 @@ class UserDAOMockTest {
     }
 
     @Test
-    void findAllUsersWhenThrowsOnConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        when(mockResSet.next()).thenReturn(true).thenReturn(false);
-        mockMapUser(mockResSet);
-        doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(DAOException.class, () -> userDAO.findAll());
-    }
-
-
-    @Test
     public void findAllUsersWhenThrowsOnExecuteQueryThenThrowsDAOException() throws SQLException {
         when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeQuery();
         assertThrows(DAOException.class, () ->  userDAO.findAll());
-    }
-
-    @Test
-    public void findAllUsersWhenThrowsOnResSetNextThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
-        doThrow(new SQLException()).when(mockResSet).next();
-        assertThrows(DAOException.class, () -> userDAO.findAll());
-    }
-
-    @Test
-    public void findAllUsersWhenThrowsOnResSetNextAndConnCloseThenThrowsDAOException() throws SQLException {
-        when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
-
-        doThrow(new SQLException()).when(mockResSet).next();
-        doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(DAOException.class, () -> userDAO.findAll());
     }
 
     //-----------------------------------------------------------------
