@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DataSourceUtilsTest {
 
     @Test
-    public void whenGetDataSourceFactory()  throws IOException {
+    public void whenGetDataSource()  {
 
         DataSource dataSource = DataSourceUtils.getDataSource();
 
