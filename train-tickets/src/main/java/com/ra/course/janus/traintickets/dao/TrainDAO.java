@@ -68,14 +68,12 @@ public class TrainDAO implements IJdbcDao<Train> {
     @Override
     public boolean delete(final Long id) {
         try(Connection connection = dataSource.getConnection()){
-            connection.setAutoCommit(false);
             try(PreparedStatement ps = connection.prepareStatement(DELETE_TRAIN)){
                 ps.setLong(1,id);
-                connection.commit();
-                return ps.executeUpdate() == 1;
+                return ps.executeUpdate() > 0;
             }
         }catch (SQLException e){
-            LOG.info("Exception in DELETE:",e);
+            //LOG.info("Exception in DELETE:",e);
             throw new DAOException(e);
         }
     }
