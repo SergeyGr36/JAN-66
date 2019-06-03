@@ -9,12 +9,12 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DataSourceFactoryTest {
+class DataSourceUtilsTest {
 
     @Test
     public void whenGetDataSourceFactory()  throws IOException {
 
-        DataSource dataSource = DataSourceFactoryHelper.getDataSource();
+        DataSource dataSource = DataSourceUtils.getDataSource();
 
         assertEquals(true, dataSource instanceof HikariDataSource);
     }
