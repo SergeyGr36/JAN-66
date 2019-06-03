@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*;
 
 class TrainDAOMockTest {
 
-    private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
+    private static final String INSERT_TRAIN = "INSERT into TRAINS (NAME, SEATING, FREE_SEATS) values (?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
     private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
     private static final String DELETE_TRAIN = "DELETE FROM TRAINS WHERE ID = ?";
@@ -55,11 +55,23 @@ class TrainDAOMockTest {
     }
 
     @Test
+    void whenResultSetWithoutMeaningAndAppearsDAOException()throws SQLException{
+        when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+
+        when(mockResultSet.next()).thenReturn(false);
+
+        assertThrows(DAOException.class,()->trainDAO.save(TEST_TRAIN));
+
+
+    }
+
+    @Test
     void ifThereIsAnExceptionInSave()throws SQLException{
         train = new Train(TRAIN_TEST_ID,TRAIN_NAME,SEATING,FREE_SEATS);
         when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
-        assertThrows(DAOException.class, ()-> trainDAO.save(train));
+        assertThrows(DAOException.class,()->trainDAO.save(train));
     }
 
     @Test

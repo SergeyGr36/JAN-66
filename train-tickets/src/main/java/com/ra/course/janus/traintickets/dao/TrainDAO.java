@@ -17,7 +17,7 @@ public class TrainDAO implements IJdbcDao<Train> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TrainDAO.class.getName());
 
-    private static final String INSERT_TRAIN = "INSERT into TRAINS (ID, NAME, SEATING, FREE_SEATS) values (?, ?, ?, ?)";
+    private static final String INSERT_TRAIN = "INSERT into TRAINS (NAME, SEATING, FREE_SEATS) values (?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
     private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
     private static final String DELETE_TRAIN = "DELETE FROM TRAINS WHERE ID = ?";
@@ -30,15 +30,18 @@ public class TrainDAO implements IJdbcDao<Train> {
     @Override
     public Train save(final Train train) {
         try(Connection connection = dataSource.getConnection()){
-            connection.setAutoCommit(false);
             try(PreparedStatement pr = connection.prepareStatement(INSERT_TRAIN)){
-                pr.setLong(1,train.getId());
-                pr.setString(2,train.getName());
-                pr.setInt(3,train.getSeating());
-                pr.setInt(4,train.getFreeSeats());
+                trainPrSt(pr,train);
                 pr.executeUpdate();
-                connection.commit();
-                return train;
+                try(ResultSet rs = pr.getGeneratedKeys()){
+                    if (rs.next()){
+                        return new Train(rs.getLong(1),train.getName(),
+                                train.getSeating(),train.getFreeSeats());
+                    }else {
+                        LOG.info("Exception in SAVE");
+                         throw new DAOException("Train is not created");
+                    }
+                }
             }
         }catch (SQLException e){
            LOG.info("Exception in SAVE :",e);
@@ -119,6 +122,12 @@ public class TrainDAO implements IJdbcDao<Train> {
     private Train createTrainForList(final ResultSet rs)throws SQLException{
     return new Train(rs.getLong(1), rs.getString(2),
             rs.getInt(3),rs.getInt(4));
+    }
+
+    private void trainPrSt(final PreparedStatement pr,final Train train)throws SQLException{
+        pr.setString(1,train.getName());
+        pr.setInt(2,train.getSeating());
+        pr.setInt(3,train.getFreeSeats());
     }
 
 }
