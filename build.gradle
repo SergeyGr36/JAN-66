@@ -47,6 +47,10 @@ configure(allprojects) { project ->
 
         compileOnly utils.lombok
         annotationProcessor utils.lombok
+        
+        compile spring.context
+        compile spring.jdbc
+        testCompile spring.test        
     }
 }
 
