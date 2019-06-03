@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import com.ra.course.janus.faculty.exception.DaoException;
 import org.apache.log4j.Logger;
 
+import javax.sql.DataSource;
+
 public class CourseDaoJdbc implements CourseDao {
 
     private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
@@ -19,32 +21,34 @@ public class CourseDaoJdbc implements CourseDao {
     private static final String DELETE_SQL = "DELETE FROM COURSE WHERE COURSE_TID=?";
 
     private static final String INSERT_ERR = "Error inserting Course";
+    private static final String INSERT_ERR_EGT_ID = "Error inserting Course - could not get TID";
     private static final String UPDATE_ERR = "Error updating Course";
     private static final String DELETE_ERR = "Error deleting Course";
     private static final String FIND_ERR = "Error finding Course";
 
     private final static Logger LOGGER = Logger.getLogger(CourseDao.class);
 
+    transient private final DataSource dataSource;
 
-    private transient final Connection connection;
+    public CourseDaoJdbc(final DataSource dataSource) {
 
-    public CourseDaoJdbc(final Connection connection) {
-        this.connection = connection;
+        this.dataSource = dataSource;
     }
 
     @Override
     public Course insert(final Course course) {
-        try {
-            try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-
-                ps.setString(1, course.getCode());
-                ps.setString(2, course.getDescription());
-                ps.executeUpdate();
-
-                try (ResultSet courseTid = ps.getGeneratedKeys()) {
-                    courseTid.next();
-                    course.setTid(courseTid.getLong(1));
-                    return course;
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+             ps.setString(1, course.getCode());
+             ps.setString(2, course.getDescription());
+             ps.executeUpdate();
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong(1);
+                    return new Course(id, course.getCode(), course.getDescription());
+                } else {
+                    LOGGER.error(INSERT_ERR_EGT_ID);
+                    throw new DaoException(INSERT_ERR_EGT_ID);
                 }
             }
         } catch (SQLException e) {
@@ -55,14 +59,15 @@ public class CourseDaoJdbc implements CourseDao {
 
 
     @Override
-    public Course update(final Course course) {
+    public boolean update(final Course course) {
         try {
-            try (PreparedStatement ps = connection.prepareStatement(UPDATE_SQL)) {
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
 
                 ps.setString(1, course.getCode());
                 ps.setString(2, course.getDescription());
                 ps.setLong(3, course.getTid());
-                return ps.executeUpdate() > 0 ? course : null;
+                return ps.executeUpdate() > 0 ? true : false;
 
             }
         } catch (SQLException e) {
@@ -74,7 +79,8 @@ public class CourseDaoJdbc implements CourseDao {
     @Override
     public boolean delete(final Course course) {
         try {
-            try (PreparedStatement ps = connection.prepareStatement(DELETE_SQL)) {
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
                 ps.setLong(1, course.getTid());
                 return ps.executeUpdate() > 0 ? true : false;
             }
@@ -85,9 +91,11 @@ public class CourseDaoJdbc implements CourseDao {
     }
 
     @Override
+    @SuppressWarnings("PMD.CloseResource")
     public Course findByTid(final long tid) {
         try {
-            final PreparedStatement ps = connection.prepareStatement(SELECT_ONE_SQL);
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
             ps.setLong(1, tid);
             final ResultSet rs = ps.executeQuery();
             try {
@@ -108,7 +116,8 @@ public class CourseDaoJdbc implements CourseDao {
     @Override
     public List<Course> findAll() {
         try {
-            try (PreparedStatement ps = connection.prepareStatement(SELECT_ALL_SQL);
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
                  ResultSet rs = ps.executeQuery()) {
 
                 final List<Course> courses = new ArrayList<>();

@@ -2,61 +2,62 @@ package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Course;
 import org.junit.jupiter.api.*;
-//import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CourseDaoJdbcIntegrationTest {
 
-    public static  Connection conn ;//= ConnectionFactory.getInstance();
-    public static  CourseDaoJdbc courseDao ;//=  new CourseDaoJdbc(conn);
+    public static  CourseDaoJdbc courseDao;
 
     @BeforeEach
     public void beforeEach () throws Exception{
-        courseDao = new CourseDaoJdbc(ConnectionFactory.getInstance().getConnection());
+            courseDao = new CourseDaoJdbc(DataSourceFactoryHelper.getDataSource());
     }
 
     @Test
     void insert(){
-        Course c = new Course();
-        c.setCode("J2EE");
-        c.setDescription("Java web developmnt course");
+        //given
+        Course c = new Course("J2EE","Java web developmnt course");
 
+        //when
         c = courseDao.insert(c);
+        //then
         assertNotNull(c.getTid());
     }
 
 
     @Test
     void findAllWhenNotExists() {
+        //when
         List<Course> cources = courseDao.findAll();
         for (Course c : cources){
             courseDao.delete(c);
         }
+
+        //then
         assertEquals(0,courseDao.findAll().size());
     }
 
 
     @Test
     void findAllWhenExists() {
+        //given
         int n0 = courseDao.findAll().size();
-        insert();
-        insert();
-        insert();
-        assertEquals(n0+3,courseDao.findAll().size());
-    }
 
+        //when
+        insert();
+
+        //then
+        assertEquals(n0+1,courseDao.findAll().size());
+    }
 
     @Test
     void findByIdWhenExists() {
-        Course c = new Course();
-        c.setCode("J2EE");
-        c.setDescription("Java web development course");
+        //when
+        Course c = courseDao.insert( new Course("J2EE","Java web development course"));
 
-        c = courseDao.insert(c);
+        //then
         assertNotNull(courseDao.findByTid(c.getTid()));
     }
 
@@ -67,48 +68,44 @@ public class CourseDaoJdbcIntegrationTest {
 
     @Test
     void updateWhenExists() {
-        Course c = new Course();
-        c.setCode("UPD_E");
-        c.setDescription("Test update when exists");
-        c = courseDao.insert(c);
+        //when
+        Course c = courseDao.insert(new Course("UPD_E","Test update when exists"));
         c.setDescription("Test update when exists - updated");
         courseDao.update(c);
 
+        //then
         Course cToCheck = courseDao.findByTid(c.getTid());
         assertTrue("Test update when exists - updated".equals(cToCheck.getDescription()));
-
-        assertNull(courseDao.findByTid(-1));
     }
 
     @Test
     void updateWhenNotExists() {
-        Course c = new Course();
-        c.setCode("UPD_NE");
-        c.setDescription("Test update when not exists");
-        c = courseDao.insert(c);
+        //when
+        Course c = courseDao.insert(new Course("UPD_NE","Test update when not exists"));
         c.setDescription("Test update when exists - updated");
         c.setTid(c.getTid()+1);
-        assertNull(courseDao.update(c));
+
+        //then
+        assertFalse(courseDao.update(c));
 
     }
 
     @Test
     void deleteWhenExists() {
-        Course c = new Course();
-        c.setCode("DEL_E");
-        c.setDescription("Test delete when exists");
-        c = courseDao.insert(c);
-        assertTrue(courseDao.delete(c));
+        //when
+        Course c= courseDao.insert(new Course("DEL_E","Test delete when exists"));
 
+        //then
+        assertTrue(courseDao.delete(c));
     }
 
     @Test
     void deleteWhenNotExists() {
-        Course c = new Course();
-        c.setCode("DEL_NE");
-        c.setDescription("Test delete when not exists");
-        c = courseDao.insert(c);
+        //when
+        Course c= courseDao.insert(new Course("DEL_NE","Test delete when not exists"));
         c.setTid(c.getTid()+1);
+
+        //then
         assertFalse(courseDao.delete(c));
 
     }
