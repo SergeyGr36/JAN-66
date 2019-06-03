@@ -62,8 +62,6 @@ class TrainDAOMockTest {
         when(mockResultSet.next()).thenReturn(false);
 
         assertThrows(DAOException.class,()->trainDAO.save(TEST_TRAIN));
-
-
     }
 
     @Test
@@ -128,6 +126,7 @@ class TrainDAOMockTest {
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
         train = trainDAO.findById(TRAIN_ID);
+
     }
 
     @Test
@@ -137,6 +136,9 @@ class TrainDAOMockTest {
         when(mockResultSet.next()).thenReturn(false);
         mockMapTrain(mockResultSet);
         train = trainDAO.findById(TRAIN_ID);
+        doThrow(new SQLException()).when(mockConn).close();
+        assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
+
     }
 
     @Test
@@ -148,7 +150,6 @@ class TrainDAOMockTest {
         doThrow(new SQLException()).when(mockConn).close();
         assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
     }
-
 
     @Test
     void whenItemWasSuccessfullySelectFindAll() throws SQLException {

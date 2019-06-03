@@ -73,7 +73,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return ps.executeUpdate() > 0;
             }
         }catch (SQLException e){
-            //LOG.info("Exception in DELETE:",e);
+            LOG.info("Exception in DELETE:",e);
             throw new DAOException(e);
         }
     }
@@ -107,7 +107,7 @@ public class TrainDAO implements IJdbcDao<Train> {
             try(PreparedStatement pr = connection.prepareStatement(SELECT_TRAIN_ALL)){
                 try(ResultSet resultSet = pr.executeQuery()){
                     while (resultSet.next()){
-                        trainsList.add(createTrainForList(resultSet));
+                        trainsList.add(createTrain(resultSet));
                     }
                 }
             }return trainsList;
@@ -117,7 +117,7 @@ public class TrainDAO implements IJdbcDao<Train> {
         }
     }
 
-    private Train createTrainForList(final ResultSet rs)throws SQLException{
+    private Train createTrain(final ResultSet rs)throws SQLException{
     return new Train(rs.getLong(1), rs.getString(2),
             rs.getInt(3),rs.getInt(4));
     }

@@ -1,10 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
-
-
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Train;
-import com.sun.source.tree.AssertTree;
-import org.h2.bnf.context.DbSchema;
 import org.h2.tools.RunScript;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,9 +54,7 @@ public class TrainDAOIntegrationTest {
     void whenWeDeleteTrain()throws Exception{
         Train someTrain = trainDAO.save(testIntegrTrain);
         final long id = someTrain.getId();
-        trainDAO.delete(id);
-
-        assertNull(someTrain);
+        assertTrue(trainDAO.delete(id));
     }
 
     @Test
@@ -87,5 +81,4 @@ public class TrainDAOIntegrationTest {
             }
         }
     }
-
 }
