@@ -17,13 +17,9 @@ public final class ConnectionFactory {
         private static Properties dbProperties = new Properties();
 
         private ConnectionFactory() throws IOException {
-            //dbProperties = new Properties();
             loadProperties();
         }
 
-        /**
-         * this method create Property and load data from config.properties file.
-         */
         private void loadProperties() throws IOException {
             dbProperties.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(CONFIG_FILE)));
         }

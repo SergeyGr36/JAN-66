@@ -8,7 +8,7 @@ public interface CourseDao {
 
     Course insert(Course course);
 
-    Course update(Course course);
+    boolean update(Course course);
 
     boolean delete(Course course);
 

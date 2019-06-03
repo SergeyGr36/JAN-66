@@ -5,8 +5,13 @@ public class DaoException
 
     public static final long serialVersionUID = -4841130589162737690L;
 
-
-        public DaoException (final String errorMessage, final Throwable err){
+    public DaoException() {
+        super();
+    }
+    public DaoException(final String s) {
+        super(s);
+    }
+    public DaoException(final String errorMessage, final Throwable err){
             super(errorMessage,err);
         }
 
