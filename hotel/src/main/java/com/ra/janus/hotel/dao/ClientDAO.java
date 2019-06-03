@@ -17,7 +17,7 @@ public class ClientDAO implements GenericDAO<Client> {
     private final transient DataSource dataSource;
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionUtils.class);
 
-    public ClientDAO(DataSource dataSource) {
+    public ClientDAO( final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
