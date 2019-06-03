@@ -38,73 +38,55 @@ public class RoomDAOTestMock {
         mockResultSet = Mockito.mock(ResultSet.class);
         mockRoom = Mockito.mock(Room.class);
         room = new Room();
+
+        when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getLong(1)).thenReturn(1L);
+        when(mockStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.getLong("id")).thenReturn(1L);
+        when(mockStatement.executeUpdate()).thenReturn(1);
+        when(mockStatement.executeUpdate()).thenReturn(1);
+        when(mockRoom.getId()).thenReturn(1L);
+        when(mockRoom.getIdTypeRoom()).thenReturn(1L);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
     }
 
     @Test
     public void whenInsertRoomInDatabaseThenSaveIt() throws SQLException, DaoException {
-        //when
         when(mockConnection.prepareStatement(Query.ADD_ROOM.get(), PreparedStatement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
-        when(mockStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong(1)).thenReturn(1L);
 
-        //then
         assertEquals(1, roomDAO.save(room).getId());
     }
 
     @Test
     public void whenSearchRoomThenReturnRoom() throws SQLException, DaoException {
-        //when
         when(mockConnection.prepareStatement(Query.SELECT_ROOM.get())).thenReturn(mockStatement);
-        when(mockStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong("id")).thenReturn(1L);
 
-        //then
         assertEquals(1L, roomDAO.findById(1L).getId());
     }
 
     @Test
     public void whenDeleteRoomFromDatabaseThenReturnOneIfDone() throws SQLException, DaoException {
-        //when
         when(mockConnection.prepareStatement(Query.REMOVE_ROOM.get())).thenReturn(mockStatement);
-        when(mockStatement.executeUpdate()).thenReturn(1);
 
-        //then
         assertEquals(1, roomDAO.delete(1L));
     }
 
     @Test
     public void whenUpdateRoomInDatabaseThenReturnUpdatedRoom() throws SQLException, DaoException {
-        //when
         when(mockConnection.prepareStatement(Query.UPDATE_ROOM.get())).thenReturn(mockStatement);
-        when(mockStatement.executeUpdate()).thenReturn(1);
-        when(mockRoom.getId()).thenReturn(1L);
-        when(mockRoom.getIdTypeRoom()).thenReturn(1L);
-        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        when(mockConnection.prepareStatement(Query.SELECT_ROOM.get())).thenReturn(statement);
-        when(statement.executeQuery()).thenReturn(rs);
-        when(rs.next()).thenReturn(true);
-        when(rs.getLong("id")).thenReturn(1L);
+        when(mockConnection.prepareStatement(Query.SELECT_ROOM.get())).thenReturn(mockStatement);
 
-        //then
         assertEquals(mockRoom.getId(), roomDAO.update(mockRoom).getId());
     }
 
     @Test
     public void whenFindAllThanReturnRoomList() throws SQLException, DaoException {
-        //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ROOMS.get())).thenReturn(mockStatement);
         List<Room> mockList = Mockito.mock(ArrayList.class);
-        when(mockStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getLong("id")).thenReturn(1l);
         when(mockList.add(mockRoom)).thenReturn(true);
 
-        //then
         assertNotNull(roomDAO.findAll());
     }
 
