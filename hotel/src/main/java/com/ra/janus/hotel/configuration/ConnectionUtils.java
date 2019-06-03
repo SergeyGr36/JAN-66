@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -14,7 +16,8 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.Scanner;
 
-public final class ConnectionUtils {
+@Configuration
+public class ConnectionUtils {
 
     private final static Properties PROPS = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionUtils.class);
@@ -35,9 +38,7 @@ public final class ConnectionUtils {
         }
     }
 
-    private ConnectionUtils() {
-    }
-
+    @Bean
     public static DataSource getDefaultDataSource() {
         final HikariDataSource hikariDataSource;
         final HikariConfig config = new HikariConfig();

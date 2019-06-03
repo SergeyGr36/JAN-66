@@ -57,6 +57,8 @@ project(":hotel") {
         compileOnly utils.lombok
         annotationProcessor 'org.projectlombok:lombok:1.18.8'
         compile hibernate.hikari
+        compile spring.context
+        compile spring.jdbc
     }
 }
 
