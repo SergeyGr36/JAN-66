@@ -12,7 +12,7 @@ public class CourseDaoJdbcIntegrationTest {
 
     @BeforeEach
     public void beforeEach () throws Exception{
-            courseDao = new CourseDaoJdbc(DataSourceFactoryHelper.getDataSource());
+            courseDao = new CourseDaoJdbc(DataSourceUtils.getDataSource());
     }
 
     @Test
@@ -25,7 +25,6 @@ public class CourseDaoJdbcIntegrationTest {
         //then
         assertNotNull(c.getTid());
     }
-
 
     @Test
     void findAllWhenNotExists() {

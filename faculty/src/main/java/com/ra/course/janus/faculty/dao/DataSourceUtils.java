@@ -8,18 +8,23 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Properties;
 
-final public class DataSourceFactoryHelper {
+final public class DataSourceUtils {
 
     final private static String CONFIG_FILE = "config.properties";
     final private static Properties DB_PROPERTIES = new Properties();
     final private static HikariConfig CONFIG = new HikariConfig();
 
-    private DataSourceFactoryHelper() throws IOException {
+    private DataSourceUtils() {
 
     }
 
-    private static void loadProperties() throws IOException {
-        DB_PROPERTIES.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(CONFIG_FILE)));
+    private static void loadProperties()  {
+        try {
+            DB_PROPERTIES.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(CONFIG_FILE)));
+        }
+        catch (IOException e){
+            throw new IllegalStateException("Could not read the application properties file.", e);
+        }
     }
 
     private static void initConfig() {
@@ -33,7 +38,7 @@ final public class DataSourceFactoryHelper {
             CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
     }
 
-    public static DataSource getDataSource() throws IOException{
+    public static DataSource getDataSource() {
         loadProperties();
         initConfig();
         return new HikariDataSource(CONFIG);
