@@ -1,9 +1,9 @@
 package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.DataSource.ConnectionFactory;
-import dao.DaoStudent;
-import dao.JDBCDaoStudent;
-import entity.Student;
+import com.ra.course.janus.faculty.entity.Student;
+import com.ra.course.janus.faculty.dao.JDBCDaoStudent;
+import com.ra.course.janus.faculty.dao.DaoStudent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 /*import org.junit.jupiter.api.*;
@@ -43,21 +43,20 @@ public class StudentDaoIntegrationTests {
 
     @Test
     void findAllWhenNotExists() {
-        List<Student> cources = DaoStudent.findAll();
-        for (Student c : cources){
-           // DaoStudent.delete(s);
+        List<Student> students = studentDao.findAll();
+        for (Student s : students){
         }
-        assertEquals(0,DaoStudent.findAll().size());
+        assertEquals(0,studentDao.findAll().size());
     }
 
 
     @Test
     void findAllWhenExists() {
-        int n0 = DaoStudent.findAll().size();
+        int n0 = studentDao.findAll().size();
         insert();
         insert();
         insert();
-        assertEquals(n0+3,DaoStudent.findAll().size());
+        assertEquals(n0+3,studentDao.findAll().size());
     }
 
 
@@ -67,28 +66,28 @@ public class StudentDaoIntegrationTests {
         s.setCode("J2EE");
         s.setDescription("Java web development course");
 
-        s = DaoStudent.insert(s);
-        assertNotNull(DaoStudent.findByStudentId(s.getId()));
+        s = studentDao.insert(s);
+        assertNotNull(studentDao.findByStudentId(s.getId()));
     }
 
     @Test
     void findByIdWhenNotExists() {
-        assertNull(DaoStudent.findByStudentId(String.valueOf(-1)));
+        assertNull(studentDao.findByStudentId((-1)));
     }
 
-    @Test
+        @Test
     void updateWhenExists() {
         Student s = new Student();
         s.setCode("UPD_E");
         s.setDescription("Test update when exists");
-        s = DaoStudent.insert(s);
+        s = studentDao.insert(s);
         s.setDescription("Test update when exists - updated");
-        DaoStudent.update(s);
+        studentDao.update(s);
 
-        Student sToCheck = (Student) DaoStudent.findByStudentId(s.getId());
+        Student sToCheck =  studentDao.findByStudentId(s.getId());
         assertTrue("Test update when exists - updated".equals(sToCheck.getDescription()));
 
-        assertNull(DaoStudent.findByStudentId(String.valueOf(-1)));
+        assertNull(studentDao.findByStudentId((-1)));
     }
 
     @Test
@@ -96,10 +95,10 @@ public class StudentDaoIntegrationTests {
         Student s = new Student();
         s.setCode("UPD_NE");
         s.setDescription("Test update when not exists");
-        s = DaoStudent.insert(s);
+        s = studentDao.insert(s);
         s.setDescription("Test update when exists - updated");
-        s.setId(Integer.parseInt(s.getId()+1));
-        assertNull(DaoStudent.update(s));
+        s.setId((s.getId()+1));
+        assertNull(studentDao.update(s));
 
     }
 
@@ -108,8 +107,8 @@ public class StudentDaoIntegrationTests {
         Student s = new Student();
         s.setCode("DEL_E");
         s.setDescription("Test delete when exists");
-        s = (Student) DaoStudent.insert(s);
-        assertTrue((BooleanSupplier) DaoStudent.delete(s));
+        s = studentDao.insert(s);
+        assertTrue(studentDao.delete(s));
 
     }
 
@@ -118,9 +117,9 @@ public class StudentDaoIntegrationTests {
         Student s = new Student();
         s.setCode("DEL_NE");
         s.setDescription("Test delete when not exists");
-        s = DaoStudent.insert(s);
-        s.setId(Integer.parseInt(s.getId()+1));
-        assertFalse(DaoStudent.delete(s));
+        s = studentDao.insert(s);
+        s.setId(s.getId()+1);
+        assertFalse(studentDao.delete(s));
 
     }
 

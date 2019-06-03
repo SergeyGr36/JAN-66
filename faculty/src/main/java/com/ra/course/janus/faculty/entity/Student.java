@@ -2,7 +2,7 @@
 package com.ra.course.janus.faculty.entity;
 
 public class Student {
-    private static int id;
+    private  int id;
     private String name;
     private String surname;
 private String code;
@@ -34,7 +34,7 @@ private String description;
         this.surname = surname;
     }
 
-    public static int getId() {
+    public int getId() {
         return id;
     }
 

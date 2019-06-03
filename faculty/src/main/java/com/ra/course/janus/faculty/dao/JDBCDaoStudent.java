@@ -1,8 +1,8 @@
 
 package com.ra.course.janus.faculty.dao;
-
-
 import com.ra.course.janus.faculty.entity.Student;
+import com.ra.course.janus.faculty.logging.LoggerClass;
+import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,12 +13,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class JDBCDaoStudent implements DaoStudent {
     private static final String INSERT_SQL = "INSERT INTO STUDENT (NAME,SURNAME,ID) VALUES (?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE STUDENT SET NAME=?,SURNAME=?,WHERE ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM STUDENT";
     private static final String SELECT_ONE_SQL = "SELECT * FROM STUDENT WHERE ID= ?";
     private static final String DELETE_SQL = "DELETE FROM STUDENT WHERE ID=?";
+
+
+    private static final String INSERT_ERR = "Error inserting student";
+    private static final String UPDATE_ERR = "Error updating student";
+    private static final String DELETE_ERR = "Error deleting student";
+    private static final String FIND_ERR = "Error finding student";
+
+
+    private final static Logger LOGGER = Logger.getLogger(DaoStudent.class);
+/*private transient final Connection connection;
+public JDBCDaoStudent(final Connection connection){
+    this.connection = connection;
+}*/
 
 
     private final DataSource dataSource;
@@ -28,21 +42,30 @@ public class JDBCDaoStudent implements DaoStudent {
     }
 
     @Override
-    public void insert(Student student) {
+    public Student insert(Student student) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
             prepareStatement(ps, student);
+            ps.setString(1,student.getCode());
+            ps.setString(2,student.getDescription());
             ps.executeUpdate();
+
+            try(ResultSet studentId = ps.getGeneratedKeys()){
+                studentId.next();
+                student.setId(studentId.getInt(1));
+                return student;
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
 @Override
-    public Student findByStudentId(String id) {
+    public Student findByStudentId(int id) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL)) {
-            ps.setString(1, id);
+            ps.setInt(1, id);
 
             Student student = null;
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,40 +95,48 @@ public class JDBCDaoStudent implements DaoStudent {
         }
     }
 
-    private Student toStudent(ResultSet rs) throws SQLException {
-        return new Student(rs.getString("NAME"),
-                rs.getString("SURNAME"), rs.getInt("ID"));
 
-    }
 
-    private void prepareStatement(PreparedStatement ps, Student student) throws SQLException {
+    private Student prepareStatement(PreparedStatement ps, Student student) throws SQLException {
         ps.setInt(1, student.getId());
         ps.setString(2, student.getName());
         ps.setString(3, student.getSurname());
-
+return student;
     }
 
     @Override
-    public void update(Student student) {
+    public Student update(Student student) {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
             prepareStatement(ps, student);
+            ps.setString(1,student.getCode());
+            ps.setString(2,student.getDescription());
+            ps.setInt(1,student.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return student;
     }
 
     @Override
-    public void delete(Student student) {
+    public boolean delete(Student student) {
         try (Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-        ps.setInt(1, Student.getId());
-
-            ps.executeUpdate();
+             PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
+            ps.setInt(1, student.getId());
+           return ps.executeUpdate()>0 ? true:false;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    private Student toStudent (final ResultSet rs) throws SQLException{
+        final Student result = new Student();
+        result.setId(rs.getInt("STUDENT_ID"));
+        result.setCode(rs.getString("CODE"));
+        result.setDescription(rs.getString("DESCRIPTION"));
+        return result;
     }
 }
 

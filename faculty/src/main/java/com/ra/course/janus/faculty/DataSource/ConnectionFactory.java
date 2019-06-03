@@ -2,6 +2,7 @@ package com.ra.course.janus.faculty.DataSource;
 
 import org.h2.jdbcx.JdbcDataSource;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;

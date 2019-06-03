@@ -6,26 +6,15 @@ import java.util.Collection;
 import java.util.List;
 
 public interface DaoStudent {
-    void insert(Student student);
+    Student insert(Student student);
 
-    default void insert(Collection<Student> students) {
-        students.forEach(this::insert);
-    }
 
-    void update(Student student);
+    Student update(Student student);
 
-    void delete(Student student);
+    boolean delete(Student student);
 
-    Student findByStudentId(String Id);
+    Student findByStudentId(int Id);
 
     List<Student> findAll();
 
-
-    default String getName(String name) {
-        throw new IllegalStateException("Method is not implemented!");
-    }
-
-    default int countAll() {
-        throw new IllegalStateException("Method is not implemented!");
-    }
 }

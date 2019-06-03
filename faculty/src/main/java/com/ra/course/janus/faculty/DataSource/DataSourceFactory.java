@@ -1,35 +1,41 @@
 package com.ra.course.janus.faculty.DataSource;
-import org.h2.jdbcx.JdbcDataSource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Objects;
+import java.sql.Connection;
 import java.util.Properties;
 
 public class DataSourceFactory {
-    private static DataSourceFactory dataSourceFactory;
-    private static JdbcDataSource dataSource;
-    private static Properties dbProperties;
+    final private static HikariConfig CONFIG = new HikariConfig();
 
-    private DataSourceFactory() throws IOException {
-        dbProperties = new Properties();
-        loadProperties();
+    final private static String DB_URL = "db.url";
+    final private static String DB_USER = "db.username";
+    final private static String DB_PASS = "db.password";
+
+    private DataSourceFactory() {
     }
 
-    private void loadProperties() throws IOException {
-        dbProperties.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties")));
+    public static DataSource get() {
+        initConfig();
+        return new HikariDataSource(CONFIG);
     }
 
+    private static void initConfig() {
 
-    public static DataSourceFactory getInstance() throws IOException {
-        synchronized (DataSourceFactory.class) {
-            if (dataSourceFactory == null) {
-                dataSourceFactory = new DataSourceFactory();
-                dataSource = new JdbcDataSource();
-                dataSource.setURL(dbProperties.getProperty("db.url"));
-                dataSource.setUser(dbProperties.getProperty("db.username"));
-                dataSource.setPassword(dbProperties.getProperty("db.password"));
-            }
+        try {
+            final Properties properties = PropertyReaderUtil.getProperties("config.properties");
+
+            CONFIG.setJdbcUrl(properties.getProperty(DB_URL));
+            CONFIG.setUsername(properties.getProperty(DB_USER));
+            CONFIG.setPassword(properties.getProperty(DB_PASS));
+            CONFIG.addDataSourceProperty("cachePrepStmts", "true");
+            CONFIG.addDataSourceProperty("prepStmtCacheSize", "250");
+            CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not read the application properties file.", e);
         }
-        return dataSourceFactory;
     }
-    }
-
+}
