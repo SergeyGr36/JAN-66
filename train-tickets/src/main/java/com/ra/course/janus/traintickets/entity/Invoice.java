@@ -7,7 +7,7 @@ public class Invoice {
 
 
 	public Invoice(long id, double price, String attributes) {
-//		super();
+		super();
 		this.id = id;
 		this.price = price;
 		this.attributes = attributes;
@@ -26,9 +26,6 @@ public class Invoice {
 	}
 
 	public double getPrice() {
-//		double priceForKm = 10.2;
-//
-//		price = priceForKm * getDistance();
 		return price;
 	}
 
@@ -44,9 +41,4 @@ public class Invoice {
 		attributes = a;
 	}
 
-//	private double getDistance() {
-//		double distance;
-//		distance = Math.random() * 100;
-//		return distance;
-//	}
 }
