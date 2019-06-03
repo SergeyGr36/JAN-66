@@ -1,13 +1,16 @@
 package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Train;
-import org.h2.tools.RunScript;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import javax.sql.DataSource;
-import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,14 +22,20 @@ public class TrainDAOIntegrationTest {
 
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/Create_Trains_Table.sql";
 
-    private static final TrainDAO trainDAO = new TrainDAO(dataSource);
+    private TrainDAO trainDAO;
 
     private static final Train testIntegrTrain =
             new Train(1L,"Test Name Train",100,90);
 
+
+    @BeforeAll
+    public static void createUsersTable() throws IOException, SQLException {
+        createTableTrains();
+    }
     @BeforeEach
     public void setUp() throws Exception{
-        createTrainsTable();
+        clearTableTrains();
+        trainDAO = new TrainDAO(dataSource);
     }
 
     @Test
@@ -74,11 +83,25 @@ public class TrainDAOIntegrationTest {
         assertIterableEquals(allTrains,findTrains);
     }
 
-    private static void createTrainsTable() throws Exception{
+    ////////////////////////////////////////////////
+
+    private static String readScriptFile() throws IOException {
+        return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));
+    }
+
+    private static void executeScript(String script) throws SQLException {
         try(Connection connection = dataSource.getConnection()){
-            try (FileReader reader = new FileReader(SQL_SCRIPT_FILE_NAME)) {
-                RunScript.execute(connection, reader);
+            try (Statement statement = connection.createStatement()) {
+                statement.execute(script);
             }
         }
+    }
+
+    private static void createTableTrains() throws IOException, SQLException {
+        executeScript(readScriptFile());
+    }
+
+    private static void clearTableTrains() throws SQLException {
+        executeScript("TRUNCATE TABLE TRAINS;");
     }
 }
