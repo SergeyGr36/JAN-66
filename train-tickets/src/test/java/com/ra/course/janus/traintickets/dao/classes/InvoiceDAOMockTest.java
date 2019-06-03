@@ -30,7 +30,7 @@ class InvoiceDAOMockTest {
     private final String INSERT_INTO = "INSERT INTO invoices (price, attributes) VALUES (?, ?)";
     private final String UPDATE_TABLE = "UPDATE invoices SET price = ?, attributes = ? WHERE id = ?";
     private final String FIND_BY_ID = "SELECT * FROM invoices WHERE id = ?";
-    private final String DELETE_BY_ID = "DELETE * FROM invoices WHERE id = ?";
+    private final String DELETE_BY_ID = "DELETE FROM invoices WHERE id = ?";
     private final String FIND_ALL = "SELECT * FROM invoices";
 
     private final long ID = 1;

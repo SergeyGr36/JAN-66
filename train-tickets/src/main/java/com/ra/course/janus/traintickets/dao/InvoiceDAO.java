@@ -19,7 +19,7 @@ public class InvoiceDAO implements IJdbcDao<Invoice> {
     private static final String INSERT_INTO = "INSERT INTO invoices (price, attributes) VALUES (?, ?)";
     private static final String UPDATE_TABLE = "UPDATE invoices SET price = ?, attributes = ? WHERE id = ?";
     private static final String FIND_BY_ID = "SELECT * FROM invoices WHERE id = ?";
-    private static final String DELETE_BY_ID = "DELETE * FROM invoices WHERE id = ?";
+    private static final String DELETE_BY_ID = "DELETE FROM invoices WHERE id = ?";
     private static final String FIND_ALL = "SELECT * FROM invoices";
     private static final Logger LOGER = LoggerFactory.getLogger(InvoiceDAO.class);
     private transient final DataSource ds;
@@ -35,7 +35,7 @@ public class InvoiceDAO implements IJdbcDao<Invoice> {
         try (Connection con = ds.getConnection(); PreparedStatement ps = con.prepareStatement(INSERT_INTO)) {
             ps.setDouble(1, item.getPrice());
             ps.setString(2, item.getAttributes());
-
+            ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     final long temp = rs.getLong(1);
