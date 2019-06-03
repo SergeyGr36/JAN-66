@@ -2,68 +2,125 @@ package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.User;
-import org.h2.tools.RunScript;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserDAOIntegrationTest {
 
     private static final DataSource DATA_SOURCE = DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
-    private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
-    private static final String UPDATE_USER = "update USERS set (name,email,password) values (?,?,?) WHERE id=?";
-    private static final String DELETE_USER = "delete from USERS where id=?";
-    private static final String FIND_BY_ID = "select * from USERS where id=?";
-    private static final String FIND_ALL = "select * from USERS";
-    private static final Long ZERO_ID = 0L;
-    private static final Long USER_ID = 100L;
-    private static final String USER_NAME = "test_name";
-    private static final String USER_EMAIL = "test_name123@gmail.com";
-    private static final String USER_PASSWORD = "password";
-    private static final User TEST_USER = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+    private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
 
     private UserDAO userDAO;
 
+    @BeforeAll
+    public static void createUsersTable() throws IOException, SQLException {
+        createTableUsers();
+    }
 
     @BeforeEach
-    public void setUp() throws IOException, SQLException {
-        createUsersTable();
+    public void setUp() throws SQLException {
+        clearTableUsers();
         userDAO = new UserDAO(DATA_SOURCE);
     }
 
+    // Test saveUser---------------------------------------------------
+
     @Test
-    public void saveUserWhenOkThenReturnUserWithGeneratedId() throws IOException, SQLException {
-        assertTrue(usersEqualsWithoutID(TEST_USER, userDAO.save(TEST_USER)));
+    public void saveUserWhenOkThenIdIsGenerated() {
+        // when
+        final User savedUser = userDAO.save(TEST_USER);
+        // then
+        assertNotNull(savedUser.getId());
     }
 
-    private static void createUsersTable() throws SQLException, IOException {
+    // Test updateUser-------------------------------------------------
+
+    @Test
+    public void updateUserWhenOkThenIsUpdated() {
+        // given
+        final Long id = userDAO.save(TEST_USER).getId();
+        final User newUser = new User(id, "new_name", "new_mail", "new_pass");
+        // when
+        userDAO.update(id, newUser);
+        final User updatedUser = userDAO.findById(id);
+        // then
+        assertEquals(newUser, updatedUser);
+    }
+
+    // Test deleteUser-------------------------------------------------
+
+    @Test
+    public void deleteUserWhenOkThenUserIsDeleted() {
+        // given
+        final Long id = userDAO.save(TEST_USER).getId();
+        // when
+        userDAO.delete(id);
+        // then
+        assertNull(userDAO.findById(id));
+    }
+
+    // Test findUserById-------------------------------------------------
+
+    @Test
+    public void findUserByIdWhenOkThenReturnUser() {
+        // given
+        final User savedUser = userDAO.save(TEST_USER);
+        // when
+        final User foundUser = userDAO.findById(savedUser.getId());
+        // then
+        assertEquals(savedUser, foundUser);
+    }
+
+    // Test findAllUsers-------------------------------------------------
+
+    @Test
+    public void findAllUsersWhenOkThenReturnListWithUsers() {
+        // given
+        final User savedUser = userDAO.save(TEST_USER);
+        List<User> savedUsers = Collections.singletonList(savedUser);
+        // when
+        List<User> foundUsers = userDAO.findAll();
+        // then
+        assertEquals(savedUsers, foundUsers);
+    }
+
+    //-----------------------------------------------------------------
+
+    private static String readScriptFile() throws IOException {
+        return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));
+    }
+
+    private static void executeScript(String script) throws SQLException {
         try (Connection conn = DATA_SOURCE.getConnection()) {
-            try (FileReader reader = new FileReader(SQL_SCRIPT_FILE_NAME)) {
-                RunScript.execute(conn, reader);
+            try (Statement statement = conn.createStatement()) {
+                statement.execute(script);
             }
-       }
+        }
     }
 
-    private boolean usersEqualsWithoutID (User user1, User user2) {
-        return user1.getName().equals(user2.getName())
-                && user1.getEmail().equals(user2.getEmail())
-                && user1.getPassword().equals(user2.getPassword());
+    private static void createTableUsers() throws IOException, SQLException {
+        executeScript(readScriptFile());
     }
 
-    private boolean usersAllFieldsEquals (User user1, User user2) {
-        return user1.getId().equals(user2.getId())
-                && usersEqualsWithoutID(user1, user2);
+    private static void clearTableUsers() throws SQLException {
+        executeScript("TRUNCATE TABLE users;");
     }
 }

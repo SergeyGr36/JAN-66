@@ -15,14 +15,15 @@ public class UserDAO implements IJdbcDao<User> {
     private final transient DataSource dataSource;
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
-    private static final String UPDATE_USER = "update USERS set (name,email,password) values (?,?,?) WHERE id=?";
+    private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
     private static final String DELETE_USER = "delete from USERS where id=?";
     private static final String FIND_BY_ID = "select * from USERS where id=?";
     private static final String FIND_ALL = "select * from USERS";
-    private static final int COL_INDEX_ID = 1;
-    private static final int COL_INDEX_NAME = 2;
-    private static final int COL_INDEX_EMAIL = 3;
-    private static final int COL_INDEX_PASSWORD = 4;
+
+    private static final int COL_IND_ID = 1;
+    private static final int COL_IND_NAME = 2;
+    private static final int COL_IND_EMAIL = 3;
+    private static final int COL_IND_PASSWD = 4;
 
     public UserDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -36,7 +37,7 @@ public class UserDAO implements IJdbcDao<User> {
                  saveStmt.executeUpdate();
                  try (ResultSet generatedKeys = saveStmt.getGeneratedKeys()) {
                      if (generatedKeys.next()) {
-                         final long id = generatedKeys.getLong(COL_INDEX_ID);
+                         final long id = generatedKeys.getLong(COL_IND_ID);
                          return new User(
                                  id,
                                  user.getName(),
@@ -121,10 +122,10 @@ public class UserDAO implements IJdbcDao<User> {
 
     private User toUser(final ResultSet rs) throws SQLException {
         return new User(
-                rs.getLong(COL_INDEX_ID),
-                rs.getString(COL_INDEX_NAME),
-                rs.getString(COL_INDEX_EMAIL),
-                rs.getString(COL_INDEX_PASSWORD)
+                rs.getLong(COL_IND_ID),
+                rs.getString(COL_IND_NAME),
+                rs.getString(COL_IND_EMAIL),
+                rs.getString(COL_IND_PASSWD)
         );
     }
 }

@@ -4,8 +4,6 @@ import com.ra.course.janus.traintickets.entity.User;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import javax.sql.DataSource;
 
@@ -23,28 +21,30 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 class UserDAOMockTest {
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
-    private static final String UPDATE_USER = "update USERS set (name,email,password) values (?,?,?) WHERE id=?";
+    private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
     private static final String DELETE_USER= "delete from USERS where id=?";
     private static final String FIND_BY_ID = "select * from USERS where id=?";
     private static final String FIND_ALL = "select * from USERS";
-    private static final Long   ZERO_ID = 0L;
+
+    private static final int COL_INDEX_ID = 1;
+    private static final int COL_INDEX_NAME = 2;
+    private static final int COL_INDEX_EMAIL = 3;
+    private static final int COL_INDEX_PASSWD = 4;
+
     private static final Long   USER_ID = 100L;
     private static final String USER_NAME = "test_name";
     private static final String USER_EMAIL = "test_name123@gmail.com";
     private static final String USER_PASSWORD = "password";
     private static final User TEST_USER = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
 
+    private static final DataSource MOCK_DATA_SOURCE = mock(DataSource.class);
     private User user;
     private UserDAO userDAO;
     private Connection mockConn;
@@ -53,12 +53,15 @@ class UserDAOMockTest {
 
     @BeforeEach
     void setUp() throws SQLException {
-        final DataSource mockDataSource = mock(DataSource.class);
-        userDAO = new UserDAO(mockDataSource);
+        userDAO = new UserDAO(MOCK_DATA_SOURCE);
+
         mockConn = mock(Connection.class);
+        when(MOCK_DATA_SOURCE.getConnection()).thenReturn(mockConn);
+
         mockPrepSt = mock(PreparedStatement.class);
         mockResSet = mock(ResultSet.class);
-        when(mockDataSource.getConnection()).thenReturn(mockConn);
+
+        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
     }
 
     // Test save-------------------------------------------------------
@@ -68,8 +71,8 @@ class UserDAOMockTest {
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
         when(mockResSet.next()).thenReturn(true);
-        when(mockResSet.getLong("id")).thenReturn(USER_ID);
-        user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+        when(mockResSet.getLong(COL_INDEX_ID)).thenReturn(USER_ID);
+        user = new User(null, USER_NAME, USER_EMAIL, USER_PASSWORD);
         user = userDAO.save(user);
         assertNotSame(TEST_USER, user);
         assertEquals(TEST_USER, user);
@@ -77,19 +80,19 @@ class UserDAOMockTest {
 
     @Test
     void saveUserWhenThrowsSQLExceptionOnExecuteUpdateThenThrowsDAOException() throws SQLException {
-        user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
-        assertThrows(DAOException.class, () -> userDAO.save(user));
+        assertThrows(DAOException.class, () -> userDAO.save(TEST_USER));
     }
 
     @Test
     void saveUserWhenFailToReadGeneratedKeyThenThrowsDAOException() throws SQLException {
-        user = new User(ZERO_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
+
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
         when(mockResSet.next()).thenReturn(false);
-        assertThrows(DAOException.class, () -> userDAO.save(user));
+        assertThrows(DAOException.class, () -> userDAO.save(TEST_USER));
     }
 
     // Test update-----------------------------------------------------
@@ -304,7 +307,7 @@ class UserDAOMockTest {
     @Test
     public void findAllUsersWhenThrowsOnResSetNextAndConnCloseThenThrowsDAOException() throws SQLException {
         when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
-        when(mockPrepSt.executeQuery()).thenReturn(mockResSet);
+
         doThrow(new SQLException()).when(mockResSet).next();
         doThrow(new SQLException()).when(mockConn).close();
         assertThrows(DAOException.class, () -> userDAO.findAll());
@@ -313,9 +316,9 @@ class UserDAOMockTest {
     //-----------------------------------------------------------------
 
     private void mockMapUser(ResultSet mockRS) throws SQLException {
-        when(mockRS.getLong("id")).thenReturn(USER_ID);
-        when(mockRS.getString("name")).thenReturn(USER_NAME);
-        when(mockRS.getString("email")).thenReturn(USER_EMAIL);
-        when(mockRS.getString("password")).thenReturn(USER_PASSWORD);
+        when(mockRS.getLong(COL_INDEX_ID)).thenReturn(USER_ID);
+        when(mockRS.getString(COL_INDEX_NAME)).thenReturn(USER_NAME);
+        when(mockRS.getString(COL_INDEX_EMAIL)).thenReturn(USER_EMAIL);
+        when(mockRS.getString(COL_INDEX_PASSWD)).thenReturn(USER_PASSWORD);
     }
 }
