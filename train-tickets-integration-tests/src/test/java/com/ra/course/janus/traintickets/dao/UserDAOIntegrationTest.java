@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserDAOIntegrationTest {
 
-    private static final DataSource DATA_SOURCE = DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
+    private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
     private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
