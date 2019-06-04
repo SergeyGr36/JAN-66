@@ -5,31 +5,25 @@ import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class ConnectToDb {
+class ConnectToDb {
     private final static Logger logger = Logger.getLogger(ConnectToDb.class);
 
-    private static Properties properties;
-
-    public ConnectToDb(String name) {
-        loadProperties(name);
-    }
-
-    private void loadProperties(String name) {
-        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(name))) {
-            properties = new Properties();
+    Properties loadProperties(String name) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name)) {
+            Properties properties = new Properties();
             properties.load(inputStream);
+            return properties;
         } catch (IOException e) {
             logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 
-    public DataSource connect() {
+    DataSource connect(Properties properties) {
         HikariDataSource hikariDataSource = new HikariDataSource();
         hikariDataSource.setJdbcUrl(properties.getProperty("db.url"));
         hikariDataSource.setUsername(properties.getProperty("db.username"));

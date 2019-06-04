@@ -9,10 +9,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class RunScript {
+class RunScript {
     private final static Logger logger = Logger.getLogger(RunScript.class);
 
-    public static void ExecuteScript(Connection connection, String fileName) {
+    PreparedStatement executeScript(Connection connection, String fileName) {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))) {
             StringBuilder stringBuilder = new StringBuilder();
             String line = bufferedReader.readLine();
@@ -20,10 +20,10 @@ public class RunScript {
                 stringBuilder.append(line);
                 line = bufferedReader.readLine();
             }
-            PreparedStatement preparedStatement = connection.prepareStatement(stringBuilder.toString());
-            preparedStatement.executeUpdate();
+            return connection.prepareStatement(stringBuilder.toString());
         } catch (IOException | SQLException e) {
             logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 }

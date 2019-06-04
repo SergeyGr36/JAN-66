@@ -24,14 +24,15 @@ class PlainJDBCTeacherDaoTest {
 
     private Teacher teacher;
     private Connection mockConnection;
+    private DataSource mockDataSource;
     private PlainJDBCTeacherDao mockTeacherDao;
     private PreparedStatement mockPreparedStatement;
     private ResultSet mockResultSet;
 
     @BeforeEach
     void before() throws SQLException {
-        teacher = new Teacher(1, "Roma", "Java");
-        DataSource mockDataSource = mock(DataSource.class);
+        teacher = new Teacher(1, "Roma", "JavaEE");
+        mockDataSource = mock(DataSource.class);
         mockConnection = mock(Connection.class);
         mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
@@ -122,7 +123,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledThenReturnNewTeacherObject() throws SQLException {
+    void whenCalledToTeacherThenReturnNewTeacherObject() throws SQLException {
         when(mockResultSet.getLong("id")).thenReturn(teacher.getId());
         when(mockResultSet.getString("name")).thenReturn(teacher.getName());
         when(mockResultSet.getString("course")).thenReturn(teacher.getCourse());
