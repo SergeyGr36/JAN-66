@@ -16,11 +16,16 @@ import java.util.List;
 
 public class JdbcAdminDao implements IJdbcDao<Admin> {
 
-    private static final String SAVE_SQL = "INCERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
+    private static final String SAVE_SQL = "INSERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
     private static final String UPDATE_SQL = "UPDATE ADMIN SET NAME=?,LASTNAME=?,PASSWORD=? WHERE ID=?";
     private static final String DELETE_SQL = "DELETE FROM ADMIN WHERE ID=? ";
     private static final String SELECT_ALL = "SELECT * FROM ADMIN";
-    private static final String SELECT_BY_ID = "SELECT FROM ADMIN WHERE ID=?";
+    private static final String SELECT_BY_ID = "SELECT * FROM ADMIN WHERE ID = ?";
+
+    private static final int COLUM_ID = 1;
+    private static final int COLUM_NAME = 2;
+    private static final int COLUM_L_NAME = 3;
+    private static final int COLUM_PASSWORD = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbcAdminDao.class.getName());
 
@@ -36,17 +41,16 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
         try(Connection connection = dataSource.getConnection();
             PreparedStatement prepSt = connection.prepareStatement(SAVE_SQL)) {
             prepareStatementOperations(prepSt, item);
-            if(prepSt.executeUpdate()>0) {
+            prepSt.executeUpdate();
                 try (ResultSet generatedKeys = prepSt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        return new Admin(generatedKeys.getLong("ID"), item.getName(),
+                        return new Admin(generatedKeys.getLong(COLUM_ID), item.getName(),
                                 item.getLastName(), item.getPassword());
+                    } else {
+                        LOGGER.info("Exception in save");
+                        throw new DAOException("There are no created keys");
                     }
-                    throw new DAOException("There are no created keys");
                 }
-            } else {
-                throw new DAOException();
-            }
 
         } catch (SQLException e) {
             LOGGER.info("Exception in save :", e);
@@ -86,17 +90,19 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
 
     @Override
     public Admin findById(final Long id) {
-
-        try(Connection connection = dataSource.getConnection();
-            PreparedStatement prepSt = connection.prepareStatement(SELECT_BY_ID);
-            ResultSet resultSet = prepSt.executeQuery()){
-
-
-            if (resultSet.next()){
-               return createObject(resultSet);
-
+        final Admin admin;
+        try(Connection connection = dataSource.getConnection()){
+            try(PreparedStatement prepSt = connection.prepareStatement(SELECT_BY_ID)) {
+                prepSt.setLong(1, id);
+                try (ResultSet resultSet = prepSt.executeQuery()) {
+                    if (resultSet.next()) {
+                        return admin = createObject(resultSet);
+                    } else {
+                        admin = null;
+                    }
+                }
             }
-             throw new DAOException("ResultSet is empty!");
+            return admin;
         } catch (SQLException e){
             LOGGER.info("Exception in findById :", e);
             throw new DAOException(e);
@@ -121,10 +127,10 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
     }
 
     private Admin createObject (final ResultSet resultSet) throws SQLException {
-        return new Admin(resultSet.getLong("ID"),
-                resultSet.getString("NAME"),
-                resultSet.getString("LASTNAME"),
-                resultSet.getString("PASSWORD"));
+        return new Admin(resultSet.getLong(COLUM_ID),
+                resultSet.getString(COLUM_NAME),
+                resultSet.getString(COLUM_L_NAME),
+                resultSet.getString(COLUM_PASSWORD));
     }
 
     public void prepareStatementOperations(final PreparedStatement ps, final Admin item) throws SQLException {

@@ -13,96 +13,87 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class JdbcAdminDaoTest {
-    private static final String SAVE_SQL = "INCERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
+    private static final String SAVE_SQL = "INSERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
     private static final String UPDATE_SQL = "UPDATE ADMIN SET NAME=?,LASTNAME=?,PASSWORD=? WHERE ID=?";
     private static final String DELETE_SQL = "DELETE FROM ADMIN WHERE ID=? ";
     private static final String SELECT_ALL = "SELECT * FROM ADMIN";
-    private static final String SELECT_BY_ID = "SELECT FROM ADMIN WHERE ID=?";
+    private static final String SELECT_BY_ID = "SELECT * FROM ADMIN WHERE ID=?";
 
     private static final long ADMIN_ID = 2L;
     private static final String ADMIN_NAME = "Roman";
     private static final String ADMIN_LASTNAME = "Hreits";
     private static final String PASSWORD = "romanHreits";
 
+    private static final Admin ADMIN_TEST = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
+    private static final Long ID_TEST = 5L;
+
+    private static final int COLUM_ID = 1;
+    private static final int COLUM_NAME = 2;
+    private static final int COLUM_L_NAME = 3;
+    private static final int COLUM_PASSWORD = 4;
+
+    private DataSource mockDataSource = mock(DataSource.class);
     private JdbcAdminDao adminDao;
-    private DataSource mockDataSource;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
+    private Connection mockConnection = mock(Connection.class);
+    private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+    private ResultSet mockResultSet = mock(ResultSet.class);
 
 
     @BeforeEach
     void before() throws SQLException {
-        mockDataSource = mock(DataSource.class);
         adminDao = new JdbcAdminDao(mockDataSource);
-        mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        mockPreparedStatement = mock(PreparedStatement.class);
-        mockResultSet = mock(ResultSet.class);
     }
 
     @Test
     void whenCallSaveThenReturnNewObjectWithAnotherId() throws SQLException {
 
-        String s = "id";
-        Admin admin = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong(s)).thenReturn(ADMIN_ID);
-        Admin savedAdmin = adminDao.save(admin);
-        assertNotSame(savedAdmin, admin);
+        when(mockResultSet.getLong(COLUM_ID)).thenReturn(ID_TEST);
+        assertNotSame(adminDao.save(ADMIN_TEST), ADMIN_TEST);
     }
 
-    @Test
-    void whenInMethodSaveExecuteUpdateNoMOreThanZeroThrowException() throws SQLException {
-
-        Admin admin = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
-        when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertThrows(DAOException.class, ()->adminDao.save(admin));
-    }
+//    @Test
+//    void whenInMethodSaveExecuteUpdateNoMOreThanZeroThrowException() throws SQLException {
+//
+//        Admin admin = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
+//        when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
+//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+//        assertThrows(DAOException.class, ()->adminDao.save(admin));
+//    }
 
     @Test
     void whenInMethodSaveResultSetHaveNoGeneratedKeysAndMethodsCloseThrowExceptions() throws SQLException {
 
-        Admin admin = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        doThrow(new SQLException()).when(mockResultSet).close();
-        doThrow(new SQLException()).when(mockPreparedStatement).close();
-        doThrow(new SQLException()).when(mockConnection).close();
-        assertThrows(DAOException.class, ()->adminDao.save(admin));
+        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        assertThrows(DAOException.class, ()->adminDao.save(ADMIN_TEST));
     }
     @Test
     void whenCallMethodUpdateThanReturnTrue() throws SQLException {
-        long idTest = 5L;
-        Admin admin = new Admin(ADMIN_ID, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
+
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        boolean flag = adminDao.update(idTest, admin);
-        assertTrue(flag);
-
+        assertTrue(adminDao.update(ID_TEST, ADMIN_TEST));
     }
+
     @Test
     void whenCallMethodUpdateThanReturnFalse() throws SQLException {
-        long idTest = 5L;
-        Admin admin = new Admin(ADMIN_ID, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
+
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        boolean flag = adminDao.update(idTest, admin);
-        assertFalse(flag);
+        assertFalse(adminDao.update(ID_TEST, ADMIN_TEST));
     }
+
     @Test
     void whenCallUpdateInDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
-        long idTest = 5L;
-        Admin admin = new Admin(ADMIN_ID, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
         doThrow(new SQLException()).when(mockConnection).close();
-        assertThrows(DAOException.class, ()->adminDao.update(idTest, admin));
+        assertThrows(DAOException.class, ()->adminDao.update(ID_TEST, ADMIN_TEST));
     }
 
     @Test
@@ -110,8 +101,7 @@ class JdbcAdminDaoTest {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        boolean flag = adminDao.delete(ADMIN_ID);
-        assertTrue(flag);
+        assertTrue(adminDao.delete(ID_TEST));
     }
 
     @Test
@@ -119,8 +109,7 @@ class JdbcAdminDaoTest {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        boolean flag = adminDao.delete(ADMIN_ID);
-        assertFalse(flag);
+        assertFalse(adminDao.delete(ID_TEST));
     }
 
 
@@ -130,35 +119,39 @@ class JdbcAdminDaoTest {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
         doThrow(new SQLException()).when(mockConnection).close();
-        assertThrows(DAOException.class, ()-> adminDao.delete(ADMIN_ID));
+        assertThrows(DAOException.class, ()-> adminDao.delete(ID_TEST));
     }
 
     @Test
     void whenCallMethodFindByIdThanReturnObject() throws SQLException {
 
-        long idTest = 5L;
-        Admin admin = new Admin(idTest, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getString("NAME")).thenReturn(ADMIN_NAME);
-        when(mockResultSet.getString("LASTNAME")).thenReturn(ADMIN_LASTNAME);
-        when(mockResultSet.getString("PASSWORD")).thenReturn(PASSWORD);
-        when(mockResultSet.getLong("ID")).thenReturn(idTest);
-        Admin foundAdmin = adminDao.findById(idTest);
-        assertEquals(admin, foundAdmin);
+        getingDataFromResultSet(mockResultSet);
+        assertEquals(ADMIN_ID, adminDao.findById(ADMIN_ID).getId());
+    }
+    @Test
+    void whenCallMethodFindByIdThanThrowExceptionsWhenResultSetNextFalse() throws SQLException {
+
+        when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        mockPreparedStatement.setLong(1, ID_TEST);
+        when(mockResultSet.next()).thenReturn(false);
+        assertEquals(adminDao.findById(ID_TEST), null);
+
     }
     @Test
     void whenCallMethodFindByIdThanThrowExceptionsThrowException() throws SQLException {
-        long idTest = 5L;
+
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
+        mockPreparedStatement.setLong(1, ID_TEST);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockResultSet.next()).thenReturn(false);
-        doThrow(new SQLException()).when(mockResultSet).close();
-        doThrow(new SQLException()).when(mockPreparedStatement).close();
-        doThrow(new SQLException()).when(mockConnection).close();
-        assertThrows(DAOException.class, ()-> adminDao.findById(idTest));
+        when(mockResultSet.next()).thenReturn(true);
+        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        assertThrows(DAOException.class, ()-> adminDao.findById(ID_TEST));
     }
+
 
     @Test
     void whenCallMethodFindAllInDbThenReturnNonEmptyList() throws SQLException {
@@ -166,12 +159,8 @@ class JdbcAdminDaoTest {
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getLong("ID")).thenReturn(ADMIN_ID);
-        when(mockResultSet.getString("NAME")).thenReturn(ADMIN_NAME);
-        when(mockResultSet.getString("LASTNAME")).thenReturn(ADMIN_LASTNAME);
-        when(mockResultSet.getString("PASSWORD")).thenReturn(PASSWORD);
-        List<Admin> list = adminDao.findAll();
-        assertFalse(list.isEmpty());
+        getingDataFromResultSet(mockResultSet);
+        assertFalse(adminDao.findAll().isEmpty());
     }
 
     @Test
@@ -179,8 +168,7 @@ class JdbcAdminDaoTest {
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        List<Admin> list = adminDao.findAll();
-        assertEquals(Collections.emptyList(), list);
+        assertEquals(Collections.emptyList(), adminDao.findAll());
     }
     @Test
     void whenCallMethodFindAllInDbThenThrowExceptions() throws SQLException {
@@ -188,13 +176,21 @@ class JdbcAdminDaoTest {
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getLong("ID")).thenReturn(ADMIN_ID);
-        when(mockResultSet.getString("NAME")).thenReturn(ADMIN_NAME);
-        when(mockResultSet.getString("LASTNAME")).thenReturn(ADMIN_LASTNAME);
-        when(mockResultSet.getString("PASSWORD")).thenReturn(PASSWORD);
+        getingDataFromResultSet(mockResultSet);
+        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        assertThrows(DAOException.class, ()-> adminDao.findAll());
+    }
+
+    private void exeptions(Connection conn, PreparedStatement pr, ResultSet rs) throws SQLException {
+
+        doThrow(new SQLException()).when(mockConnection).close();
         doThrow(new SQLException()).when(mockResultSet).close();
         doThrow(new SQLException()).when(mockPreparedStatement).close();
-        doThrow(new SQLException()).when(mockConnection).close();
-        assertThrows(DAOException.class, ()-> adminDao.findAll());
+    }
+    private void getingDataFromResultSet(ResultSet resultSet) throws SQLException {
+        when(mockResultSet.getLong(COLUM_ID)).thenReturn(ADMIN_ID);
+        when(mockResultSet.getString(COLUM_NAME)).thenReturn(ADMIN_NAME);
+        when(mockResultSet.getString(COLUM_L_NAME)).thenReturn(ADMIN_LASTNAME);
+        when(mockResultSet.getString(COLUM_PASSWORD)).thenReturn(PASSWORD);
     }
 }
