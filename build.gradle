@@ -50,7 +50,7 @@ configure(allprojects) { project ->
         
         compile spring.context
         compile spring.jdbc
-        testCompile spring.test        
+        testCompile spring.test
     }
 }
 

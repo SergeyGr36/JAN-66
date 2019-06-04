@@ -1,19 +1,24 @@
 package com.ra.janus.developersteam.dao;
 
+import com.ra.janus.developersteam.config.DAOConfiguration;
 import com.ra.janus.developersteam.datasources.DataSourceFactory;
 import com.ra.janus.developersteam.entity.Bill;
 import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+//import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = {DAOConfiguration.class})
 public class PlainJdbcBillDAOIntegrationTest {
 
     private static final DataSource dataSource = DataSourceFactory.get();
