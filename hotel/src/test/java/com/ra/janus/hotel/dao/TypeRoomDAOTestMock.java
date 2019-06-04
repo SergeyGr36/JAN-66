@@ -27,7 +27,7 @@ class TypeRoomDAOTestMock {
     private static ResultSet mockResultSet;
 
     @BeforeEach
-    private void before() throws Exception {
+    public void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
         typeRoom = new TypeRoom();
         typeRoomDAO = new TypeRoomDAO(mockDataSource);
