@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
+
 public class TrainDAO implements IJdbcDao<Train> {
 
     private final transient DataSource dataSource;
@@ -39,7 +41,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 }
             }
         }catch (SQLException e){
-           LOG.info("Exception in SAVE :",e);
+           LOG.error(SAVE_FAILED.getMessage(),e);
             throw new DAOException(e);
         }
     }
@@ -49,14 +51,11 @@ public class TrainDAO implements IJdbcDao<Train> {
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN)){
                 trainPrSt(ps,train);
-//                ps.setString(1,train.getName());
-//                ps.setInt(2,train.getSeating());
-//                ps.setInt(3,train.getFreeSeats());
                 ps.setLong(4,id);
                 return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
-            LOG.info("Exception in UPDATE:",e);
+            LOG.error(UPDATE_FAILED.getMessage(),e);
             throw new DAOException(e);
         }
     }
@@ -69,7 +68,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 return ps.executeUpdate() > 0;
             }
         }catch (SQLException e){
-            LOG.info("Exception in DELETE:",e);
+            LOG.error(DELETE_FAILED.getMessage(),e);
             throw new DAOException(e);
         }
     }
@@ -89,7 +88,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 }
             }
         }catch (SQLException e){
-            LOG.info("Exception in FIND_BY_ID:",e);
+            LOG.error(FIND_FAILED.getMessage(),e);
             throw new DAOException(e);
         }
     }
@@ -106,7 +105,7 @@ public class TrainDAO implements IJdbcDao<Train> {
                 }
             }return trainsList;
         }catch (SQLException e){
-            LOG.info("Exception in FIND_ALL:",e);
+            LOG.error(FINDALL_FAILED.getMessage(),e);
             throw new DAOException(e);
         }
     }

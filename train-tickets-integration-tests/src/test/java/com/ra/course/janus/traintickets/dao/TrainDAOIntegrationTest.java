@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TrainDAOIntegrationTest {
     private static final DataSource dataSource =
-            DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
+            DataSourceFactory.DATA_SOURCE.getInstance();
 
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/Create_Trains_Table.sql";
 

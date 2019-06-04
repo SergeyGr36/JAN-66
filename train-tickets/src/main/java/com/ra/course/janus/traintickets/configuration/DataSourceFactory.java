@@ -10,13 +10,13 @@ import java.util.Properties;
 
 public enum DataSourceFactory {
 
-    HIKARY_H2_IN_MEMORY {
+    DATA_SOURCE {
         @Override
         protected DataSource createDataSource() {
             final HikariDataSource ds = new HikariDataSource();
-            ds.setJdbcUrl(DB_PROPS.getProperty("db.h2_in_memory.url"));
-            ds.setUsername(DB_PROPS.getProperty("db.h2_in_memory.user"));
-            ds.setPassword(DB_PROPS.getProperty("db.h2_in_memory.password"));
+            ds.setJdbcUrl(DB_PROPS.getProperty("db.url"));
+            ds.setUsername(DB_PROPS.getProperty("db.user"));
+            ds.setPassword(DB_PROPS.getProperty("db.password"));
             return ds;
         }
     };
@@ -33,7 +33,7 @@ public enum DataSourceFactory {
 
     protected DataSource dataSource;
 
-    public DataSource getDataSource() {
+    public DataSource getInstance() {
         if (this.dataSource == null) {
             this.dataSource = createDataSource();
         }
