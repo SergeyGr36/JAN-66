@@ -38,6 +38,12 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
+
+        testCompile testing.mockito
+
+        compile log.logbackCore
+        compile log.logbackClassic
+        compile log.slf4jApi
     }
 }
 
@@ -48,9 +54,7 @@ wrapper {
 project(':train-tickets') {
     dependencies {
         compile db.h2
-        testCompile testing.mockito
         compile hibernate.hikari
-        compile log.slf4jSimple
     }
 }
 
