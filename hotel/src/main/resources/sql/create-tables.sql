@@ -12,7 +12,7 @@ CREATE TABLE if not exists rooms (
     DESCRIPTION    VARCHAR(30)   NOT NULL);
 
 CREATE TABLE IF NOT EXISTS TYPE_ROOM (
-    ID BIGINT                   NOT NULL,
+    ID BIGINT SERIAL            PRIMARY KEY,
     COUNT_PLACES INT            NOT NULL,
     PRISE INT                   NOT NULL,
     DESCRIPTION VARCHAR(1000)   NOT NULL,

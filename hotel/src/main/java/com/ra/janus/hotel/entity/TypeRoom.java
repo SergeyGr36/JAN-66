@@ -1,8 +1,6 @@
 package com.ra.janus.hotel.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -18,4 +16,10 @@ public class TypeRoom implements Serializable {
     private String description;
     private String classOfRoom;
 
+    public TypeRoom(int countPlaces, int prise, String description, String classOfRoom) {
+        this.countPlaces = countPlaces;
+        this.prise = prise;
+        this.description = description;
+        this.classOfRoom = classOfRoom;
+    }
 }
