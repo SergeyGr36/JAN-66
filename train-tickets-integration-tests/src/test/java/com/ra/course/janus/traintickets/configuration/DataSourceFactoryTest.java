@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class DataSourceFactoryTest {
 
     @Test
-    void hikaryH2InMemoryConnectionTest() throws SQLException {
+    void DataSourceTest() throws SQLException {
         assertAll(() -> {
-            DataSource ds = DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
+            DataSource ds = DataSourceFactory.DATA_SOURCE.getInstance();
             Connection conn = ds.getConnection();
             conn.close();
         });
