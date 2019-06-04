@@ -3,7 +3,6 @@ package com.ra.janus.hotel.dao;
 import com.ra.janus.hotel.entity.Client;
 import com.ra.janus.hotel.exception.DaoException;
 import com.ra.janus.hotel.configuration.ConnectionUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

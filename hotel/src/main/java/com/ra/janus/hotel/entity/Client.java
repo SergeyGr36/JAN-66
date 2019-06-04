@@ -12,7 +12,7 @@ import java.sql.Date;
 @Data
 public class Client implements Serializable {
 
-    static final Long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private long id;
     private String fullName;
