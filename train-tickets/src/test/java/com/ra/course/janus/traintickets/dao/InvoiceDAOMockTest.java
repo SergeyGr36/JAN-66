@@ -1,4 +1,4 @@
-package com.ra.course.janus.traintickets.dao.classes;
+package com.ra.course.janus.traintickets.dao;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
