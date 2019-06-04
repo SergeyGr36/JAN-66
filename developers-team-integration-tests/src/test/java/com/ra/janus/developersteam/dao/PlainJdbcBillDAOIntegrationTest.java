@@ -13,16 +13,20 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {DAOConfiguration.class})
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {DAOConfiguration.class})
 public class PlainJdbcBillDAOIntegrationTest {
-
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Bill> billDAO = new PlainJdbcBillDAO(dataSource);
+    @Autowired
+    private static DataSource dataSource;// = DataSourceFactory.get();
+    @Autowired
+    private static BaseDao<Bill> billDAO;// = new PlainJdbcBillDAO(dataSource);
 
     private static Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
 
