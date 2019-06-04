@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InvoiceDaoIntegrationTest {
-    private static final DataSource IN_DATA_SOURCE = DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
+    private static final DataSource IN_DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String PATH_TO_FILE = "src/test/resources/invoices_table.sql";
     private static final Invoice INVOICE_TEST = new Invoice(1, 10, "Something");
     private InvoiceDAO invoiceDAO;
