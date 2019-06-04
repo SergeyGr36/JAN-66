@@ -2,6 +2,9 @@ package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.User;
 import com.ra.course.janus.traintickets.exception.DAOException;
+import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -11,8 +14,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class UserDAO implements IJdbcDao<User> {
     private final transient DataSource dataSource;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
@@ -45,11 +52,14 @@ public class UserDAO implements IJdbcDao<User> {
                                  user.getPassword()
                          );
                      } else {
-                         throw new DAOException();
+                         final DAOException e = new DAOException();
+                         LOGGER.error(SAVE_FAILED.getMessage(), e);
+                         throw e;
                      }
                  }
              }
         } catch (SQLException e) {
+            LOGGER.error(SAVE_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -63,6 +73,7 @@ public class UserDAO implements IJdbcDao<User> {
                  return updateStmt.executeUpdate() > 0;
              }
         } catch (SQLException e) {
+            LOGGER.error(UPDATE_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -75,6 +86,7 @@ public class UserDAO implements IJdbcDao<User> {
                 return deleteStmt.executeUpdate() > 0;
             }
         } catch (SQLException e) {
+            LOGGER.error(DELETE_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -95,6 +107,7 @@ public class UserDAO implements IJdbcDao<User> {
             }
             return user;
         } catch (SQLException e) {
+            LOGGER.error(FIND_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -110,6 +123,7 @@ public class UserDAO implements IJdbcDao<User> {
             }
             return users;
         } catch (SQLException e) {
+            LOGGER.error(FINDALL_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
