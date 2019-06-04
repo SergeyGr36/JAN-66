@@ -27,7 +27,7 @@ class TypeRoomDAOTestMock {
     private static ResultSet mockResultSet;
 
     @BeforeEach
-    void before() throws Exception {
+    private void before() throws Exception {
         mockDataSource = Mockito.mock(DataSource.class);
         typeRoom = new TypeRoom();
         typeRoomDAO = new TypeRoomDAO(mockDataSource);
@@ -45,83 +45,85 @@ class TypeRoomDAOTestMock {
 
 
     @Test
-    void whenCallSaveThenReturnTypeRoom() throws SQLException, DaoException {
+    public void whenCallSaveThenReturnTypeRoom() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.INSERT_TYPE_BY_ID.get(), PreparedStatement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         //then
         assertNotNull(typeRoomDAO.save(typeRoom));
     }
+
     @Test
-    void whenCallSaveThenReturnNothingSaved() throws SQLException {
+    public void whenCallSaveThenReturnNothingSaved() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.INSERT_TYPE_BY_ID.get(), PreparedStatement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         //then
         assertThrows(DaoException.class,()-> typeRoomDAO.save(typeRoom));
     }
+
     @Test
-    void whenCallSaveThenReturnException() throws SQLException {
+    public void whenCallSaveThenReturnException() throws SQLException {
         //when
         when(mockDataSource.getConnection()).thenThrow(new SQLException());
         //then
         assertThrows(DaoException.class,()-> typeRoomDAO.save(typeRoom));
     }
 
-
     @Test
-    void whenCallUpdateThenReturnTypeRoom() throws SQLException, DaoException {
+    public void whenCallUpdateThenReturnTypeRoom() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.UPDATE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         //then
         assertNotNull(typeRoomDAO.update(typeRoom));
     }
+
     @Test
-    void whenCallUpdateThenReturnNothingUpdated () throws SQLException {
+    public void whenCallUpdateThenReturnNothingUpdated () throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.UPDATE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         //then
         assertThrows(DaoException.class,()-> typeRoomDAO.update(typeRoom));
     }
+
     @Test
-    void whenCallUpdateThenReturnException() throws SQLException {
+    public void whenCallUpdateThenReturnException() throws SQLException {
         //when
         when(mockDataSource.getConnection()).thenThrow(new SQLException());
         //then
         assertThrows(DaoException.class,()-> typeRoomDAO.update(typeRoom));
     }
 
-
-
     @Test
-    void whenCallDeleteThenDeleted () throws SQLException {
+    public void whenCallDeleteThenDeleted () throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         //then
         assertDoesNotThrow(()->typeRoomDAO.delete(1L));
     }
+
     @Test
-    void whenCallDeleteThenNothingDeleted () throws SQLException {
+    public void whenCallDeleteThenNothingDeleted () throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.DELETE_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         //then
         assertEquals(typeRoomDAO.delete(1L),0);
     }
+
     @Test
-    void whenCallDeleteThenReturnException() throws SQLException {
+    public void whenCallDeleteThenReturnException() throws SQLException {
         //when
         when(mockDataSource.getConnection()).thenThrow(new SQLException());
         //then
         assertThrows(DaoException.class,()-> typeRoomDAO.delete(1L));
     }
 
-
     @Test
-    void whenCallFindByIdThenReturnTypeRoom() throws SQLException, DaoException {
+    public void whenCallFindByIdThenReturnTypeRoom() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockResultSet.next()).thenReturn(true);
@@ -130,8 +132,9 @@ class TypeRoomDAOTestMock {
         //then
         assertEquals(1L, typeRoom.getId());
     }
+
     @Test
-    void whenCallFindByIdThenReturnNothing() throws SQLException, DaoException {
+    public void whenCallFindByIdThenReturnNothing() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_TYPE_BY_ID.get())).thenReturn(mockPreparedStatement);
         when(mockResultSet.next()).thenReturn(false);
@@ -140,17 +143,17 @@ class TypeRoomDAOTestMock {
         //then
         assertNull(typeRoom);
     }
+
     @Test
-    void whenCallFindByIdThenReturnException() throws SQLException {
+    public void whenCallFindByIdThenReturnException() throws SQLException {
         //when
         when(mockDataSource.getConnection()).thenThrow(new SQLException());
         //then
         assertThrows(DaoException.class,()->typeRoomDAO.findById(1L));
     }
 
-
     @Test
-    void whenCallFindAllThenReturnList() throws SQLException, DaoException {
+    public void whenCallFindAllThenReturnList() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_TYPES.get())).thenReturn(mockPreparedStatement);
         when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
@@ -159,8 +162,9 @@ class TypeRoomDAOTestMock {
         //then
         assertEquals(2,typeRooms.size());
     }
+
     @Test
-    void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
+    public void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_TYPES.get())).thenReturn(mockPreparedStatement);
         when(mockResultSet.next()).thenReturn(false);
@@ -169,12 +173,12 @@ class TypeRoomDAOTestMock {
         //then
         assertEquals(0,typeRooms.size());
     }
+
     @Test
-    void whenCallFindAllThenReturnException() throws SQLException {
+    public void whenCallFindAllThenReturnException() throws SQLException {
         //when
         when(mockDataSource.getConnection()).thenThrow(new SQLException());
         //then
         assertThrows(DaoException.class,()->typeRoomDAO.findAll());
     }
-
 }

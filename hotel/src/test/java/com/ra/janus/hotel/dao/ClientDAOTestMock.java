@@ -5,7 +5,6 @@ import com.ra.janus.hotel.enums.Query;
 import com.ra.janus.hotel.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 

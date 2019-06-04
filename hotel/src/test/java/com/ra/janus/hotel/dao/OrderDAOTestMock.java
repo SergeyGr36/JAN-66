@@ -30,14 +30,14 @@ class OrderDAOTestMock {
     private Order order = new Order(1L, 1L, null, null, StatusOrder.NEW, null, null, 1L);
 
     @BeforeEach
-    private void init() throws SQLException {
+    public void init() throws SQLException {
         MockitoAnnotations.initMocks(this);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         orderDAO = new OrderDAO(mockDataSource);
     }
 
     @Test
-    void whenCallSaveThenReturnOrder() throws SQLException, DaoException {
+    public void whenCallSaveThenReturnOrder() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
@@ -50,7 +50,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallSaveAndSavedZeroRecordsThrowException() throws SQLException {
+    public void whenCallSaveAndSavedZeroRecordsThrowException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
@@ -63,7 +63,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallSaveThrowException() throws SQLException {
+    public void whenCallSaveThrowException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.INSERT_ORDER.get(), Statement.RETURN_GENERATED_KEYS)).thenReturn(mockStatement);
         when(mockStatement.getGeneratedKeys()).thenReturn(resultSet);
@@ -76,7 +76,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallUpdateThenReturnOrder() throws SQLException, DaoException {
+    public void whenCallUpdateThenReturnOrder() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
@@ -86,7 +86,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallUpdateThenUpdatedZeroRecordsAndThrowException() throws SQLException {
+    public void whenCallUpdateThenUpdatedZeroRecordsAndThrowException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
@@ -96,7 +96,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallUpdateThrowException() throws SQLException {
+    public void whenCallUpdateThrowException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.UPDATE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
@@ -106,7 +106,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallDeleteThenDeletedOneRecord() throws SQLException {
+    public void whenCallDeleteThenDeletedOneRecord() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(1);
@@ -116,7 +116,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallDeleteThenNotDeletedRecord() throws SQLException {
+    public void whenCallDeleteThenNotDeletedRecord() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenReturn(0);
@@ -126,7 +126,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallDeleteThenThrowException() throws SQLException {
+    public void whenCallDeleteThenThrowException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.DELETE_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeUpdate()).thenThrow(SQLException.class);
@@ -136,7 +136,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindByIdThenReturnOrder() throws SQLException, DaoException {
+    public void whenCallFindByIdThenReturnOrder() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
@@ -152,7 +152,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindByIdThenReturnNull() throws SQLException, DaoException {
+    public void whenCallFindByIdThenReturnNull() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
@@ -163,7 +163,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindByIdThenReturnException() throws SQLException {
+    public void whenCallFindByIdThenReturnException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ORDER_BY_ID.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(SQLException.class);
@@ -173,7 +173,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindAllThenReturnListOrder() throws SQLException, DaoException {
+    public void whenCallFindAllThenReturnListOrder() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
@@ -188,7 +188,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
+    public void whenCallFindAllThenReturnEmptyList() throws SQLException, DaoException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenReturn(resultSet);
@@ -199,7 +199,7 @@ class OrderDAOTestMock {
     }
 
     @Test
-    void whenCallFindAllThenReturnException() throws SQLException {
+    public void whenCallFindAllThenReturnException() throws SQLException {
         //when
         when(mockConnection.prepareStatement(Query.SELECT_ALL_ORDERS.get())).thenReturn(mockStatement);
         when(mockStatement.executeQuery()).thenThrow(SQLException.class);
