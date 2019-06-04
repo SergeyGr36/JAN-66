@@ -28,12 +28,12 @@ public class ClientDAOTestMock {
 
     @BeforeEach
     public void init() throws SQLException {
-        mockDataSource = Mockito.mock(DataSource.class);
+        mockDataSource = mock(DataSource.class);
         clientDao = new ClientDAO(mockDataSource);
-        mockConnection = Mockito.mock(Connection.class);
-        mockStatement = Mockito.mock(PreparedStatement.class);
-        mockResultSet = Mockito.mock(ResultSet.class);
-        mockClient = Mockito.mock(Client.class);
+        mockConnection = mock(Connection.class);
+        mockStatement = mock(PreparedStatement.class);
+        mockResultSet = mock(ResultSet.class);
+        mockClient = mock(Client.class);
         client = new Client();
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
 
@@ -82,7 +82,7 @@ public class ClientDAOTestMock {
     @Test
     public void whenFindAllThanReturnClientList() throws SQLException {
         when(mockConnection.prepareStatement(Query.CLIENT_FIND_ALL.get())).thenReturn(mockStatement);
-        List<Client> mockList = Mockito.mock(ArrayList.class);
+        List<Client> mockList = mock(ArrayList.class);
         when(mockList.add(mockClient)).thenReturn(true);
 
         assertNotNull(clientDao.findAll());

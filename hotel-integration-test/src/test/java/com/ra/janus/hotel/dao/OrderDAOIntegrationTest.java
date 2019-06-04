@@ -27,38 +27,38 @@ class OrderDAOIntegrationTest {
     }
 
     @Test
-    void whenCallSaveThenReturnOrder() throws DaoException {
+    public void whenCallSaveThenReturnOrder() throws DaoException {
         assertNotNull(orderDAO.save(order));
     }
 
     @Test
-    void whenCallUpdateThenReturnOrder() throws DaoException {
+    public void whenCallUpdateThenReturnOrder() throws DaoException {
        order.setStatus(StatusOrder.BOOKED);
        assertNotNull(orderDAO.update(order));
     }
 
     @Test
-    void whenCallDeleteThenDeletedOneRecord() {
+    public void whenCallDeleteThenDeletedOneRecord() {
         assertDoesNotThrow (() -> orderDAO.delete(order.getId()));
     }
 
     @Test
-    void whenCallDeleteThenNotDeletedRecord() {
+    public void whenCallDeleteThenNotDeletedRecord() {
         assertEquals(orderDAO.delete(9L), 0);
     }
 
     @Test
-    void whenCallFindByIdThenReturnOrder() throws DaoException {
+    public void whenCallFindByIdThenReturnOrder() throws DaoException {
         assertEquals(orderDAO.findById(order.getId()), order);
     }
 
     @Test
-    void whenCallFindByIdThenReturnNull() throws DaoException {
+    public void whenCallFindByIdThenReturnNull() throws DaoException {
         assertNull(orderDAO.findById(9L));
     }
 
     @Test
-    void whenCallFindAllThenReturnListOrder() throws DaoException {
+    public void whenCallFindAllThenReturnListOrder() throws DaoException {
         orderDAO.save(new Order(2L, 1L, null, null, StatusOrder.NEW, null, null, 1L));
         List<Order> orders = orderDAO.findAll();
         assertEquals(orders.size(), 2);

@@ -34,11 +34,9 @@ public class ClientDAOIntegrationTest {
 
     @Test
     public void testMethodSaveClientInDB() throws DaoException {
-
-        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com",
-                Date.valueOf(LocalDate.now()));
+        Client client = new Client("Tommy", "0960960606", "tommy@gmail.com", Date.valueOf(LocalDate.now()));
         clientDao.save(client);
-        Assertions.assertEquals(client, clientDao.findById(client.getId()));
+        assertEquals(client, clientDao.findById(client.getId()));
     }
 
 
@@ -50,7 +48,7 @@ public class ClientDAOIntegrationTest {
         Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
                 Date.valueOf(LocalDate.now()));
         clientDao.update(client1);
-        Assertions.assertEquals(client1, clientDao.findById(client.getId()));
+        assertEquals(client1, clientDao.findById(client.getId()));
     }
 
 
@@ -72,7 +70,7 @@ public class ClientDAOIntegrationTest {
         Client client1 = new Client(client.getId(), "Sam", "0000000000", "sam@",
                 Date.valueOf(LocalDate.now()));
         clientDao.save(client1);
-        Assertions.assertEquals(client1, clientDao.findById(client1.getId()));
+        assertEquals(client1, clientDao.findById(client1.getId()));
     }
 
 
