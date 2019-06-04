@@ -9,7 +9,11 @@ public enum ErrorMessages {
 
     private final String message;
 
-    ErrorMessages(String message) {
+    ErrorMessages(final String message) {
         this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
