@@ -1,17 +1,15 @@
 CREATE TABLE if not exists client (
-    id           BIGINT SERIAL NOT NULL,
-    full_name    VARCHAR(100)  NOT NULL,
-    phone_number VARCHAR(20)   NOT NULL,
-    email        VARCHAR(30)   NOT NULL,
-    birthday     DATE          NOT NULL,
-    constraint client_pk PRIMARY KEY (id));
+    ID           BIGINT SERIAL PRIMARY KEY,
+    FULL_NAME    VARCHAR(100)  NOT NULL,
+    PHONE_NUMBER VARCHAR(20)   NOT NULL,
+    EMAIL        VARCHAR(30)   NOT NULL,
+    BIRTHDAY     DATE          NOT NULL);
 
 CREATE TABLE if not exists rooms (
-    id             BIGINT SERIAL NOT NULL,
-    num            VARCHAR(100)  NOT NULL,
-    type_id        VARCHAR(20)   NOT NULL,
-    description    VARCHAR(30)   NOT NULL,
-    constraint room_pk PRIMARY KEY (id));
+    ID             BIGINT SERIAL PRIMARY KEY,
+    NUM            VARCHAR(100)  NOT NULL,
+    TYPE_ID        VARCHAR(20)   NOT NULL,
+    DESCRIPTION    VARCHAR(30)   NOT NULL);
 
 CREATE TABLE IF NOT EXISTS TYPE_ROOM (
     ID BIGINT                   NOT NULL,
@@ -22,12 +20,12 @@ CREATE TABLE IF NOT EXISTS TYPE_ROOM (
     PRIMARY KEY (ID));
 
 create table if not exists T_ORDER(
-    id bigint auto_increment primary key,
-    id_client bigint,
-    id_type_room bigint,
-    date_in date,
-    date_out date,
-    status varchar(10),
-    date_create date,
-    date_update date,
-    id_room bigint);
+    ID BIGINT SERIAL PRIMARY KEY,
+    ID_CLIENT BIGINT,
+    ID_TYPE_ROOM BIGINT,
+    DATE_IN DATE,
+    DATE_OUT DATE,
+    STATUS VARCHAR(10),
+    DATE_CREATE DATE,
+    DATE_UPDATE DATE,
+    ID_ROOM BIGINT);
