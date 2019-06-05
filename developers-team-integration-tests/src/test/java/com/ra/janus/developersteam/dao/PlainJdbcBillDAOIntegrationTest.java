@@ -6,6 +6,8 @@ import com.ra.janus.developersteam.entity.Bill;
 import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.sql.DataSource;
@@ -24,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(classes = {DAOConfiguration.class})
 public class PlainJdbcBillDAOIntegrationTest {
     @Autowired
-    private static DataSource dataSource;// = DataSourceFactory.get();
+    private DataSource dataSource;
     @Autowired
-    private static BaseDao<Bill> billDAO;// = new PlainJdbcBillDAO(dataSource);
+    private BaseDao<Bill> billDAO;
 
-    private static Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
+    private Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
 
     @BeforeEach
     public void beforeEach() throws Exception {
