@@ -52,7 +52,7 @@ class InvoiceJdbcDaoMockTest {
     }
 
     @Test
-    void whenInputInvoiceThanSaveThatOneAndReturnWithNewKey() throws SQLException {
+    public void whenInputInvoiceThanSaveThatOneAndReturnWithNewKey() throws SQLException {
         when(mockConnection.prepareStatement(INSERT_INTO)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
@@ -62,7 +62,7 @@ class InvoiceJdbcDaoMockTest {
     }
 
     @Test
-    void expectDAOExceptionInSaveMethodWhenResultSetIsFalse() throws SQLException {
+    public void expectDAOExceptionInSaveMethodWhenResultSetIsFalse() throws SQLException {
         when(mockConnection.prepareStatement(INSERT_INTO)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
@@ -70,14 +70,14 @@ class InvoiceJdbcDaoMockTest {
     }
 
     @Test
-    void expectDAOExceptionInSaveMethodWhenResultSetCanNotBeGetting() throws SQLException {
+    public void expectDAOExceptionInSaveMethodWhenResultSetCanNotBeGetting() throws SQLException {
         when(mockConnection.prepareStatement(INSERT_INTO)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenThrow(SQLException.class);
         assertThrows(DAOException.class, () -> invoiceDao.save(invoice));
     }
 
     @Test
-    void testSaveWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
+    public void testSaveWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
         when(mockConnection.prepareStatement(INSERT_INTO)).thenThrow(new SQLException());
         Executable ex = () -> invoiceDao.save(invoice);
         assertThrows(DAOException.class,ex );
@@ -85,60 +85,60 @@ class InvoiceJdbcDaoMockTest {
     }
 
     @Test
-    void testUpdateWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
+    public void testUpdateWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenThrow(new SQLException());
         Executable ex = () -> invoiceDao.update(ID, invoice);
         assertThrows(DAOException.class, ex);
     }
     @Test
-    void testDeleteWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
+    public void testDeleteWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_BY_ID)).thenThrow(new SQLException());
         Executable ex = () -> invoiceDao.delete(ID);
         assertThrows(DAOException.class, ex);
     }
     @Test
-    void testFindByIdWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
+    public void testFindByIdWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
         when(mockConnection.prepareStatement(FIND_BY_ID)).thenThrow(new SQLException());
         Executable ex = () -> invoiceDao.findById(ID);
         assertThrows(DAOException.class, ex);
     }
     @Test
-    void testFindAllWhenCantCreateStatementThenCatchException() throws SQLException {
+    public void testFindAllWhenCantCreateStatementThenCatchException() throws SQLException {
         when(mockConnection.createStatement()).thenThrow(new SQLException());
         Executable ex = () -> invoiceDao.findAll();
         assertThrows(DAOException.class, ex);
     }
 
     @Test
-    void updateInvoiceByIDThenReturnTrue() throws SQLException {
+    public void updateInvoiceByIDThenReturnTrue() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         assertTrue(() -> invoiceDao.update(ID, invoice));
     }
 
     @Test
-    void updateInvoiceByIDThenReturnFalse() throws SQLException {
+    public void updateInvoiceByIDThenReturnFalse() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertFalse(() -> invoiceDao.update(ID, invoice));
     }
 
     @Test
-    void testDeleteInvoiceFromDBByIdThenReturnTrue() throws SQLException {
+    public void testDeleteInvoiceFromDBByIdThenReturnTrue() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         assertTrue(() -> invoiceDao.delete(ID));
     }
 
     @Test
-    void testDeleteInvoiceFromDBByIdThenReturnFalse() throws SQLException {
+    public void testDeleteInvoiceFromDBByIdThenReturnFalse() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertFalse(() -> invoiceDao.delete(ID));
     }
 
     @Test
-    void testFindInvoiceInDBByIdThenReturnInvoice() throws SQLException {
+    public void testFindInvoiceInDBByIdThenReturnInvoice() throws SQLException {
         when(mockConnection.prepareStatement(FIND_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
@@ -149,20 +149,20 @@ class InvoiceJdbcDaoMockTest {
     }
 
     @Test
-    void testFindInvoiceInDBByIdThenThrowException() throws SQLException {
+    public void testFindInvoiceInDBByIdThenThrowException() throws SQLException {
         when(mockConnection.prepareStatement(FIND_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         assertThrows(DAOException.class, () -> invoiceDao.findById(ID));
     }
     @Test
-    void testFindInvoiceInDBByIdThenThrowExceptionForCreatePreparedStatement() throws SQLException {
+    public void testFindInvoiceInDBByIdThenThrowExceptionForCreatePreparedStatement() throws SQLException {
         when(mockConnection.prepareStatement(FIND_BY_ID)).thenThrow(new SQLException());
         assertThrows(DAOException.class, () -> invoiceDao.findById(ID));
     }
 
     @Test
-    void testFindAllInvoicesFromDBThenReturnListWithThem() throws SQLException {
+    public void testFindAllInvoicesFromDBThenReturnListWithThem() throws SQLException {
         var statement = mock(Statement.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         when(mockConnection.createStatement()).thenReturn(statement);

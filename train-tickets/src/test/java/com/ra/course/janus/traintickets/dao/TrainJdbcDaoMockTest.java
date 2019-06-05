@@ -33,14 +33,14 @@ class TrainJdbcDaoMockTest {
     private ResultSet mockResultSet = mock(ResultSet.class);
 
     @BeforeEach
-    void setup() throws SQLException {
+    public void trainTestsInit() throws SQLException {
         trainDAO = new TrainJdbcDao(mockDataSourse);
         when(mockDataSourse.getConnection()).thenReturn(mockConn);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
     @Test
-    void whenTheObjectSuccessfullySaved() throws SQLException {
+    public void whenTheObjectSuccessfullySaved() throws SQLException {
         when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
 
@@ -53,7 +53,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenResultSetWithoutMeaningAndAppearsDAOException()throws SQLException{
+    public void whenResultSetWithoutMeaningAndAppearsDAOException()throws SQLException{
         when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
 
@@ -62,7 +62,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void ifThereIsAnExceptionInSave()throws SQLException{
+    public void ifThereIsAnExceptionInSave()throws SQLException{
         train = new Train(TRAIN_TEST_ID,TRAIN_NAME,SEATING,FREE_SEATS);
         when(mockConn.prepareStatement(INSERT_TRAIN)).thenReturn(mockPreparedStatement);
 
@@ -71,7 +71,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenTheObjectWasSuccessfullyUpdated()throws SQLException {
+    public void whenTheObjectWasSuccessfullyUpdated()throws SQLException {
         when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
@@ -81,7 +81,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenItemWasNotSuccessfullyUpdated()throws SQLException{
+    public void whenItemWasNotSuccessfullyUpdated()throws SQLException{
         when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
@@ -90,7 +90,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void ifThereIsAnExceptionInUpdate()throws SQLException{
+    public void ifThereIsAnExceptionInUpdate()throws SQLException{
         when(mockConn.prepareStatement(UPDATE_TRAIN)).thenReturn(mockPreparedStatement);
 
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
@@ -101,7 +101,7 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenTheObjectWasSuccessfullyDelete() throws SQLException{
+    public void whenTheObjectWasSuccessfullyDelete() throws SQLException{
         when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
 
@@ -109,14 +109,14 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenItemWasNotSuccessfullyDelete()throws SQLException{
+    public void whenItemWasNotSuccessfullyDelete()throws SQLException{
         when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         assertFalse(trainDAO.delete(TRAIN_ID));
     }
 
     @Test
-    void ifThereIsAnExceptionInDelete()throws SQLException{
+    public void ifThereIsAnExceptionInDelete()throws SQLException{
         when(mockConn.prepareStatement(DELETE_TRAIN)).thenReturn(mockPreparedStatement);
 
         doThrow(new SQLException()).when(mockPreparedStatement).executeUpdate();
@@ -126,70 +126,67 @@ class TrainJdbcDaoMockTest {
     }
 
     @Test
-    void whenItemWasSuccessfullySelect()throws SQLException {
+    public void whenItemWasSuccessfullySelect()throws SQLException {
         when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
 
         train = trainDAO.findById(TRAIN_ID);
 
+        assertEquals(TEST_TRAIN, train);
     }
 
     @Test
-    void whenItemWasNotSuccessfullySelect()throws SQLException{
+    public void whenItemWasNotSuccessfullySelect()throws SQLException{
         when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         when(mockResultSet.next()).thenReturn(false);
         mockMapTrain(mockResultSet);
 
         doThrow(new SQLException()).when(mockConn).close();
-        assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
 
+        assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
     }
 
     @Test
-    void ifThereIsAnExceptionInFindById()throws SQLException{
+    public void ifThereIsAnExceptionInFindById()throws SQLException{
         when(mockConn.prepareStatement(SELECT_TRAIN_ID)).thenReturn(mockPreparedStatement);
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockResultSet.next()).thenReturn(true);
         mockMapTrain(mockResultSet);
 
         doThrow(new SQLException()).when(mockConn).close();
+
         assertThrows(DAOException.class, () -> trainDAO.findById(TRAIN_ID));
     }
 
     @Test
-    void whenItemWasSuccessfullySelectFindAll() throws SQLException {
+    public void whenItemWasSuccessfullySelectFindAll() throws SQLException {
         when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
-
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         mockMapTrain(mockResultSet);
 
         List<Train> trainList = trainDAO.findAll();
+
         assertTrue(trainList.size() == 1);
     }
 
     @Test
-    void whenItemWasNotSuccessfullySelectFindAll() throws SQLException{
+    public void whenItemWasNotSuccessfullySelectFindAll() throws SQLException{
         when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
-
         when(mockResultSet.next()).thenReturn(false);
         mockMapTrain(mockResultSet);
 
         List<Train> trainList = trainDAO.findAll();
+
         assertTrue(trainList.size() == 0);
     }
 
     @Test
-    void ifThereIsAnExceptionInFindAll()throws SQLException{
+    public void ifThereIsAnExceptionInFindAll()throws SQLException{
         when(mockConn.prepareStatement(SELECT_TRAIN_ALL)).thenReturn(mockPreparedStatement);
-
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
         doThrow(new SQLException()).when(mockConn).close();
+
         assertThrows(DAOException.class, () -> trainDAO.findAll());
     }
 

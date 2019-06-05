@@ -40,13 +40,13 @@ class AdminJdbcDaoMockTest {
 
 
     @BeforeEach
-    void before() throws SQLException {
+    public void before() throws SQLException {
         adminDao = new AdminJdbcDao(mockDataSource);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
     }
 
     @Test
-    void whenCallSaveThenReturnNewObjectWithAnotherId() throws SQLException {
+    public void whenCallSaveThenReturnNewObjectWithAnotherId() throws SQLException {
 
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
@@ -54,8 +54,9 @@ class AdminJdbcDaoMockTest {
         when(mockResultSet.getLong(COLUM_ID)).thenReturn(ID_TEST);
         assertNotSame(adminDao.save(ADMIN_TEST), ADMIN_TEST);
     }
+    
     @Test
-    void whenInMethodSaveResultSetHaveNoGeneratedKeysThrowExceptions() throws SQLException {
+    public void whenInMethodSaveResultSetHaveNoGeneratedKeysThrowExceptions() throws SQLException {
 
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
@@ -64,16 +65,16 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenInMethodSaveMethodsCloseThrowExceptions() throws SQLException {
+    public void whenInMethodSaveMethodsCloseThrowExceptions() throws SQLException {
 
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        exeptions();
         assertThrows(DAOException.class, ()->adminDao.save(ADMIN_TEST));
     }
     @Test
-    void whenCallMethodUpdateThanReturnTrue() throws SQLException {
+    public void whenCallMethodUpdateThanReturnTrue() throws SQLException {
 
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -81,7 +82,7 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallMethodUpdateThanReturnFalse() throws SQLException {
+    public void whenCallMethodUpdateThanReturnFalse() throws SQLException {
 
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
@@ -89,14 +90,14 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallUpdateInDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
+    public void whenCallUpdateInDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
         doThrow(new SQLException()).when(mockConnection).close();
         assertThrows(DAOException.class, ()->adminDao.update(ID_TEST, ADMIN_TEST));
     }
 
     @Test
-    void whenCallDeleteObjectFromDbReturnTrue() throws SQLException {
+    public void whenCallDeleteObjectFromDbReturnTrue() throws SQLException {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -104,7 +105,7 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallDeleteObjectFromDbReturnFalse() throws SQLException {
+    public void whenCallDeleteObjectFromDbReturnFalse() throws SQLException {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
@@ -112,7 +113,7 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallDeleteObjectFromDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
+    public void whenCallDeleteObjectFromDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
 
         when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
         doThrow(new SQLException()).when(mockConnection).close();
@@ -120,16 +121,16 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallMethodFindByIdThanReturnObject() throws SQLException {
+    public void whenCallMethodFindByIdThanReturnObject() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        getingDataFromResultSet(mockResultSet);
+        getingDataFromResultSet();
         assertEquals(ADMIN_ID, adminDao.findById(ADMIN_ID).getId());
     }
     @Test
-    void whenCallMethodFindByIdThanThrowExceptionsWhenResultSetNextFalse() throws SQLException {
+    public void whenCallMethodFindByIdThanThrowExceptionsWhenResultSetNextFalse() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         mockPreparedStatement.setLong(1, ID_TEST);
@@ -139,51 +140,50 @@ class AdminJdbcDaoMockTest {
     }
 
     @Test
-    void whenCallMethodFindByIdThanThrowExceptionsThrowException() throws SQLException {
+    public void whenCallMethodFindByIdThanThrowExceptionsThrowException() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         mockPreparedStatement.setLong(1, ID_TEST);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        exeptions();
         assertThrows(DAOException.class, ()-> adminDao.findById(ID_TEST));
     }
 
     @Test
-    void whenCallMethodFindAllInDbThenReturnNonEmptyList() throws SQLException {
+    public void whenCallMethodFindAllInDbThenReturnNonEmptyList() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        getingDataFromResultSet(mockResultSet);
+        getingDataFromResultSet();
         assertFalse(adminDao.findAll().isEmpty());
     }
 
     @Test
-    void whenFindAllInDbThenReturnEmptyList() throws SQLException {
+    public void whenFindAllInDbThenReturnEmptyList() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         assertEquals(Collections.emptyList(), adminDao.findAll());
     }
     @Test
-    void whenCallMethodFindAllInDbThenThrowExceptions() throws SQLException {
+    public void whenCallMethodFindAllInDbThenThrowExceptions() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        getingDataFromResultSet(mockResultSet);
-        exeptions(mockConnection, mockPreparedStatement, mockResultSet);
+        getingDataFromResultSet();
+        exeptions();
         assertThrows(DAOException.class, ()-> adminDao.findAll());
     }
 
-    private void exeptions(Connection conn, PreparedStatement pr, ResultSet rs) throws SQLException {
-
+    private void exeptions() throws SQLException {
         doThrow(new SQLException()).when(mockConnection).close();
         doThrow(new SQLException()).when(mockResultSet).close();
         doThrow(new SQLException()).when(mockPreparedStatement).close();
     }
-    private void getingDataFromResultSet(ResultSet resultSet) throws SQLException {
+    private void getingDataFromResultSet() throws SQLException {
         when(mockResultSet.getLong(COLUM_ID)).thenReturn(ADMIN_ID);
         when(mockResultSet.getString(COLUM_NAME)).thenReturn(ADMIN_NAME);
         when(mockResultSet.getString(COLUM_L_NAME)).thenReturn(ADMIN_LASTNAME);

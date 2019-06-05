@@ -20,7 +20,7 @@ public class TrainJdbcDaoIntegrationTest {
     private static final DataSource dataSource =
             DataSourceFactory.DATA_SOURCE.getInstance();
 
-    private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/Create_Trains_Table.sql";
+    private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_trains_table.sql";
 
     private TrainJdbcDao trainDAO;
 
@@ -39,7 +39,7 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    void whenWeSaveTrain() throws Exception{
+    public void whenWeSaveTrain() throws Exception{
         Train train = trainDAO.save(testIntegrTrain);
         Train someTrain = trainDAO.save(train);
 
@@ -49,7 +49,7 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    void whenWeUpdateTrain()throws Exception{
+    public void whenWeUpdateTrain()throws Exception{
         Train somethingTrain = trainDAO.save(testIntegrTrain);
 
         somethingTrain.setName("Test Train");
@@ -60,14 +60,14 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    void whenWeDeleteTrain()throws Exception{
+    public void whenWeDeleteTrain()throws Exception{
         Train someTrain = trainDAO.save(testIntegrTrain);
         final long id = someTrain.getId();
         assertTrue(trainDAO.delete(id));
     }
 
     @Test
-    void whenWeFindTrainByID()throws Exception{
+    public void whenWeFindTrainByID()throws Exception{
         Train someTrain = trainDAO.save(testIntegrTrain);
         Train findTrain = trainDAO.findById(someTrain.getId());
 
@@ -75,7 +75,7 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    void whenWeUseFindAllTrains() throws Exception{
+    public void whenWeUseFindAllTrains() throws Exception{
         Train someTrain = trainDAO.save(testIntegrTrain);
         List<Train> allTrains = Arrays.asList(someTrain);
         List<Train> findTrains = trainDAO.findAll();

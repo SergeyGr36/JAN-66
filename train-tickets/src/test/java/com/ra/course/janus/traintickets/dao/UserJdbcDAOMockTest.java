@@ -50,7 +50,7 @@ class UserJdbcDAOMockTest {
     private ResultSet mockResSet;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    public void setUp() throws SQLException {
         userDAO = new UserJdbcDAO(MOCK_DATA_SOURCE);
 
         mockConn = mock(Connection.class);
@@ -65,7 +65,7 @@ class UserJdbcDAOMockTest {
     // Test save-------------------------------------------------------
 
     @Test
-    void saveWhenUserSavedOkThenNewUserReturnedWithMappingOk() throws SQLException {
+    public void saveWhenUserSavedOkThenNewUserReturnedWithMappingOk() throws SQLException {
         // given
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
@@ -78,34 +78,37 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void saveUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
-
+    public void saveUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
+        // when
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
+        // then
         assertThrows(DAOException.class, () -> userDAO.save(TEST_USER));
     }
 
     @Test
-    void saveUserWhenFailToReadGeneratedKeyThenThrowsDAOException() throws SQLException {
-
+    public void saveUserWhenFailToReadGeneratedKeyThenThrowsDAOException() throws SQLException {
+        // when
         when(mockConn.prepareStatement(SAVE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.getGeneratedKeys()).thenReturn(mockResSet);
         when(mockResSet.next()).thenReturn(false);
+        //then
         assertThrows(DAOException.class, () -> userDAO.save(TEST_USER));
     }
 
     // Test update-----------------------------------------------------
 
     @Test
-    void updateWhenUserWithProvidedIdUpdateOkThenReturnTrue() throws SQLException {
+    public void updateWhenUserWithProvidedIdUpdateOkThenReturnTrue() throws SQLException {
+        // when
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(1);
-        user = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
-        assertTrue(userDAO.update(USER_ID, user));
+        // then
+        assertTrue(userDAO.update(USER_ID, TEST_USER));
     }
 
     @Test
-    void updateWhenUserWithProvidedIdNotFoundThenReturnFalse() throws SQLException {
+    public void updateWhenUserWithProvidedIdNotFoundThenReturnFalse() throws SQLException {
         // when
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(0);
@@ -114,7 +117,7 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void updateUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
+    public void updateUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
         // when
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
@@ -125,7 +128,7 @@ class UserJdbcDAOMockTest {
     // Test delete-----------------------------------------------------
 
     @Test
-    void deleteWhenUserWithProvidedIdDeleteOkThenReturnTrue() throws SQLException {
+    public void deleteWhenUserWithProvidedIdDeleteOkThenReturnTrue() throws SQLException {
         // when
         when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(1);
@@ -134,7 +137,7 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void deleteWhenUserWithProvidedIdNotFoundThenReturnFalse() throws SQLException {
+    public void deleteWhenUserWithProvidedIdNotFoundThenReturnFalse() throws SQLException {
         // when
         when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(0);
@@ -143,7 +146,7 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void deleteUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
+    public void deleteUserWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
         //when
         when(mockConn.prepareStatement(DELETE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
@@ -154,7 +157,7 @@ class UserJdbcDAOMockTest {
     // Test findById-------------------------------------------------------
 
     @Test
-    void findByIdWhenUserWithProvidedIdFoundOkThenReturnUser() throws SQLException {
+    public void findByIdWhenUserWithProvidedIdFoundOkThenReturnUser() throws SQLException {
         // given
         when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
         when(mockResSet.next()).thenReturn(true);
@@ -166,7 +169,7 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void findByIdWhenUserWithProvidedIdNotFoundThenReturnNull() throws SQLException {
+    public void findByIdWhenUserWithProvidedIdNotFoundThenReturnNull() throws SQLException {
         // given
         when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
         when(mockResSet.next()).thenReturn(false);
@@ -179,7 +182,7 @@ class UserJdbcDAOMockTest {
 
 
     @Test
-    void findUserByIdWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
+    public void findUserByIdWhenThrowsSQLExceptionThenThrowsDAOException() throws SQLException {
         // when
         when(mockConn.prepareStatement(FIND_BY_ID)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeQuery();
@@ -190,7 +193,7 @@ class UserJdbcDAOMockTest {
     // Test findAll----------------------------------------------------
 
     @Test
-    void findAllUsersWhenFoundOneUserThenReturnsListWithOneUser() throws SQLException {
+    public void findAllUsersWhenFoundOneUserThenReturnsListWithOneUser() throws SQLException {
         // given
         when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
         when(mockResSet.next()).thenReturn(true).thenReturn(false);
@@ -203,7 +206,7 @@ class UserJdbcDAOMockTest {
     }
 
     @Test
-    void findAllUsersWhenNoUsersFoundThenReturnsEmptyList() throws SQLException {
+    public void findAllUsersWhenNoUsersFoundThenReturnsEmptyList() throws SQLException {
         // given
         when(mockConn.prepareStatement(FIND_ALL)).thenReturn(mockPrepSt);
         when(mockResSet.next()).thenReturn(false);

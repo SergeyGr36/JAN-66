@@ -37,22 +37,18 @@ public class AdminJdbcDaoIntegrationTest {
     public void whenSaveObjectFirstTimeReturnIdOne() {
         Admin saveAdmin1 = adminDao.save(ADMIN);
         assertNotNull(saveAdmin1.getId());
-        Admin saveAdmin2 = adminDao.save(ADMIN);
-        assertNotNull(saveAdmin2.getId());
     }
 
     @Test
     public void whenCallUpdateObjectSuccessfullyCompleted(){
-
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final Long ID = saveAdmin1.getId();
-        boolean update = adminDao.update(ID, TEST_ADMIN);
+        adminDao.update(ID, TEST_ADMIN);
         Admin byId = adminDao.findById(ID);
         assertNotEquals(byId, saveAdmin1);
     }
     @Test
     public void deleteObjectFromDb(){
-
         Admin saveAdmin1 = adminDao.save(ADMIN);
         assertTrue(adminDao.delete(saveAdmin1.getId()));
     }
