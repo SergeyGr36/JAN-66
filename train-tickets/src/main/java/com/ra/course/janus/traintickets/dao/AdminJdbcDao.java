@@ -49,7 +49,7 @@ public class AdminJdbcDao implements IJdbcDao<Admin> {
                         return new Admin(generatedKeys.getLong(COLUM_ID), item.getName(),
                                 item.getLastName(), item.getPassword());
                     } else {
-                        DAOException e = new DAOException();
+                        final DAOException e = new DAOException();
                         LOGGER.error(SAVE_FAILED.getMessage(), e);
                         throw e;
                     }
@@ -98,7 +98,7 @@ public class AdminJdbcDao implements IJdbcDao<Admin> {
                 if (resultSet.next()) {
                     return createObject(resultSet);
                 } else {
-                    DAOException e = new DAOException();
+                    final DAOException e = new DAOException();
                     LOGGER.error(FIND_FAILED.getMessage(), e);
                     throw e;
                 }
