@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
+
 public class JdbcAdminDao implements IJdbcDao<Admin> {
 
     private static final String SAVE_SQL = "INSERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
@@ -47,28 +49,27 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
                         return new Admin(generatedKeys.getLong(COLUM_ID), item.getName(),
                                 item.getLastName(), item.getPassword());
                     } else {
-                        LOGGER.info("Exception in save");
-                        throw new DAOException("There are no created keys");
+                        DAOException e = new DAOException();
+                        LOGGER.error(SAVE_FAILED.getMessage(), e);
+                        throw e;
                     }
                 }
 
         } catch (SQLException e) {
-            LOGGER.info("Exception in save :", e);
+            LOGGER.error(SAVE_FAILED.getMessage(), e);
             throw new DAOException(e);
            }
     }
 
     @Override
     public boolean update(final Long id, final Admin item) {
-
         try(Connection connection = dataSource.getConnection();
             PreparedStatement prepSt = connection.prepareStatement(UPDATE_SQL)){
             prepareStatementOperations(prepSt, item);
             prepSt.setLong(4, id);
-
-            return prepSt.executeUpdate()>0;
+            return prepSt.executeUpdate() > 0;
         } catch (SQLException e){
-            LOGGER.info("Exception in update :", e);
+            LOGGER.error(UPDATE_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -83,27 +84,27 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
             return prepSt.executeUpdate()>0;
 
         } catch (SQLException e){
-            LOGGER.info("Exception in delete :", e);
+            LOGGER.error(DELETE_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
 
     @Override
     public Admin findById(final Long id) {
-//        final Admin admin;
         try(Connection connection = dataSource.getConnection();
             PreparedStatement prepSt = connection.prepareStatement(SELECT_BY_ID)){
             prepSt.setLong(1, id);
-                try (ResultSet resultSet = prepSt.executeQuery()) {
-                    if (resultSet.next()) {
-                        return createObject(resultSet);
-                    } else {
-                        LOGGER.info("Exception in findById");
-                        throw new DAOException();
-                    }
+            try (ResultSet resultSet = prepSt.executeQuery()) {
+                if (resultSet.next()) {
+                    return createObject(resultSet);
+                } else {
+                    DAOException e = new DAOException();
+                    LOGGER.error(FIND_FAILED.getMessage(), e);
+                    throw e;
                 }
+            }
         } catch (SQLException e){
-            LOGGER.info("Exception in findById :", e);
+            LOGGER.info(FIND_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
@@ -120,7 +121,7 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
             return adminList;
 
         } catch (SQLException e){
-            LOGGER.info("Exception in findAll :", e);
+            LOGGER.info(FINDALL_FAILED.getMessage(), e);
             throw new DAOException(e);
         }
     }
