@@ -16,13 +16,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TrainDAOIntegrationTest {
+public class TrainJdbcDaoIntegrationTest {
     private static final DataSource dataSource =
             DataSourceFactory.DATA_SOURCE.getInstance();
 
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/Create_Trains_Table.sql";
 
-    private TrainDAO trainDAO;
+    private TrainJdbcDao trainDAO;
 
     private static final Train testIntegrTrain =
             new Train(1L,"Test Name Train",100,90);
@@ -35,7 +35,7 @@ public class TrainDAOIntegrationTest {
     @BeforeEach
     public void setUp() throws Exception{
         clearTableTrains();
-        trainDAO = new TrainDAO(dataSource);
+        trainDAO = new TrainJdbcDao(dataSource);
     }
 
     @Test

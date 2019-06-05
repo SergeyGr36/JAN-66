@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class UserDAOIntegrationTest {
+public class UserJdbcDAOIntegrationTest {
 
     private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
     private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
 
-    private UserDAO userDAO;
+    private UserJdbcDAO userDAO;
 
     @BeforeAll
     public static void createUsersTable() throws IOException, SQLException {
@@ -38,7 +38,7 @@ public class UserDAOIntegrationTest {
     @BeforeEach
     public void setUp() throws SQLException {
         clearTableUsers();
-        userDAO = new UserDAO(DATA_SOURCE);
+        userDAO = new UserJdbcDAO(DATA_SOURCE);
     }
 
     // Test saveUser---------------------------------------------------

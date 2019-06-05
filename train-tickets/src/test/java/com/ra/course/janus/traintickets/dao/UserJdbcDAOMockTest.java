@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class UserDAOMockTest {
+class UserJdbcDAOMockTest {
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
@@ -44,14 +44,14 @@ class UserDAOMockTest {
 
     private static final DataSource MOCK_DATA_SOURCE = mock(DataSource.class);
     private User user;
-    private UserDAO userDAO;
+    private UserJdbcDAO userDAO;
     private Connection mockConn;
     private PreparedStatement mockPrepSt;
     private ResultSet mockResSet;
 
     @BeforeEach
     void setUp() throws SQLException {
-        userDAO = new UserDAO(MOCK_DATA_SOURCE);
+        userDAO = new UserJdbcDAO(MOCK_DATA_SOURCE);
 
         mockConn = mock(Connection.class);
         when(MOCK_DATA_SOURCE.getConnection()).thenReturn(mockConn);

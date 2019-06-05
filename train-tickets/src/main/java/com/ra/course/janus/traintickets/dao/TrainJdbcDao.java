@@ -10,17 +10,17 @@ import java.util.List;
 
 import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
 
-public class TrainDAO implements IJdbcDao<Train> {
+public class TrainJdbcDao implements IJdbcDao<Train> {
 
     private final transient DataSource dataSource;
-    private static final Logger LOG = LoggerFactory.getLogger(TrainDAO.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TrainJdbcDao.class.getName());
     private static final String INSERT_TRAIN = "INSERT into TRAINS (NAME, SEATING, FREE_SEATS) values (?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
     private static final String UPDATE_TRAIN = "UPDATE TRAINS SET NAME = ?, SEATING = ?, FREE_SEATS = ? WHERE ID = ?";
     private static final String DELETE_TRAIN = "DELETE FROM TRAINS WHERE ID = ?";
     private static final String SELECT_TRAIN_ALL = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS";
 
-    public  TrainDAO(final DataSource dataSource) {
+    public TrainJdbcDao(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

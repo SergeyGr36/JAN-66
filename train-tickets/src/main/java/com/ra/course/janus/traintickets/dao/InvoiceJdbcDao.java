@@ -15,18 +15,18 @@ import com.ra.course.janus.traintickets.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InvoiceDAO implements IJdbcDao<Invoice> {
+public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
     private static final String INSERT_INTO = "INSERT INTO invoices (price, attributes) VALUES (?, ?)";
     private static final String UPDATE_TABLE = "UPDATE invoices SET price = ?, attributes = ? WHERE id = ?";
     private static final String FIND_BY_ID = "SELECT * FROM invoices WHERE id = ?";
     private static final String DELETE_BY_ID = "DELETE FROM invoices WHERE id = ?";
     private static final String FIND_ALL = "SELECT * FROM invoices";
-    private static final Logger LOGER = LoggerFactory.getLogger(InvoiceDAO.class);
+    private static final Logger LOGER = LoggerFactory.getLogger(InvoiceJdbcDao.class);
     private transient final DataSource ds;
     private static final String LOG_MESSAGE = "failed operation";
     private static final String CANT_CLOSE = "Can`t close connection";
 
-    public InvoiceDAO(final DataSource ds) {
+    public InvoiceJdbcDao(final DataSource ds) {
         this.ds = ds;
     }
 

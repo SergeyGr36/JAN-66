@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class TrainDAOMockTest {
+class TrainJdbcDaoMockTest {
 
     private static final String INSERT_TRAIN = "INSERT into TRAINS (NAME, SEATING, FREE_SEATS) values (?, ?, ?)";
     private static final String SELECT_TRAIN_ID = "SELECT ID, NAME, SEATING, FREE_SEATS FROM TRAINS WHERE ID = ?";
@@ -25,7 +25,7 @@ class TrainDAOMockTest {
     private static final Train TEST_TRAIN = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
 
     private Train train;
-    private TrainDAO trainDAO;
+    private TrainJdbcDao trainDAO;
 
     private DataSource mockDataSourse = mock(DataSource.class);
     private Connection mockConn = mock(Connection.class);
@@ -34,7 +34,7 @@ class TrainDAOMockTest {
 
     @BeforeEach
     void setup() throws SQLException {
-        trainDAO = new TrainDAO(mockDataSourse);
+        trainDAO = new TrainJdbcDao(mockDataSourse);
         when(mockDataSourse.getConnection()).thenReturn(mockConn);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }

@@ -16,10 +16,10 @@ import java.util.List;
 
 
 
-public class UserDAO implements IJdbcDao<User> {
+public class UserJdbcDAO implements IJdbcDao<User> {
     private final transient DataSource dataSource;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserJdbcDAO.class);
 
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
@@ -32,7 +32,7 @@ public class UserDAO implements IJdbcDao<User> {
     private static final int COL_IND_EMAIL = 3;
     private static final int COL_IND_PASSWD = 4;
 
-    public UserDAO(final DataSource dataSource) {
+    public UserJdbcDAO(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 

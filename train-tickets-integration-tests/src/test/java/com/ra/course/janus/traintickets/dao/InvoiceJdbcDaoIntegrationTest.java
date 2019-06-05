@@ -17,11 +17,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InvoiceDaoIntegrationTest {
+public class InvoiceJdbcDaoIntegrationTest {
     private static final DataSource IN_DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String PATH_TO_FILE = "src/test/resources/sql_scripts/invoices_table.sql";
     private static final Invoice INVOICE_TEST = new Invoice(1, 10, "Something");
-    private InvoiceDAO invoiceDAO;
+    private InvoiceJdbcDao invoiceDAO;
 
 
     @BeforeAll
@@ -32,7 +32,7 @@ public class InvoiceDaoIntegrationTest {
     @BeforeEach
     public void deleteAllFromTable() throws IOException, SQLException {
         deleteTable();
-        invoiceDAO = new InvoiceDAO(IN_DATA_SOURCE);
+        invoiceDAO = new InvoiceJdbcDao(IN_DATA_SOURCE);
 
     }
 

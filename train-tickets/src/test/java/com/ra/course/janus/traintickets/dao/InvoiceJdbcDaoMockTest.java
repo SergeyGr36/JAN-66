@@ -17,7 +17,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.ra.course.janus.traintickets.dao.InvoiceDAO;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ import org.junit.jupiter.api.function.Executable;
 
 import com.ra.course.janus.traintickets.entity.Invoice;
 
-class InvoiceDAOMockTest {
+class InvoiceJdbcDaoMockTest {
     private final String INSERT_INTO = "INSERT INTO invoices (price, attributes) VALUES (?, ?)";
     private final String UPDATE_TABLE = "UPDATE invoices SET price = ?, attributes = ? WHERE id = ?";
     private final String FIND_BY_ID = "SELECT * FROM invoices WHERE id = ?";
@@ -35,7 +34,7 @@ class InvoiceDAOMockTest {
 
     private final long ID = 1;
     private Invoice invoice;
-    private InvoiceDAO invoiceDao;
+    private InvoiceJdbcDao invoiceDao;
     private DataSource mockDataSource;
     private Connection mockConnection;
     private PreparedStatement mockPreparedStatement;
@@ -44,7 +43,7 @@ class InvoiceDAOMockTest {
     @BeforeEach
     public void before() throws Exception {
         mockDataSource = mock(DataSource.class);
-        invoiceDao = new InvoiceDAO(mockDataSource);
+        invoiceDao = new InvoiceJdbcDao(mockDataSource);
         mockConnection = mock(Connection.class);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
         mockResultSet = mock(ResultSet.class);
