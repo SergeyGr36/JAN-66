@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminDaoIntegrationTest {
 
-    private static final DataSource DATA_SOURCE = DataSourceFactory.HIKARY_H2_IN_MEMORY.getDataSource();
+    private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String FILE_PATH = "src/test/resources/sql_scripts/admin_table.sql";
     private JdbcAdminDao adminDao;
     private static final Admin TEST_ADMIN = new Admin(0, "Petya", "Volk", "12345");
