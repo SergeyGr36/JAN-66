@@ -2,7 +2,6 @@ package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Admin;
-import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.*;
 
 import javax.sql.DataSource;
@@ -17,11 +16,11 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class AdminDaoIntegrationTest {
+public class AdminJdbcDaoIntegrationTest {
 
     private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String FILE_PATH = "src/test/resources/sql_scripts/admin_table.sql";
-    private JdbcAdminDao adminDao;
+    private AdminJdbcDao adminDao;
     private static final Admin TEST_ADMIN = new Admin(0, "Petya", "Volk", "12345");
     private static final Admin ADMIN = new Admin(0,"Roman", "Hreits", "12345");
 
@@ -31,7 +30,7 @@ public class AdminDaoIntegrationTest {
     }
     @BeforeEach
     public void setUp()  {
-        adminDao = new JdbcAdminDao(DATA_SOURCE);
+        adminDao = new AdminJdbcDao(DATA_SOURCE);
     }
 
     @Test

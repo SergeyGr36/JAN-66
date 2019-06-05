@@ -4,17 +4,15 @@ import com.ra.course.janus.traintickets.entity.Admin;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class JdbcAdminDaoTest {
+class AdminJdbcDaoMockTest {
     private static final String SAVE_SQL = "INSERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
     private static final String UPDATE_SQL = "UPDATE ADMIN SET NAME=?,LASTNAME=?,PASSWORD=? WHERE ID=?";
     private static final String DELETE_SQL = "DELETE FROM ADMIN WHERE ID=? ";
@@ -35,7 +33,7 @@ class JdbcAdminDaoTest {
     private static final int COLUM_PASSWORD = 4;
 
     private DataSource mockDataSource = mock(DataSource.class);
-    private JdbcAdminDao adminDao;
+    private AdminJdbcDao adminDao;
     private Connection mockConnection = mock(Connection.class);
     private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
     private ResultSet mockResultSet = mock(ResultSet.class);
@@ -43,7 +41,7 @@ class JdbcAdminDaoTest {
 
     @BeforeEach
     void before() throws SQLException {
-        adminDao = new JdbcAdminDao(mockDataSource);
+        adminDao = new AdminJdbcDao(mockDataSource);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
 
-public class JdbcAdminDao implements IJdbcDao<Admin> {
+public class AdminJdbcDao implements IJdbcDao<Admin> {
 
     private static final String SAVE_SQL = "INSERT INTO ADMIN (NAME, LASTNAME, PASSWORD) VALUES(?,?,?)";
     private static final String UPDATE_SQL = "UPDATE ADMIN SET NAME=?,LASTNAME=?,PASSWORD=? WHERE ID=?";
@@ -29,11 +29,11 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
     private static final int COLUM_L_NAME = 3;
     private static final int COLUM_PASSWORD = 4;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcAdminDao.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminJdbcDao.class.getName());
 
     private final transient DataSource dataSource;
 
-    public JdbcAdminDao(final DataSource dataSource) {
+    public AdminJdbcDao(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
