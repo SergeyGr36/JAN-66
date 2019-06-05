@@ -2,6 +2,7 @@ package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Admin;
+import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.*;
 
 import javax.sql.DataSource;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,24 +37,40 @@ public class AdminDaoIntegrationTest {
     @Test
     public void whenSaveObjectFirstTimeReturnIdOne() {
         Admin saveAdmin1 = adminDao.save(ADMIN);
-        assertTrue(saveAdmin1.getId()==1);
+        assertNotNull(saveAdmin1.getId());
         Admin saveAdmin2 = adminDao.save(ADMIN);
-        assertTrue(saveAdmin2.getId()==2);
+        assertNotNull(saveAdmin2.getId());
     }
 
     @Test
     public void whenCallUpdateObjectSuccessfullyCompleted(){
 
         Admin saveAdmin1 = adminDao.save(ADMIN);
-        Admin saveAdmin2 = adminDao.save(ADMIN);
         final Long ID = saveAdmin1.getId();
         boolean update = adminDao.update(ID, TEST_ADMIN);
         Admin byId = adminDao.findById(ID);
         assertNotEquals(byId, saveAdmin1);
     }
-
+    @Test
     public void deleteObjectFromDb(){
 
+        Admin saveAdmin1 = adminDao.save(ADMIN);
+        assertTrue(adminDao.delete(saveAdmin1.getId()));
+    }
+    @Test
+    public void findByIdObjectInDb(){
+        Admin saveAdmin1 = adminDao.save(ADMIN);
+        final long id = saveAdmin1.getId();
+        assertNotNull(adminDao.findById(id));
+    }
+
+    @Test
+    public void findAllObjectsInDb(){
+
+        adminDao.save(ADMIN);
+        adminDao.save(ADMIN);
+        List<Admin> all = adminDao.findAll();
+        assertEquals(all.size(), 2);
     }
 
     private static void createTable() throws SQLException, IOException {

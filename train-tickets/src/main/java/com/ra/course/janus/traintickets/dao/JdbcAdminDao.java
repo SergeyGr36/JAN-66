@@ -20,7 +20,7 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
     private static final String UPDATE_SQL = "UPDATE ADMIN SET NAME=?,LASTNAME=?,PASSWORD=? WHERE ID=?";
     private static final String DELETE_SQL = "DELETE FROM ADMIN WHERE ID=? ";
     private static final String SELECT_ALL = "SELECT * FROM ADMIN";
-    private static final String SELECT_BY_ID = "SELECT * FROM ADMIN WHERE ID = ?";
+    private static final String SELECT_BY_ID = "SELECT * FROM ADMIN WHERE ID=?";
 
     private static final int COLUM_ID = 1;
     private static final int COLUM_NAME = 2;
@@ -90,19 +90,18 @@ public class JdbcAdminDao implements IJdbcDao<Admin> {
 
     @Override
     public Admin findById(final Long id) {
-        final Admin admin;
-        try(Connection connection = dataSource.getConnection()){
-            try(PreparedStatement prepSt = connection.prepareStatement(SELECT_BY_ID)) {
-                prepSt.setLong(1, id);
+//        final Admin admin;
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement prepSt = connection.prepareStatement(SELECT_BY_ID)){
+            prepSt.setLong(1, id);
                 try (ResultSet resultSet = prepSt.executeQuery()) {
                     if (resultSet.next()) {
-                        return admin = createObject(resultSet);
+                        return createObject(resultSet);
                     } else {
-                        admin = null;
+                        LOGGER.info("Exception in findById");
+                        throw new DAOException();
                     }
                 }
-            }
-            return admin;
         } catch (SQLException e){
             LOGGER.info("Exception in findById :", e);
             throw new DAOException(e);

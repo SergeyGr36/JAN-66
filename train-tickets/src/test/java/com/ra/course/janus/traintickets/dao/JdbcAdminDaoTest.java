@@ -4,6 +4,8 @@ import com.ra.course.janus.traintickets.entity.Admin;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Collections;
@@ -54,22 +56,21 @@ class JdbcAdminDaoTest {
         when(mockResultSet.getLong(COLUM_ID)).thenReturn(ID_TEST);
         assertNotSame(adminDao.save(ADMIN_TEST), ADMIN_TEST);
     }
-
-//    @Test
-//    void whenInMethodSaveExecuteUpdateNoMOreThanZeroThrowException() throws SQLException {
-//
-//        Admin admin = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
-//        when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-//        assertThrows(DAOException.class, ()->adminDao.save(admin));
-//    }
-
     @Test
-    void whenInMethodSaveResultSetHaveNoGeneratedKeysAndMethodsCloseThrowExceptions() throws SQLException {
+    void whenInMethodSaveResultSetHaveNoGeneratedKeysThrowExceptions() throws SQLException {
 
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
+        assertThrows(DAOException.class, ()->adminDao.save(ADMIN_TEST));
+    }
+
+    @Test
+    void whenInMethodSaveMethodsCloseThrowExceptions() throws SQLException {
+
+        when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
         exeptions(mockConnection, mockPreparedStatement, mockResultSet);
         assertThrows(DAOException.class, ()->adminDao.save(ADMIN_TEST));
     }
@@ -112,8 +113,6 @@ class JdbcAdminDaoTest {
         assertFalse(adminDao.delete(ID_TEST));
     }
 
-
-
     @Test
     void whenCallDeleteObjectFromDbConnectionPrepareStatementAndConnectionCloseThrowException() throws SQLException {
 
@@ -135,12 +134,12 @@ class JdbcAdminDaoTest {
     void whenCallMethodFindByIdThanThrowExceptionsWhenResultSetNextFalse() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         mockPreparedStatement.setLong(1, ID_TEST);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        assertEquals(adminDao.findById(ID_TEST), null);
-
+        assertThrows(DAOException.class, ()->adminDao.findById(ID_TEST));
     }
+
     @Test
     void whenCallMethodFindByIdThanThrowExceptionsThrowException() throws SQLException {
 
@@ -151,7 +150,6 @@ class JdbcAdminDaoTest {
         exeptions(mockConnection, mockPreparedStatement, mockResultSet);
         assertThrows(DAOException.class, ()-> adminDao.findById(ID_TEST));
     }
-
 
     @Test
     void whenCallMethodFindAllInDbThenReturnNonEmptyList() throws SQLException {
