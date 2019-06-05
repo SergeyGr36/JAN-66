@@ -1,10 +1,14 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.config.DAOConfiguration;
 import com.ra.janus.developersteam.entity.Developer;
 import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -14,9 +18,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {DAOConfiguration.class})
 public class PlainJdbcDeveloperDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Developer> developerDAO = new PlainJdbcDeveloperDAO(dataSource);
+    @Autowired
+    private DataSource dataSource;
+    @Autowired
+    private BaseDao<Developer> developerDAO;
 
     private static Developer developerToCreate = new Developer(1L, "Nick");
 

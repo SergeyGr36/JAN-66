@@ -1,13 +1,10 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.config.DAOConfiguration;
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
 import com.ra.janus.developersteam.entity.Bill;
 import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.sql.DataSource;
