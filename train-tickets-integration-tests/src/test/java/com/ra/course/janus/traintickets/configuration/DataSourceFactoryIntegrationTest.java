@@ -7,10 +7,10 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class DataSourceFactoryTest {
+class DataSourceFactoryIntegrationTest {
 
     @Test
-    void DataSourceTest() throws SQLException {
+    public void dataSourceIntegrationTest() throws SQLException {
         assertAll(() -> {
             DataSource ds = DataSourceFactory.DATA_SOURCE.getInstance();
             Connection conn = ds.getConnection();
