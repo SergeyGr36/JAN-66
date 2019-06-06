@@ -1,85 +1,61 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Bill;
-import com.ra.janus.developersteam.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 class PlainJdbcBillDAOMockTest {
-    private static final String INSERT_SQL = "INSERT INTO bills (docDate) VALUES (?)";
-    private static final String UPDATE_SQL = "UPDATE bills SET docDate=? WHERE id=?";
+    private static final String INSERT_SQL = "INSERT INTO bills (docdate) VALUES (?)";
+    private static final String UPDATE_SQL = "UPDATE bills SET docdate=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM bills";
     private static final String SELECT_ONE_SQL = "SELECT * FROM bills WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM bills WHERE id=?";
     private static final long TEST_ID = 1L;
     private static final Bill TEST_BILL = new Bill(TEST_ID, new Date(System.currentTimeMillis()));
 
-    private JdbcTemplate template = mock(JdbcTemplate.class);
+    private JdbcTemplate mockTemplate = mock(JdbcTemplate.class);
+    private KeyHolder mockKeyHolder = mock(KeyHolder.class);
+    private PreparedStatementCreator mockPSC = mock(PreparedStatementCreator.class);
 
     private PlainJdbcBillDAO billDAO;
 
-//    @BeforeEach
-//    void before() throws Exception {
-//        billDAO = new PlainJdbcBillDAO(template);
-//        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-//        when(mockResultSet.next()).thenReturn(false);
-//        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-//        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
-//    }
-//
-//    @Test
-//    void whenCreateBillShouldReturnBill() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-//        when(mockResultSet.next()).thenReturn(true);
-//        when(mockResultSet.getLong(1)).thenReturn(TEST_ID);
-//
-//        //when
-//        Bill bill = billDAO.create(TEST_BILL);
-//
-//        //then
-//        assertEquals(TEST_BILL, bill);
-//    }
-//
-//    @Test
-//    void whenCreateBillShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-//
-//        //when
-//        final Executable executable = () -> billDAO.create(TEST_BILL);
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
-//
-//    @Test
-//    void whenCreateBillShouldThrowException() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
-//
-//        //when
-//        final Executable executable = () -> billDAO.create(TEST_BILL);
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
+    @BeforeEach
+    void before() throws Exception {
+        billDAO = new PlainJdbcBillDAO(mockTemplate);
+        when(mockTemplate.update(any(PreparedStatementCreator.class), any(KeyHolder.class))).thenAnswer(
+                new Answer() {
+                    public Object answer(InvocationOnMock invocation) {
+                        Object[] args = invocation.getArguments();
+                        KeyHolder holder = (KeyHolder) args[1];
+                        Map<String, Object> map = new HashMap<>(1);
+                        map.put("something like a generated key", Long.valueOf(1L));
+                        holder.getKeyList().add(map);
+                        return 1;
+                    }
+                });
+    }
+
+    //
+    @Test
+    void whenCreateBillShouldReturnBill() throws Exception {
+        //when
+        Bill bill = billDAO.create(TEST_BILL);
+
+        //then
+        assertEquals(TEST_BILL, bill);
+    }
 //
 //    //==============================
 //

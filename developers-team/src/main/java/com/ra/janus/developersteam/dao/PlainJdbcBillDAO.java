@@ -26,9 +26,6 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
     private static final String SELECT_ONE_SQL = "SELECT * FROM bills WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM bills WHERE id=?";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcBillDAO.class);
-    private static final String EXCEPTION_WARN = "An exception occurred!";
-
     transient private final JdbcTemplate jdbcTemplate;
 
     public PlainJdbcBillDAO(final JdbcTemplate jdbcTemplate) {
@@ -52,7 +49,7 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
     public Bill get(final long id) {
         try {
         return jdbcTemplate.queryForObject(SELECT_ONE_SQL,
-                new Object[]{id}, BeanPropertyRowMapper.newInstance(Bill.class));}
+                BeanPropertyRowMapper.newInstance(Bill.class), id);}
         catch (EmptyResultDataAccessException e) {
             return null;
         }
