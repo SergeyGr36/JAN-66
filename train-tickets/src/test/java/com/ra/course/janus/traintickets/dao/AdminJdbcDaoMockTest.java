@@ -43,6 +43,7 @@ class AdminJdbcDaoMockTest {
     public void before() throws SQLException {
         adminDao = new AdminJdbcDao(mockDataSource);
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
     }
 
     @Test
@@ -51,7 +52,6 @@ class AdminJdbcDaoMockTest {
         when(mockConnection.prepareStatement(SAVE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong(COLUM_ID)).thenReturn(ID_TEST);
         assertNotSame(adminDao.save(ADMIN_TEST), ADMIN_TEST);
     }
     
@@ -124,7 +124,6 @@ class AdminJdbcDaoMockTest {
     public void whenCallMethodFindByIdThanReturnObject() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         getingDataFromResultSet();
         assertEquals(ADMIN_ID, adminDao.findById(ADMIN_ID).getId());
@@ -134,7 +133,6 @@ class AdminJdbcDaoMockTest {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         mockPreparedStatement.setLong(1, ID_TEST);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         assertThrows(DAOException.class, ()->adminDao.findById(ID_TEST));
     }
@@ -144,7 +142,6 @@ class AdminJdbcDaoMockTest {
 
         when(mockConnection.prepareStatement(SELECT_BY_ID)).thenReturn(mockPreparedStatement);
         mockPreparedStatement.setLong(1, ID_TEST);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         exeptions();
         assertThrows(DAOException.class, ()-> adminDao.findById(ID_TEST));
@@ -154,7 +151,6 @@ class AdminJdbcDaoMockTest {
     public void whenCallMethodFindAllInDbThenReturnNonEmptyList() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         getingDataFromResultSet();
         assertFalse(adminDao.findAll().isEmpty());
@@ -163,7 +159,6 @@ class AdminJdbcDaoMockTest {
     @Test
     public void whenFindAllInDbThenReturnEmptyList() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
         assertEquals(Collections.emptyList(), adminDao.findAll());
     }
@@ -171,9 +166,7 @@ class AdminJdbcDaoMockTest {
     public void whenCallMethodFindAllInDbThenThrowExceptions() throws SQLException {
 
         when(mockConnection.prepareStatement(SELECT_ALL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        getingDataFromResultSet();
         exeptions();
         assertThrows(DAOException.class, ()-> adminDao.findAll());
     }
