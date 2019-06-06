@@ -33,41 +33,58 @@ public class AdminJdbcDaoIntegrationTest {
         adminDao = new AdminJdbcDao(DATA_SOURCE);
     }
 
+    // Test save Admin--------------------------------------------------------------------
     @Test
     public void whenSaveObjectFirstTimeReturnIdOne() {
+        // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
+        // then
         assertNotNull(saveAdmin1.getId());
     }
 
+    // Test update Admin------------------------------------------------------------------
     @Test
     public void whenCallUpdateObjectSuccessfullyCompleted(){
+        // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final Long ID = saveAdmin1.getId();
         adminDao.update(ID, TEST_ADMIN);
         Admin byId = adminDao.findById(ID);
+        // then
         assertNotEquals(byId, saveAdmin1);
     }
+
+    // Test delete Admin------------------------------------------------------------------
     @Test
     public void deleteObjectFromDb(){
+        // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
+        // then
         assertTrue(adminDao.delete(saveAdmin1.getId()));
     }
+
+    // Test findById Admin----------------------------------------------------------------
     @Test
     public void findByIdObjectInDb(){
+        // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final long id = saveAdmin1.getId();
+        // then
         assertNotNull(adminDao.findById(id));
     }
 
+    // Test findAll Admins----------------------------------------------------------------
     @Test
     public void findAllObjectsInDb(){
-
+        // when
         adminDao.save(ADMIN);
         adminDao.save(ADMIN);
         List<Admin> all = adminDao.findAll();
+        // then
         assertEquals(all.size(), 2);
     }
 
+    //------------------------------------------------------------------------------------
     private static void createTable() throws SQLException, IOException {
         try (Connection conn = DATA_SOURCE.getConnection()) {
            conn.createStatement().execute(Files.readAllLines(Paths.get(FILE_PATH)).stream()
