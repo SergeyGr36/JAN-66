@@ -3,17 +3,19 @@ package com.ra.janus.developersteam.dao;
 import com.ra.janus.developersteam.entity.Bill;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PlainJdbcBillDAOMockTest {
@@ -40,14 +42,14 @@ class PlainJdbcBillDAOMockTest {
                         Object[] args = invocation.getArguments();
                         KeyHolder holder = (KeyHolder) args[1];
                         Map<String, Object> map = new HashMap<>(1);
-                        map.put("something like a generated key", Long.valueOf(1L));
+                        map.put("Something like a generated key", Long.valueOf(1L));
                         holder.getKeyList().add(map);
                         return 1;
                     }
                 });
     }
 
-    //
+
     @Test
     void whenCreateBillShouldReturnBill() throws Exception {
         //when
@@ -56,60 +58,51 @@ class PlainJdbcBillDAOMockTest {
         //then
         assertEquals(TEST_BILL, bill);
     }
-//
-//    //==============================
-//
-//    @Test
-//    void whenReadBillFromDbByIdThenReturnIt() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-//        when(mockResultSet.getLong("id")).thenReturn(TEST_ID);
-//
-//        //when
-//        Bill bill = billDAO.get(TEST_ID);
-//
-//        //then
-//        assertEquals(TEST_ID, bill.getId());
-//    }
-//
-//    @Test
-//    void whenReadAbsentBillFromDbByIdThenReturnNull() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockResultSet.next()).thenReturn(false);
-//
-//        //when
-//        Bill bill = billDAO.get(TEST_ID);
-//
-//        //then
-//        assertNull(bill);
-//    }
-//
-//    @Test
-//    void whenReadBillFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
-//
-//        //when
-//        final Executable executable = () -> billDAO.get(TEST_ID);
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
-//
-//    @Test
-//    void whenReadAllBillsFromDbThenReturnNonEmptyList() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-//
-//        //when
-//        List<Bill> list = billDAO.getAll();
-//
-//        //then
-//        assertFalse(list.isEmpty());
-//    }
+
+    //==============================
+
+    @Test
+    void whenReadBillFromDbByIdThenReturnIt() throws Exception {
+        //given
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenReturn(TEST_BILL);
+
+        //when
+        Bill bill = billDAO.get(TEST_ID);
+
+        //then
+        assertEquals(TEST_ID, bill.getId());
+    }
+
+    @Test
+    void whenReadAbsentBillFromDbByIdThenReturnNull() throws Exception {
+        //given
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenThrow(new EmptyResultDataAccessException(1));
+
+        //when
+        Bill bill = billDAO.get(TEST_ID);
+
+        //then
+        assertEquals(null, bill);
+    }
+
+    @Test
+    void whenReadAllBillsFromDbThenReturnNonEmptyList() throws Exception {
+        //given
+        Map<String, Object> testMap = new HashMap<>(1);
+        testMap.put("id", TEST_BILL.getId());
+        testMap.put("docdate", TEST_BILL.getDocDate());
+        List<Map<String, Object>> rows = new ArrayList<>();
+        rows.add(testMap);
+        when(mockTemplate.queryForList(SELECT_ALL_SQL)).thenReturn(rows);
+
+        //when
+        List<Bill> list = billDAO.getAll();
+
+        //then
+        assertFalse(list.isEmpty());
+    }
 //
 //    @Test
 //    void whenReadAllBillsFromDbThenThrowException() throws Exception {

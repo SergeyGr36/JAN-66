@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class PlainJdbcBillDAO implements BaseDao<Bill> {
     private static final String INSERT_SQL = "INSERT INTO bills (docdate) VALUES (?)";
     private static final String UPDATE_SQL = "UPDATE bills SET docdate=? WHERE id=?";
-    private static final String SELECT_ALL_SQL = "SELECT id, docdate FROM bills";
+    private static final String SELECT_ALL_SQL = "SELECT * FROM bills";
     private static final String SELECT_ONE_SQL = "SELECT * FROM bills WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM bills WHERE id=?";
 
