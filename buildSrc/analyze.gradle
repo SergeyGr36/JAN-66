@@ -21,6 +21,12 @@ pmd {
     ruleSetFiles = rootProject.files('buildSrc/pmd/pmd_checks.xml')
 }
 
+spotbugs {
+    toolVersion = '3.1.12'
+    effort = "max"
+    reportLevel = "high"
+}
+
 jdepend {
     toolVersion = "2.9.1"
     sourceSets = [sourceSets.main]
@@ -94,6 +100,7 @@ jacocoTestCoverageVerification {
 test {
     useJUnitPlatform()
 }
+
 
 check.dependsOn jacocoTestCoverageVerification
 test.finalizedBy jacocoTestReport
