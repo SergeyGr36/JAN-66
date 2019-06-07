@@ -4,10 +4,7 @@ import com.ra.course.janus.faculty.entity.Teacher;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +19,11 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
 
     private final DataSource dataSource;
 
-    PlainJDBCTeacherDao(DataSource dataSource) {
+    public PlainJDBCTeacherDao(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    Teacher toTeacher(ResultSet resultSet) throws SQLException {
+    private Teacher toTeacher(ResultSet resultSet) throws SQLException {
         return new Teacher(resultSet.getLong("id"), resultSet.getString("name"), resultSet.getString("course"));
     }
 

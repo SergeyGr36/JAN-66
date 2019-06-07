@@ -57,5 +57,7 @@ project(':faculty') {
 }
 
 project(':facultyIntegrationTests') {
-
+    dependencies {
+        compile project(':faculty')
+    }
 }

@@ -20,7 +20,7 @@ class PlainJDBCTeacherDaoTest {
     private static final String INSERT = "INSERT INTO TEACHER (ID, NAME, COURSE) VALUES (?, ?, ?)";
     private static final String UPDATE = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT = "SELECT * FROM TEACHER";
-    private static final String DELETE = "DELETE FROM TEACHER";
+    private static final String DELETE = "DELETE FROM TEACHER WHERE ID = ?";
 
     private Teacher teacher;
     private Connection mockConnection;
@@ -101,7 +101,7 @@ class PlainJDBCTeacherDaoTest {
         int rows = 1;
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
-        boolean isDeleted = mockTeacherDao.delete();
+        boolean isDeleted = mockTeacherDao.delete(1);
         assertTrue(isDeleted);
     }
 
@@ -110,7 +110,7 @@ class PlainJDBCTeacherDaoTest {
         int rows = 0;
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
-        boolean isDeleted = mockTeacherDao.delete();
+        boolean isDeleted = mockTeacherDao.delete(1);
         assertFalse(isDeleted);
     }
 
@@ -118,7 +118,7 @@ class PlainJDBCTeacherDaoTest {
     void whenCalledDeleteThenThrowException() throws SQLException {
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
-        Executable executable = () -> mockTeacherDao.delete();
+        Executable executable = () -> mockTeacherDao.delete(1);
         assertThrows(RuntimeException.class, executable);
     }
 

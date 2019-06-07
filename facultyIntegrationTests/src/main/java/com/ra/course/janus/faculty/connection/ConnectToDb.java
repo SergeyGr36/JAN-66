@@ -4,17 +4,16 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
-
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-final class ConnectToDb {
+public final class ConnectToDb {
     private ConnectToDb() {}
 
-    private final static String file = "C:/Users/User/Desktop/projects/Java/Hillel/janus/faculty/src/main/resources/config.properties";
+    private final static String file = "C:\\Users\\User\\Desktop\\projects\\Java\\Hillel\\janus\\facultyIntegrationTests\\src\\test\\resources\\config.properties";
     private final static Properties properties = new Properties();
     private final static HikariConfig hikariConfig = new HikariConfig();
 
@@ -29,7 +28,7 @@ final class ConnectToDb {
         hikariConfig.setPassword(properties.getProperty("db.password"));
     }
 
-    static DataSource getDataSource() throws IOException {
+    public static DataSource getDataSource() throws IOException {
         loadProperties();
         initDataSource();
         return new HikariDataSource(hikariConfig);
