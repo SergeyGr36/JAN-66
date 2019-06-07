@@ -4,12 +4,13 @@ import com.ra.janus.developersteam.entity.Bill;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,11 +35,14 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public Bill create(final Bill bill) {
         final KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            final PreparedStatement ps = connection
-                    .prepareStatement(INSERT_SQL);
-            ps.setDate(1, bill.getDocDate());
-            return ps;
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(final Connection connection) throws SQLException {
+                final PreparedStatement ps = connection
+                        .prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+                ps.setDate(1, bill.getDocDate());
+                return ps;
+            }
         }, keyHolder);
         final long id = keyHolder.getKey().longValue();
         return new Bill(id, bill);
@@ -68,9 +72,12 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
     @Override
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public boolean update(final Bill bill) {
-        final int rowCount = jdbcTemplate.update(UPDATE_SQL, ps -> {
-            ps.setDate(1, bill.getDocDate());
-            ps.setLong(2, bill.getId());
+        final int rowCount = jdbcTemplate.update(UPDATE_SQL, new PreparedStatementSetter() {
+            @Override
+            public void setValues(final PreparedStatement ps) throws SQLException {
+                ps.setDate(1, bill.getDocDate());
+                ps.setLong(2, bill.getId());
+            }
         });
         return rowCount != 0;
     }
