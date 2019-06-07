@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface DaoStudent {
     Student insert(Student student);
-    boolean update(Student student);
+    Student update(Student student);
 
     boolean delete(Student student);
 
