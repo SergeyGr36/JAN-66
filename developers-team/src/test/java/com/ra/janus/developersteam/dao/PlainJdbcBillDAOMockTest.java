@@ -10,6 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Date;
@@ -36,6 +37,12 @@ class PlainJdbcBillDAOMockTest {
     @BeforeEach
     void before() throws Exception {
         billDAO = new PlainJdbcBillDAO(mockTemplate);
+
+    }
+
+    @Test
+    void whenCreateBillShouldReturnBill() throws Exception {
+        //given
         when(mockTemplate.update(any(PreparedStatementCreator.class), any(KeyHolder.class))).thenAnswer(
                 new Answer() {
                     public Object answer(InvocationOnMock invocation) {
@@ -47,11 +54,7 @@ class PlainJdbcBillDAOMockTest {
                         return 1;
                     }
                 });
-    }
 
-
-    @Test
-    void whenCreateBillShouldReturnBill() throws Exception {
         //when
         Bill bill = billDAO.create(TEST_BILL);
 
@@ -103,92 +106,52 @@ class PlainJdbcBillDAOMockTest {
         //then
         assertFalse(list.isEmpty());
     }
-//
-//    @Test
-//    void whenReadAllBillsFromDbThenThrowException() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
-//
-//        //when
-//        final Executable executable = () -> billDAO.getAll();
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
-//
-//    @Test
-//    void whenUpdateBillInDbThenReturnTrue() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-//
-//        //when
-//        boolean updated = billDAO.update(TEST_BILL);
-//
-//        //then
-//        assertTrue(updated);
-//    }
-//
-//    @Test
-//    void whenUpdateBillInDbThenReturnFalse() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-//
-//        //when
-//        boolean updated = billDAO.update(TEST_BILL);
-//
-//        //then
-//        assertFalse(updated);
-//    }
-//
-//    @Test
-//    void whenUpdateBillInDbThenThrowException() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
-//
-//        //when
-//        final Executable executable = () -> billDAO.update(TEST_BILL);
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
-//
-//    @Test
-//    void whenDeleteBillFromDbThenReturnTrue() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-//
-//        //when
-//        boolean deleted = billDAO.delete(TEST_ID);
-//
-//        //then
-//        assertTrue(deleted);
-//    }
-//
-//    @Test
-//    void whenDeleteBillFromDbThenReturnFalse() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-//        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-//
-//        //when
-//        boolean deleted = billDAO.delete(TEST_ID);
-//
-//        //then
-//        assertFalse(deleted);
-//    }
-//
-//    @Test
-//    void whenDeleteBillFromDbThenThrowException() throws Exception {
-//        //given
-//        when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
-//
-//        //when
-//        final Executable executable = () -> billDAO.delete(TEST_ID);
-//
-//        //then
-//        assertThrows(DAOException.class, executable);
-//    }
+
+    @Test
+    void whenUpdateBillInDbThenReturnTrue() throws Exception {
+        //given
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenReturn(1);
+
+        //when
+        boolean updated = billDAO.update(TEST_BILL);
+
+        //then
+        assertTrue(updated);
+    }
+
+    @Test
+    void whenUpdateBillInDbThenReturnFalse() throws Exception {
+        //given
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenReturn(0);
+
+        //when
+        boolean updated = billDAO.update(TEST_BILL);
+
+        //then
+        assertFalse(updated);
+    }
+
+    @Test
+    void whenDeleteBillFromDbThenReturnTrue() throws Exception {
+        //given
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(1);
+
+        //when
+        boolean deleted = billDAO.delete(TEST_ID);
+
+        //then
+        assertTrue(deleted);
+    }
+
+    @Test
+    void whenDeleteBillFromDbThenReturnFalse() throws Exception {
+        //given
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(0);
+
+        //when
+        boolean deleted = billDAO.delete(TEST_ID);
+
+        //then
+        assertFalse(deleted);
+    }
 }
