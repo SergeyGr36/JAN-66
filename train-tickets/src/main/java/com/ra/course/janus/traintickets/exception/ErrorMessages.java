@@ -5,7 +5,8 @@ public enum ErrorMessages {
     UPDATE_FAILED("Update failed"),
     DELETE_FAILED("Delete failed"),
     FIND_FAILED("Find by id failed"),
-    FINDALL_FAILED("Find all failed!");
+    FINDALL_FAILED("Find all failed!"),
+    CONFIG_FAILED("Failed to read configuration properties");
 
     private final String message;
 

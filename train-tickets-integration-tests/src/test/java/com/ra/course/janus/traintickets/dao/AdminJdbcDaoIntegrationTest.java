@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class AdminJdbcDaoIntegrationTest {
 
     private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
@@ -29,8 +28,9 @@ public class AdminJdbcDaoIntegrationTest {
         createTable();
     }
     @BeforeEach
-    public void setUp()  {
+    public void setUp() throws SQLException {
         adminDao = new AdminJdbcDao(DATA_SOURCE);
+        clearAdminsTable();
     }
 
     // Test save Admin--------------------------------------------------------------------
@@ -47,9 +47,9 @@ public class AdminJdbcDaoIntegrationTest {
     public void whenCallUpdateObjectSuccessfullyCompleted(){
         // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
-        final Long ID = saveAdmin1.getId();
-        adminDao.update(ID, TEST_ADMIN);
-        Admin byId = adminDao.findById(ID);
+        final Long id = saveAdmin1.getId();
+        adminDao.update(id, TEST_ADMIN);
+        Admin byId = adminDao.findById(id);
         // then
         assertNotEquals(byId, saveAdmin1);
     }
@@ -91,8 +91,8 @@ public class AdminJdbcDaoIntegrationTest {
                    .collect(Collectors.joining("")));
         }
     }
-    @AfterEach
-    public void clearTable () throws SQLException, IOException {
+
+    private static void clearAdminsTable() throws SQLException {
         try (Connection conn = DATA_SOURCE.getConnection()) {
             conn.createStatement().execute("TRUNCATE TABLE ADMIN");
         }
