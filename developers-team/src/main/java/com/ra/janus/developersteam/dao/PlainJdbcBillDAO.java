@@ -69,7 +69,6 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
     @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public boolean update(final Bill bill) {
         final int rowCount = jdbcTemplate.update(UPDATE_SQL, ps -> {
-            //prepareStatement(ps, bill);
             ps.setDate(1, bill.getDocDate());
             ps.setLong(2, bill.getId());
         });
@@ -81,13 +80,4 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
         final int rowCount = jdbcTemplate.update(DELETE_SQL, id);
         return rowCount != 0;
     }
-//
-//    private Bill toBill(final ResultSet rs) throws SQLException {
-//        return new Bill(rs.getLong("id"),
-//                rs.getDate("docDate"));
-//    }
-
-//    private void prepareStatement(final PreparedStatement ps, final Bill bill) throws SQLException {
-//        ps.setDate(1, bill.getDocDate());
-//    }
 }
