@@ -1,8 +1,7 @@
 package com.ra.course.janus.faculty.dao;
-import com.ra.course.janus.faculty.DaoException;
 import com.ra.course.janus.faculty.entity.Student;
 import org.apache.log4j.Logger;
-import javax.sql.DataSource;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

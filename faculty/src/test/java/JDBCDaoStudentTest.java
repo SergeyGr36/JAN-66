@@ -1,6 +1,6 @@
-import com.ra.course.janus.faculty.DaoException;
 import com.ra.course.janus.faculty.dao.JDBCDaoStudent;
 import com.ra.course.janus.faculty.entity.Student;
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
