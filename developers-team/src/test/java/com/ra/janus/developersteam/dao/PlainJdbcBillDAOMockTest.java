@@ -2,6 +2,7 @@ package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Bill;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.invocation.InvocationOnMock;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.KeyHolder;
 
+import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
@@ -29,24 +31,28 @@ class PlainJdbcBillDAOMockTest {
     private static final Bill TEST_BILL = new Bill(TEST_ID, new Date(System.currentTimeMillis()));
 
     private JdbcTemplate mockTemplate = mock(JdbcTemplate.class);
-    private KeyHolder mockKeyHolder = mock(KeyHolder.class);
-    private PreparedStatementCreator mockPSC = mock(PreparedStatementCreator.class);
+    private Connection mockConnection = mock(Connection.class);
+    private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
 
     private PlainJdbcBillDAO billDAO;
 
     @BeforeEach
     void before() throws Exception {
         billDAO = new PlainJdbcBillDAO(mockTemplate);
-
     }
 
     @Test
     void whenCreateBillShouldReturnBill() throws Exception {
         //given
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS))
+                .thenReturn(mockPreparedStatement);
         when(mockTemplate.update(any(PreparedStatementCreator.class), any(KeyHolder.class))).thenAnswer(
                 new Answer() {
-                    public Object answer(InvocationOnMock invocation) {
+                    public Object answer(InvocationOnMock invocation) throws SQLException {
                         Object[] args = invocation.getArguments();
+                        PreparedStatementCreator creator = (PreparedStatementCreator) args[0];
+                        creator.createPreparedStatement(mockConnection);
+
                         KeyHolder holder = (KeyHolder) args[1];
                         Map<String, Object> map = new HashMap<>(1);
                         map.put("Something like a generated key", Long.valueOf(1L));
@@ -110,7 +116,15 @@ class PlainJdbcBillDAOMockTest {
     @Test
     void whenUpdateBillInDbThenReturnTrue() throws Exception {
         //given
-        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenReturn(1);
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                PreparedStatementSetter setter = (PreparedStatementSetter) args[1];
+                setter.setValues(mockPreparedStatement);
+                return 1;
+            }
+        });
 
         //when
         boolean updated = billDAO.update(TEST_BILL);
