@@ -1,9 +1,8 @@
 package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.connect.ConnectionUtil;
-import com.ra.course.janus.faculty.dao.PlainJDBCTeacherDao;
-import com.ra.course.janus.faculty.dao.TeacherDao;
 import com.ra.course.janus.faculty.entity.Teacher;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +32,7 @@ class PlainJDBCTeacherDaoIntegrationTest {
     @Test
     void insertTest() {
         Teacher teacher = TEACHER_DAO.insert(TEACHER_INSERT);
-        assertEquals(teacher, TEACHER_INSERT);
+        Assertions.assertEquals(teacher, TEACHER_INSERT);
     }
 
     @Test

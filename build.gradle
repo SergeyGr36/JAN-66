@@ -83,8 +83,6 @@ project(':developers-team-integration-tests') {
 project(':faculty') {
     dependencies {
         compile db.h2
-        compile testing.junit5Platform
-        compile testing.mockito
         compile spring.context
         compile log.log4jDependency
         compile hibernate.hikari
