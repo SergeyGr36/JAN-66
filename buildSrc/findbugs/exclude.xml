@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<FindBugsFilter>
-    <Match>
-        <Bug pattern="NP_OPTIONAL_RETURN_NULL"/>
-    </Match>
-    <Match>
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
-    </Match>
-</FindBugsFilter>
