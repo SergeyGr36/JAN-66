@@ -80,3 +80,15 @@ project(':developers-team-integration-tests') {
         compile project(':developers-team')
     }
 }
+project(':train-tickets') {
+    dependencies {
+        compile db.h2
+        compile hibernate.hikari
+    }
+}
+
+project(':train-tickets-integration-tests') {
+    dependencies {
+        compile project(':train-tickets')
+    }
+}
