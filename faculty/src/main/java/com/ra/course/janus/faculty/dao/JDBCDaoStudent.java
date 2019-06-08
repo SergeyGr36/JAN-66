@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class JDBCDaoStudent implements DaoStudent {
     private static final String INSERT_SQL = "INSERT INTO STUDENT (CODE,DESCRIPTION) VALUES (?, ?)";
-    private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=?,WHERE STUDENT_ID=?";
+    private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=? WHERE ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM STUDENT";
     private static final String SELECT_ONE_SQL = "SELECT * FROM STUDENT WHERE ID= ?";
     private static final String DELETE_SQL = "DELETE FROM STUDENT WHERE ID=?";
@@ -57,7 +57,7 @@ public class JDBCDaoStudent implements DaoStudent {
 
                 ps.setString(1, student.getCode());
                 ps.setString(2, student.getDescription());
-                ps.setLong(1, student.getId());
+                ps.setLong(3, student.getId());
                 return ps.executeUpdate() > 0 ? true : false;
             }
         } catch (SQLException e) {
@@ -125,7 +125,7 @@ public class JDBCDaoStudent implements DaoStudent {
 
     private Student toStudent (final ResultSet rs) throws SQLException{
         final Student result = new Student();
-        result.setId(rs.getLong("STUDENT_ID"));
+        result.setId(rs.getLong("ID"));
         result.setCode(rs.getString("CODE"));
         result.setDescription(rs.getString("DESCRIPTION"));
         return result;

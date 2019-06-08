@@ -45,7 +45,7 @@ wrapper {
     version = '5.4.1'
 }
 
-project('faculty'){
+project(':faculty'){
     dependencies{
         compile log.log4jDependency
         compile log.log4jExtras
@@ -65,7 +65,7 @@ project('faculty'){
     }
 
 
-project('faculty-integration-tests') {
+project(':faculty-integration-tests') {
     dependencies {
 
 

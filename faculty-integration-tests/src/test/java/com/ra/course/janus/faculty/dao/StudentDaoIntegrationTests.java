@@ -41,6 +41,7 @@ public class StudentDaoIntegrationTests {
     void findAllWhenNotExists() {
         List<Student> students = studentDao.findAll();
         for (Student s : students){
+            studentDao.delete(s);
         }
         assertEquals(0,studentDao.findAll().size());
     }
@@ -94,7 +95,7 @@ public class StudentDaoIntegrationTests {
         s = studentDao.insert(s);
         s.setDescription("Test update when exists - updated");
         s.setId((s.getId()+1));
-        assertNull(studentDao.update(s));
+        assertFalse(studentDao.update(s));
 
     }
 

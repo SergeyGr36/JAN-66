@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 public class JDBCDaoStudentTest  {
     private static final String INSERT_SQL = "INSERT INTO STUDENT (CODE,DESCRIPTION) VALUES (?, ?)";
-    private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=?,WHERE STUDENT_ID=?";
+    private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=? WHERE ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM STUDENT";
     private static final String SELECT_ONE_SQL = "SELECT * FROM STUDENT WHERE ID= ?";
     private static final String DELETE_SQL = "DELETE FROM STUDENT WHERE ID=?";
@@ -144,7 +144,7 @@ public class JDBCDaoStudentTest  {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong("STUDENT_ID")).thenReturn(1L);
+        when(mockResultSet.getLong("ID")).thenReturn(1L);
         assertEquals(1, daoStudent.findByStudentId(1).getId());
     }
 
