@@ -38,6 +38,12 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
+        testCompile testing.mockito
+        compile log.log4j2Api
+        compile log.log4jCore
+        compile log.logbackCore
+        compile log.logbackClassic
+        compile log.slf4jApi
     }
 }
 
@@ -45,6 +51,35 @@ wrapper {
     version = '5.4.1'
 }
 
+project(":hotel") {
+    dependencies {
+        compile db.h2
+        compileOnly utils.lombok
+        annotationProcessor 'org.projectlombok:lombok:1.18.8'
+        compile hibernate.hikari
+        compile spring.context
+        compile spring.jdbc
+    }
+}
+
+project(":hotel-integration-test") {
+    dependencies {
+        compile project(":hotel")
+    }
+}
+
+project(':developers-team') {
+    dependencies {
+        compile db.h2
+        compile hibernate.hikari
+    }
+}
+
+project(':developers-team-integration-tests') {
+    dependencies {
+        compile project(':developers-team')
+    }
+}
 project(':faculty') {
     dependencies {
         compile db.h2
