@@ -38,7 +38,7 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
-        
+
         testCompile testing.mockito
 
         compile log.logbackCore
