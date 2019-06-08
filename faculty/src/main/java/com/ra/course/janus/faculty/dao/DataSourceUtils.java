@@ -17,7 +17,7 @@ public class DataSourceUtils {
     private DataSourceUtils() {
     }
 
-    private static void loadProperties()  {
+    private static void loadProperties(){
         try {
             DB_PROPERTIES.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(CONFIG_FILE)));
         }
