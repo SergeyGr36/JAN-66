@@ -13,6 +13,4 @@ class ConnectionUtilTest {
         DataSource dataSource = ConnectionUtil.getDataSource();
         assertTrue(dataSource instanceof HikariDataSource);
     }
-
-
 }
