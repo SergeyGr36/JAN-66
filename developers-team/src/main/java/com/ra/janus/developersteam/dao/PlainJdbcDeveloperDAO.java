@@ -4,12 +4,14 @@ import com.ra.janus.developersteam.entity.Developer;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
     private static final String EXCEPTION_WARN = "An exception occurred!";
     private static final String INSERT_SQL = "INSERT INTO developers (name) VALUES (?)";

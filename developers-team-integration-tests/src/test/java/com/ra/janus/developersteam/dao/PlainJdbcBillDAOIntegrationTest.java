@@ -1,10 +1,11 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.config.DAOConfiguration;
 import com.ra.janus.developersteam.entity.Bill;
 import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -12,14 +13,21 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {DAOConfiguration.class})
 public class PlainJdbcBillDAOIntegrationTest {
+    @Autowired
+    private DataSource dataSource;
+    @Autowired
+    private BaseDao<Bill> billDAO;
 
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Bill> billDAO = new PlainJdbcBillDAO(dataSource);
-
-    private static Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
+    private Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
 
     @BeforeEach
     public void beforeEach() throws Exception {
