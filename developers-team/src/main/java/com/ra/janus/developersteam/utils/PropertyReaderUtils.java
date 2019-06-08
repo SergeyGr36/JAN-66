@@ -8,7 +8,7 @@ import java.util.Properties;
  * PropertyReaderUtils
  * <p>
  * Can work with many property files.
- * Default properties file is "config.properties"
+ * Default properties file is "configuration.properties"
  */
 public final class PropertyReaderUtils{
 
