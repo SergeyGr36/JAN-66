@@ -6,7 +6,7 @@ public interface IJdbcDao<T> {
 
     T save(T item);
 
-    boolean update(Long id, T item);
+    boolean update(T item);
 
     boolean delete(Long id);
 
