@@ -1,5 +1,5 @@
 rootProject.name = 'janus'
-rootProject.name = 'janus'
-include 'faculty'
-include 'faculty-integration-tests'
-
+include 'hotel'
+include 'hotel-integration-test'
+include 'developers-team'
+include 'developers-team-integration-tests'
