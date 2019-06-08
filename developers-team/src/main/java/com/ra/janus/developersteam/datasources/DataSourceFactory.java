@@ -1,43 +1,37 @@
 package com.ra.janus.developersteam.datasources;
 
-import com.ra.janus.developersteam.utils.PropertyReaderUtils;
+import com.ra.janus.developersteam.configuration.DBProperties;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Properties;
 
-final public class DataSourceFactory {
+@Component
+public class DataSourceFactory {
 
-    final private static HikariConfig CONFIG = new HikariConfig();
+    private final transient DBProperties dbProperties;
 
-    final private static String DB_URL = "db.url";
-    final private static String DB_USER = "db.username";
-    final private static String DB_PASS = "db.password";
-
-    private DataSourceFactory() {
+    @Autowired
+    public DataSourceFactory(final DBProperties dbProperties) {
+        this.dbProperties = dbProperties;
     }
 
-    public static DataSource get() {
-            initConfig();
-            return new HikariDataSource(CONFIG);
+    public DataSource get() {
+            return new HikariDataSource(getHikariConfig());
     }
 
-    private static void initConfig() {
+    private HikariConfig getHikariConfig() {
 
-        try {
-            final Properties properties = PropertyReaderUtils.getProperties("config.properties");
-
-            CONFIG.setJdbcUrl(properties.getProperty(DB_URL));
-            CONFIG.setUsername(properties.getProperty(DB_USER));
-            CONFIG.setPassword(properties.getProperty(DB_PASS));
-            CONFIG.addDataSourceProperty("cachePrepStmts", "true");
-            CONFIG.addDataSourceProperty("prepStmtCacheSize", "250");
-            CONFIG.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        } catch (IOException e) {
-            throw new IllegalStateException("Could not read the application properties file.", e);
-        }
+        final HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(dbProperties.url);
+        hikariConfig.setUsername(dbProperties.username);
+        hikariConfig.setPassword(dbProperties.password);
+        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        return hikariConfig;
     }
 }
 
