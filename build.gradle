@@ -91,7 +91,7 @@ project(':faculty') {
     }
 }
 
-project(':facultyIntegrationTests') {
+project(':faculty-integration-tests') {
     dependencies {
         compile project(':faculty')
     }

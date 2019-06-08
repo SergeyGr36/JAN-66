@@ -1,7 +1,7 @@
 package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Teacher;
-import com.ra.course.janus.faculty.exceptions.DAOExceptions;
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
@@ -20,6 +20,11 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
     private static final String UPDATE_TEACHER = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT_TEACHER = "SELECT * FROM TEACHER";
     private static final String DELETE_TEACHER = "DELETE FROM TEACHER WHERE ID = ?";
+
+    private static final String INSERT_ERR = "Error inserting Teacher";
+    private static final String UPDATE_ERR = "Error updating Teacher";
+    private static final String DELETE_ERR = "Error deleting Teacher";
+    private static final String FIND_ERR = "Error finding Teacher";
 
     transient private final DataSource dataSource;
 
@@ -47,7 +52,7 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
             return new Teacher(teacher);
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DAOExceptions(e);
+            throw new DaoException(INSERT_ERR, e);
         }
     }
 
@@ -62,7 +67,7 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
             return rowsCount != 0;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DAOExceptions(e);
+            throw new DaoException(UPDATE_ERR, e);
         }
     }
 
@@ -79,7 +84,7 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
             return list;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DAOExceptions(e);
+            throw new DaoException(FIND_ERR, e);
         }
     }
 
@@ -92,7 +97,7 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
             return rowsCount != 0;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DAOExceptions(e);
+            throw new DaoException(DELETE_ERR, e);
         }
     }
 }

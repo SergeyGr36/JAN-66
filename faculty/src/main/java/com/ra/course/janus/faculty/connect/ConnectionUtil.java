@@ -1,6 +1,6 @@
 package com.ra.course.janus.faculty.connect;
 
-import com.ra.course.janus.faculty.exceptions.DAOExceptions;
+import com.ra.course.janus.faculty.exception.DaoException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.log4j.Logger;
@@ -34,7 +34,7 @@ public final class ConnectionUtil {
             loadProperties();
         } catch (IOException e) {
             LOGGER.error(e);
-            throw new DAOExceptions(e);
+            throw new DaoException("Error loading DB properties",e);
         }
 
         initDataSource();

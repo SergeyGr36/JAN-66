@@ -1,4 +1,4 @@
-package com.ra.janus.faculty.dao;
+package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.connect.ConnectionUtil;
 import com.ra.course.janus.faculty.dao.PlainJDBCTeacherDao;
