@@ -1,9 +1,7 @@
 package com.ra.course.janus.faculty.dao;
 
-import com.ra.course.janus.faculty.DataSource.ConnectionFactory;
+import com.ra.course.janus.faculty.dao.DataSourceUtils;
 import com.ra.course.janus.faculty.entity.Student;
-import com.ra.course.janus.faculty.dao.JDBCDaoStudent;
-import com.ra.course.janus.faculty.dao.DaoStudent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 /*import org.junit.jupiter.api.*;
@@ -11,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;*/
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +23,7 @@ public class StudentDaoIntegrationTests {
 
     @BeforeEach
     public void beforeEach () throws Exception{
-       studentDao = new JDBCDaoStudent((DataSource) ConnectionFactory.getInstance().getConnection());
+       studentDao = new JDBCDaoStudent( DataSourceUtils.getDataSource());
     }
 
     @Test

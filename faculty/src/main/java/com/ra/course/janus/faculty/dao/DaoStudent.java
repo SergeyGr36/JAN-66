@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface DaoStudent {
     Student insert(Student student);
-    Student update(Student student);
+    boolean update(Student student);
 
     boolean delete(Student student);
 
-    Student findByStudentId(int Id);
+    Student findByStudentId(long id);
 
     List<Student> findAll();
 

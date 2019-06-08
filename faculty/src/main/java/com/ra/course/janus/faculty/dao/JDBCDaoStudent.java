@@ -1,53 +1,91 @@
 package com.ra.course.janus.faculty.dao;
 import com.ra.course.janus.faculty.entity.Student;
+import com.ra.course.janus.faculty.exception.DaoException;
 import org.apache.log4j.Logger;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 public class JDBCDaoStudent implements DaoStudent {
-    private static final String INSERT_SQL = "INSERT INTO STUDENT (NAME,SURNAME,ID) VALUES (?, ?, ?)";
-    private static final String UPDATE_SQL = "UPDATE STUDENT SET NAME=?,SURNAME=?,WHERE ID=?";
+    private static final String INSERT_SQL = "INSERT INTO STUDENT (CODE,DESCRIPTION) VALUES (?, ?)";
+    private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=?,WHERE STUDENT_ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM STUDENT";
     private static final String SELECT_ONE_SQL = "SELECT * FROM STUDENT WHERE ID= ?";
     private static final String DELETE_SQL = "DELETE FROM STUDENT WHERE ID=?";
-    private static final String INSERT_ERR = "Error inserting student";
+
+    private static final String INSERT_ERR = "Error inserting Student";
+    private static final String INSERT_ERR_EGT_ID = "Error inserting Student - could not get ID";
     private static final String UPDATE_ERR = "Error updating student";
-    private static final String DELETE_ERR = "Error deleting student";
-    private static final String FIND_ERR = "Error finding student";
+    private static final String DELETE_ERR = "Error deleting Student";
+    private static final String FIND_ERR = "Error finding Student";
 
 
     private final static Logger LOGGER = Logger.getLogger(DaoStudent.class);
- private  transient final Connection connection;
- public JDBCDaoStudent(final Connection connection){
-     this.connection = connection;
- }
+    transient private final DataSource dataSource;
+    public JDBCDaoStudent(final DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
 
     @Override
     public Student insert(final Student student) {
-     try{
-         try (PreparedStatement ps = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)){
-                 ps.setString(1, student.getCode());
-                 ps.setString(2, student.getDescription());
-                 ps.executeUpdate();
-                 try (ResultSet studentId = ps.getGeneratedKeys()) {
-                     studentId.next();
-                     student.setId(studentId.getInt(1));
-                     return student;
-                 }
-             }
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, student.getCode());
+            ps.setString(2, student.getDescription());
+            ps.executeUpdate();
+            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
+                if (generatedKeys.next()) {
+                    final long id = generatedKeys.getLong(1);
+                    return new Student(id, student.getCode(), student.getDescription());
+                } else {
+                    LOGGER.error(INSERT_ERR_EGT_ID);
+                    throw new DaoException(INSERT_ERR_EGT_ID);
+                }
+            }
         } catch (SQLException e) {
             LOGGER.error(INSERT_ERR, e);
             throw new DaoException(INSERT_ERR, e);
         }
     }
-
-@Override
-/*@SuppressWarnings("PMD.CloseResource")*/
-    public Student findByStudentId(final int id) {
+    @Override
+    public boolean update(final Student student) {
         try{
-            final PreparedStatement ps = connection.prepareStatement(SELECT_ONE_SQL);
-            ps.setInt(1, id);
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
+
+                ps.setString(1, student.getCode());
+                ps.setString(2, student.getDescription());
+                ps.setLong(1, student.getId());
+                return ps.executeUpdate() > 0 ? true : false;
+            }
+        } catch (SQLException e) {
+            LOGGER.error(UPDATE_ERR, e);
+            throw new DaoException(UPDATE_ERR, e);
+        }
+    }
+    @Override
+    public boolean delete(final Student student) {
+        try{
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
+                ps.setLong(1, student.getId());
+                return ps.executeUpdate() > 0 ? true : false;
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error(DELETE_ERR, e);
+            throw new DaoException(DELETE_ERR, e);
+        }
+    }
+@Override
+@SuppressWarnings("PMD.CloseResource")
+    public Student findByStudentId(final long id) {
+        try{
+            final Connection conn = dataSource.getConnection();
+            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
+            ps.setLong(1, id);
             final ResultSet rs = ps.executeQuery();
             try{
                 if (rs.next()) {
@@ -67,8 +105,10 @@ public class JDBCDaoStudent implements DaoStudent {
     @Override
     public List<Student> findAll() {
         try{
-        try (PreparedStatement ps = connection.prepareStatement(SELECT_ALL_SQL);
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
              ResultSet rs = ps.executeQuery()) {
+
 
             final List<Student> students = new ArrayList<>();
             while (rs.next()) {
@@ -83,38 +123,9 @@ public class JDBCDaoStudent implements DaoStudent {
     }
 
 
-    @Override
-    public Student update(final Student student) {
-     try{
-        try (PreparedStatement ps = connection.prepareStatement(UPDATE_SQL)) {
-
-            ps.setString(1, student.getCode());
-            ps.setString(2, student.getDescription());
-            ps.setInt(1, student.getId());
-            return ps.executeUpdate() > 0 ? student : null;
-        }
-        } catch (SQLException e) {
-            LOGGER.error(UPDATE_ERR, e);
-            throw new DaoException(UPDATE_ERR, e);
-        }
-    }
-
-    @Override
-    public boolean delete(final Student student) {
-     try{
-        try (PreparedStatement ps = connection.prepareStatement(DELETE_SQL)) {
-            ps.setInt(1, student.getId());
-            return ps.executeUpdate() > 0 ? true : false;
-        }
-        } catch (SQLException e) {
-            LOGGER.error(DELETE_ERR, e);
-            throw new DaoException(DELETE_ERR, e);
-        }
-    }
-
     private Student toStudent (final ResultSet rs) throws SQLException{
         final Student result = new Student();
-        result.setId(rs.getInt("STUDENT_ID"));
+        result.setId(rs.getLong("STUDENT_ID"));
         result.setCode(rs.getString("CODE"));
         result.setDescription(rs.getString("DESCRIPTION"));
         return result;

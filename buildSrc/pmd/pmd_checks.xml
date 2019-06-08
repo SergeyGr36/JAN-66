@@ -372,7 +372,7 @@
     <rule ref="category/java/errorprone.xml/CloseResource">
         <properties>
             <property name="closeTargets" value="" />
-            <property name="types" value="java.sql.Connection,java.sql.Statement,java.sql.ResultSet" />
+            <property name="types" value="java.create_facuty.Connection,java.create_facuty.Statement,java.create_facuty.ResultSet" />
             <property name="closeAsDefaultTarget" value="true" />
         </properties>
     </rule>
