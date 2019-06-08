@@ -28,9 +28,7 @@ final public class DataSourceUtils {
     }
 
     private static void initConfig() {
-            CONFIG.setJdbcUrl(DB_PROPERTIES.getProperty("db.url") +
-                    ";INIT=runscript from 'classpath:scripts/" +
-                    DB_PROPERTIES.getProperty("db.start") + "'");
+            CONFIG.setJdbcUrl(DB_PROPERTIES.getProperty("db.url"));
             CONFIG.setUsername(DB_PROPERTIES.getProperty("db.username"));
             CONFIG.setPassword(DB_PROPERTIES.getProperty("db.password"));
             CONFIG.addDataSourceProperty("cachePrepStmts", "true");
