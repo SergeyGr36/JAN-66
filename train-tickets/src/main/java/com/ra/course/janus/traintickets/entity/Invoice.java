@@ -1,12 +1,14 @@
 package com.ra.course.janus.traintickets.entity;
 
+import java.math.BigDecimal;
+
 public class Invoice {
 	private long id;
-	private double price;
+	private BigDecimal price;
 	private String attributes;
 
 
-	public Invoice(long id, double price, String attributes) {
+	public Invoice(long id, BigDecimal price, String attributes) {
 		super();
 		this.id = id;
 		this.price = price;
@@ -25,12 +27,12 @@ public class Invoice {
 		this.id = id;
 	}
 
-	public double getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(double p) {
-		price = p;
+	public void setPrice(BigDecimal p) {
+		this.price = p;
 	}
 
 	public String getAttributes() {
