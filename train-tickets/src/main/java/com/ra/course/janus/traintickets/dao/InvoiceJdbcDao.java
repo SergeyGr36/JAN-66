@@ -33,7 +33,7 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
     @Override
     public Invoice save(final Invoice item) {
         try (Connection con = ds.getConnection(); PreparedStatement ps = con.prepareStatement(INSERT_INTO)) {
-            ps.setDouble(1, item.getPrice());
+            ps.setBigDecimal(1, item.getPrice());
             ps.setString(2, item.getAttributes());
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -51,10 +51,10 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
     }
 
     @Override
-    public boolean update(final Long id, final Invoice item) {
+    public boolean update(Invoice item) {
         try (Connection con = ds.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(UPDATE_TABLE)) {
-                ps.setDouble(1, item.getPrice());
+                ps.setBigDecimal(1, item.getPrice());
                 ps.setString(2, item.getAttributes());
                 ps.setLong(3, item.getId());
                 return ps.executeUpdate() == 1;
@@ -117,6 +117,6 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
     }
 
     private Invoice createInvoice(final ResultSet rs) throws SQLException {
-        return new Invoice(rs.getLong(1), rs.getDouble(2), rs.getString(3));
+        return new Invoice(rs.getLong(1), rs.getBigDecimal(2), rs.getString(3));
     }
 }

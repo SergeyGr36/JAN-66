@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InvoiceJdbcDaoIntegrationTest {
     private static final DataSource IN_DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String PATH_TO_FILE = "src/test/resources/sql_scripts/invoices_table.sql";
-    private static final Invoice INVOICE_TEST = new Invoice(1, 10, "Something");
+    private static final Invoice INVOICE_TEST = new Invoice(1, new BigDecimal(10), "Something");
     private InvoiceJdbcDao invoiceDAO;
 
 
@@ -51,8 +52,8 @@ public class InvoiceJdbcDaoIntegrationTest {
     @Test
     public void updateInvoiceWhenOkThenReturnTrue() {
         final long id = invoiceDAO.save(INVOICE_TEST).getId();
-        final Invoice expect = new Invoice(id, 5, "sth");
-        assertTrue(invoiceDAO.update(id, expect));
+        final Invoice expect = new Invoice(id, new BigDecimal(10), "sth");
+        assertTrue(invoiceDAO.update(expect));
     }
 
     @Test

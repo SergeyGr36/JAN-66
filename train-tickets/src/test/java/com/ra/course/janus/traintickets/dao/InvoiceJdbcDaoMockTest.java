@@ -87,7 +87,7 @@ class InvoiceJdbcDaoMockTest {
     @Test
     public void testUpdateWhenCantCreatePreparedStatementThenCatchException() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenThrow(new SQLException());
-        Executable ex = () -> invoiceDao.update(ID, invoice);
+        Executable ex = () -> invoiceDao.update(invoice);
         assertThrows(DAOException.class, ex);
     }
     @Test
@@ -113,14 +113,14 @@ class InvoiceJdbcDaoMockTest {
     public void updateInvoiceByIDThenReturnTrue() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        assertTrue(() -> invoiceDao.update(ID, invoice));
+        assertTrue(() -> invoiceDao.update(invoice));
     }
 
     @Test
     public void updateInvoiceByIDThenReturnFalse() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_TABLE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertFalse(() -> invoiceDao.update(ID, invoice));
+        assertFalse(() -> invoiceDao.update(invoice));
     }
 
     @Test
