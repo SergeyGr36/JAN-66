@@ -59,7 +59,7 @@ public class UserJdbcDAOIntegrationTest {
         final Long id = userDAO.save(TEST_USER).getId();
         final User newUser = new User(id, "new_name", "new_mail", "new_pass");
         // when
-        userDAO.update(id, newUser);
+        userDAO.update(newUser);
         final User updatedUser = userDAO.findById(id);
         // then
         assertEquals(newUser, updatedUser);

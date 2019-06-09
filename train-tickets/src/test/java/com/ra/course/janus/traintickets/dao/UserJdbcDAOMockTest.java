@@ -104,7 +104,7 @@ class UserJdbcDAOMockTest {
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(1);
         // then
-        assertTrue(userDAO.update(USER_ID, TEST_USER));
+        assertTrue(userDAO.update(TEST_USER));
     }
 
     @Test
@@ -113,7 +113,7 @@ class UserJdbcDAOMockTest {
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         when(mockPrepSt.executeUpdate()).thenReturn(0);
         //then
-        assertFalse(userDAO.update(USER_ID, TEST_USER));
+        assertFalse(userDAO.update(TEST_USER));
     }
 
     @Test
@@ -122,7 +122,7 @@ class UserJdbcDAOMockTest {
         when(mockConn.prepareStatement(UPDATE_USER)).thenReturn(mockPrepSt);
         doThrow(new SQLException()).when(mockPrepSt).executeUpdate();
         // then
-        assertThrows(DAOException.class, () -> userDAO.update(USER_ID, TEST_USER));
+        assertThrows(DAOException.class, () -> userDAO.update(TEST_USER));
     }
 
     // Test delete-----------------------------------------------------

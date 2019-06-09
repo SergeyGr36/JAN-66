@@ -65,11 +65,11 @@ public class UserJdbcDAO implements IJdbcDao<User> {
     }
 
     @Override
-    public boolean update(final Long id, final User user) {
+    public boolean update(final User user) {
         try (Connection conn = dataSource.getConnection()) {
              try (PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER)) {
                  prepareStatementWithUser(updateStmt, user);
-                 updateStmt.setLong(4, id);
+                 updateStmt.setLong(4, user.getId());
                  return updateStmt.executeUpdate() > 0;
              }
         } catch (SQLException e) {
