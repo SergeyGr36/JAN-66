@@ -47,11 +47,11 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
     }
 
     @Override
-    public boolean update(final Long id, final Train train) {
+    public boolean update(final Train train) {
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement ps = connection.prepareStatement(UPDATE_TRAIN)){
                 trainPrSt(ps,train);
-                ps.setLong(4,id);
+                ps.setLong(4,train.getId());
                 return  ps.executeUpdate() == 1;
             }
         }catch (SQLException e){
