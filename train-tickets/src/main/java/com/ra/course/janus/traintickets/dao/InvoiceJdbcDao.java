@@ -51,7 +51,7 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
     }
 
     @Override
-    public boolean update(Invoice item) {
+    public boolean update(final Invoice item) {
         try (Connection con = ds.getConnection()) {
             try (PreparedStatement ps = con.prepareStatement(UPDATE_TABLE)) {
                 ps.setBigDecimal(1, item.getPrice());
