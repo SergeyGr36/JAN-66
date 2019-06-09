@@ -80,6 +80,7 @@ project(':developers-team-integration-tests') {
         compile project(':developers-team')
     }
 }
+
 project(':faculty') {
     dependencies {
         compile db.h2
