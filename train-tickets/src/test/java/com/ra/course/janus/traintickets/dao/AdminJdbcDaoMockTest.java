@@ -24,7 +24,7 @@ class AdminJdbcDaoMockTest {
     private static final String ADMIN_LASTNAME = "Hreits";
     private static final String PASSWORD = "romanHreits";
 
-    private static final Admin ADMIN_TEST = new Admin(0, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
+    private static final Admin ADMIN_TEST = new Admin(ADMIN_ID, ADMIN_NAME, ADMIN_LASTNAME, PASSWORD);
     private static final Long ID_TEST = 5L;
 
     private static final int COLUM_ID = 1;
@@ -85,7 +85,7 @@ class AdminJdbcDaoMockTest {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         // then
-        assertTrue(adminDao.update(ID_TEST, ADMIN_TEST));
+        assertTrue(adminDao.update(ADMIN_TEST));
     }
 
     @Test
@@ -94,7 +94,7 @@ class AdminJdbcDaoMockTest {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         // then
-        assertFalse(adminDao.update(ID_TEST, ADMIN_TEST));
+        assertFalse(adminDao.update(ADMIN_TEST));
     }
 
     @Test
@@ -103,7 +103,7 @@ class AdminJdbcDaoMockTest {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
         doThrow(new SQLException()).when(mockConnection).close();
         // then
-        assertThrows(DAOException.class, ()->adminDao.update(ID_TEST, ADMIN_TEST));
+        assertThrows(DAOException.class, ()->adminDao.update(ADMIN_TEST));
     }
 
     // Test method delete-------------------------------------------------------------------

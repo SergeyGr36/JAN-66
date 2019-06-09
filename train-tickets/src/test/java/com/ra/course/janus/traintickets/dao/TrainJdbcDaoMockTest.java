@@ -77,7 +77,7 @@ class TrainJdbcDaoMockTest {
 
         train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
 
-        assertTrue(trainDAO.update(TRAIN_ID,train));
+        assertTrue(trainDAO.update(train));
     }
 
     @Test
@@ -86,7 +86,7 @@ class TrainJdbcDaoMockTest {
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
 
         train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
-        assertFalse(trainDAO.update(TRAIN_ID,train));
+        assertFalse(trainDAO.update(train));
     }
 
     @Test
@@ -97,7 +97,7 @@ class TrainJdbcDaoMockTest {
         doThrow(new SQLException()).when(mockConn).close();
 
         train = new Train(TRAIN_ID,TRAIN_NAME,SEATING,FREE_SEATS);
-        assertThrows(DAOException.class,()->trainDAO.update(TRAIN_ID,train));
+        assertThrows(DAOException.class,()->trainDAO.update(train));
     }
 
     @Test

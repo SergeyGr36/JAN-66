@@ -20,7 +20,7 @@ public class AdminJdbcDaoIntegrationTest {
     private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
     private static final String FILE_PATH = "src/test/resources/sql_scripts/admin_table.sql";
     private AdminJdbcDao adminDao;
-    private static final Admin TEST_ADMIN = new Admin(0, "Petya", "Volk", "12345");
+    private static final Admin TEST_ADMIN = new Admin(1, "Petya", "Volk", "12345");
     private static final Admin ADMIN = new Admin(0,"Roman", "Hreits", "12345");
 
     @BeforeAll
@@ -48,7 +48,7 @@ public class AdminJdbcDaoIntegrationTest {
         // when
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final Long id = saveAdmin1.getId();
-        adminDao.update(id, TEST_ADMIN);
+        adminDao.update(TEST_ADMIN);
         Admin byId = adminDao.findById(id);
         // then
         assertNotEquals(byId, saveAdmin1);

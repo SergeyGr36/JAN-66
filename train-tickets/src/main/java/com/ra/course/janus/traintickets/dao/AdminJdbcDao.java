@@ -62,11 +62,11 @@ public class AdminJdbcDao implements IJdbcDao<Admin> {
     }
 
     @Override
-    public boolean update(final Long id, final Admin item) {
+    public boolean update(final Admin item) {
         try(Connection connection = dataSource.getConnection();
             PreparedStatement prepSt = connection.prepareStatement(UPDATE_SQL)){
             prepareStatementOperations(prepSt, item);
-            prepSt.setLong(4, id);
+            prepSt.setLong(4, item.getId());
             return prepSt.executeUpdate() > 0;
         } catch (SQLException e){
             LOGGER.error(UPDATE_FAILED.getMessage(), e);
