@@ -60,7 +60,6 @@ public class InvoiceJdbcDaoIntegrationTest {
     public void findInvoiceByIdWhenOkThenReturnThatOne() {
         final long id = invoiceDAO.save(INVOICE_TEST).getId();
         assertEquals(invoiceDAO.findById(id).getAttributes(), INVOICE_TEST.getAttributes());
-        assertEquals(invoiceDAO.findById(id).getPrice(), INVOICE_TEST.getPrice());
     }
 
     @Test
