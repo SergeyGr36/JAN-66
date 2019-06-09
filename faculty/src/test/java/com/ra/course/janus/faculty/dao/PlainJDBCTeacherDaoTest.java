@@ -30,7 +30,7 @@ class PlainJDBCTeacherDaoTest {
     private ResultSet mockResultSet;
 
     @BeforeEach
-    void before() throws SQLException {
+    public void before() throws SQLException {
         teacher = new Teacher(1, "Roma", "JavaEE");
         mockDataSource = mock(DataSource.class);
         mockConnection = mock(Connection.class);
@@ -42,14 +42,14 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledInsertShouldReturnTeacher() throws SQLException {
+    public void whenCalledInsertShouldReturnTeacher() throws SQLException {
         when(mockConnection.prepareStatement(INSERT)).thenReturn(mockPreparedStatement);
         Teacher mockTeacher = mockTeacherDao.insert(teacher);
         assertEquals(teacher, mockTeacher);
     }
 
     @Test
-    void whenCalledInsertAndThenThrowsException() throws SQLException {
+    public void whenCalledInsertAndThenThrowsException() throws SQLException {
         when(mockConnection.prepareStatement(INSERT)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
         Executable executable = () -> mockTeacherDao.insert(teacher);
@@ -57,7 +57,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledUpdateThenReturnTrue() throws SQLException {
+    public void whenCalledUpdateThenReturnTrue() throws SQLException {
         int rows = 1;
         when(mockConnection.prepareStatement(UPDATE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
@@ -66,7 +66,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledUpdateThenReturnFalse() throws SQLException {
+    public void whenCalledUpdateThenReturnFalse() throws SQLException {
         int rows = 0;
         when(mockConnection.prepareStatement(UPDATE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
@@ -75,14 +75,14 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledUpdateThenThrowException() throws SQLException {
+    public void whenCalledUpdateThenThrowException() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE)).thenThrow(new SQLException());
         Executable executable = () -> mockTeacherDao.update(teacher);
         assertThrows(RuntimeException.class, executable);
     }
 
     @Test
-    void whenCalledSelectThenReturnNotEmptyList() throws SQLException {
+    public void whenCalledSelectThenReturnNotEmptyList() throws SQLException {
         when(mockConnection.prepareStatement(SELECT)).thenReturn(mockPreparedStatement);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         List<Teacher> list = mockTeacherDao.select();
@@ -90,14 +90,14 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledSelectThenThrowsException() throws SQLException {
+    public void whenCalledSelectThenThrowsException() throws SQLException {
         when(mockConnection.prepareStatement(SELECT)).thenThrow(new SQLException());
         Executable executable = () -> mockTeacherDao.select();
         assertThrows(RuntimeException.class, executable);
     }
 
     @Test
-    void whenCalledDeleteThenReturnTrue() throws SQLException {
+    public void whenCalledDeleteThenReturnTrue() throws SQLException {
         int rows = 1;
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
@@ -106,7 +106,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledDeleteThenReturnFalse() throws SQLException {
+    public void whenCalledDeleteThenReturnFalse() throws SQLException {
         int rows = 0;
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(rows);
@@ -115,7 +115,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledDeleteThenThrowException() throws SQLException {
+    public void whenCalledDeleteThenThrowException() throws SQLException {
         when(mockConnection.prepareStatement(DELETE)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
         Executable executable = () -> mockTeacherDao.delete(1);
@@ -123,7 +123,7 @@ class PlainJDBCTeacherDaoTest {
     }
 
     @Test
-    void whenCalledToTeacherThenReturnNewTeacherObject() throws SQLException {
+    public void whenCalledToTeacherThenReturnNewTeacherObject() throws SQLException {
         when(mockResultSet.getLong("id")).thenReturn(teacher.getId());
         when(mockResultSet.getString("name")).thenReturn(teacher.getName());
         when(mockResultSet.getString("course")).thenReturn(teacher.getCourse());

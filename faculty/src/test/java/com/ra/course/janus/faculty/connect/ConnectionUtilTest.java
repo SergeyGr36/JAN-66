@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConnectionUtilTest {
     @Test
-    void whenGetDataSourceThenReturnNewDataSource() {
+    public void whenGetDataSourceThenReturnNewDataSource() {
         DataSource dataSource = ConnectionUtil.getDataSource();
         assertTrue(dataSource instanceof HikariDataSource);
     }

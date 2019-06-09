@@ -38,22 +38,21 @@ public class CourseDaoJdbcTest {
     private static PreparedStatement mockPreparedStatement;
     private static ResultSet mockResultSet;
     private static ResultSet mockGeneratedKeys;
-    private static Course course;
     private static CourseDaoJdbc courseDao;
 
 
     @BeforeEach
     public void before()throws SQLException {
         mockPreparedStatement = mock(PreparedStatement.class);
-        mockResultSet = Mockito.mock(ResultSet.class);
-        mockGeneratedKeys =  Mockito.mock(ResultSet.class);
+        mockResultSet = mock(ResultSet.class);
+        mockGeneratedKeys =  mock(ResultSet.class);
         courseDao = new CourseDaoJdbc(mockDataSource);
 
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
    }
 
     @Test
-    void insertWhenKeysWereNotGenerated () throws SQLException {
+    public void insertWhenKeysWereNotGenerated () throws SQLException {
 
         when(mockConnection.prepareStatement(INSERT_SQL,Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -67,7 +66,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void insert() throws SQLException {
+    public void insert() throws SQLException {
 
         when(mockConnection.prepareStatement(INSERT_SQL,Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
@@ -79,7 +78,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void insertWhenException() throws SQLException {
+    public void insertWhenException() throws SQLException {
         when(mockConnection.prepareStatement(INSERT_SQL,Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
 
@@ -89,7 +88,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void updateWhenExists() throws SQLException {
+    public void updateWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         when(mockResultSet.getLong(1)).thenReturn(2L);
@@ -98,7 +97,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void updateWhenNotExists() throws SQLException {
+    public void updateWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         when(mockResultSet.getLong(1)).thenReturn(1L);
@@ -108,7 +107,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void deleteWhenExists() throws SQLException {
+    public void deleteWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
         Course m = new Course();
@@ -116,7 +115,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void deleteWhenNotExists() throws SQLException {
+    public void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
         Course m = new Course();
@@ -125,7 +124,7 @@ public class CourseDaoJdbcTest {
     }
 
     @Test
-    void deleteWhenException() throws SQLException {
+    public void deleteWhenException() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
@@ -137,7 +136,7 @@ public class CourseDaoJdbcTest {
 
 
     @Test
-    void findByTidWhenFound() throws SQLException {
+    public void findByTidWhenFound() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
@@ -156,7 +155,7 @@ public class CourseDaoJdbcTest {
 
 
     @Test
-    void findByTidWhenException() throws SQLException {
+    public void findByTidWhenException() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
@@ -166,7 +165,7 @@ public class CourseDaoJdbcTest {
 
 
     @Test
-    void findAll()throws SQLException {
+    public void findAll()throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         List<Course> mockList = Mockito.mock(ArrayList.class);

@@ -46,7 +46,7 @@ class PlainJDBCTeacherDaoIntegrationTest {
     void selectTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
         List list = TEACHER_DAO.select();
-        System.out.println(list);
+        assertTrue(list.size()>0);
     }
 
     @Test
