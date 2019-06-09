@@ -80,3 +80,18 @@ project(':developers-team-integration-tests') {
         compile project(':developers-team')
     }
 }
+
+project(':faculty') {
+    dependencies {
+        compile db.h2
+        compile spring.context
+        compile log.log4jDependency
+        compile hibernate.hikari
+    }
+}
+
+project(':faculty-integration-tests') {
+    dependencies {
+        compile project(':faculty')
+    }
+}
