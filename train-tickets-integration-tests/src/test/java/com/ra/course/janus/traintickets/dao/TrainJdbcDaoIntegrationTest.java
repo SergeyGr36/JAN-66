@@ -53,7 +53,7 @@ public class TrainJdbcDaoIntegrationTest {
         Train somethingTrain = trainDAO.save(testIntegrTrain);
 
         somethingTrain.setName("Test Train");
-        somethingTrain.setFreePlaces(50);
+        somethingTrain.setFreeSeats(50);
 
         trainDAO.update(somethingTrain);
         assertNotSame(somethingTrain,testIntegrTrain);
