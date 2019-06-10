@@ -1,5 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
 
+import com.ra.course.janus.traintickets.MainSpringConfig;
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.User;
 
@@ -16,18 +17,27 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = MainSpringConfig.class)
 public class UserJdbcDAOIntegrationTest {
 
-    private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
+    @Autowired
+    private static DataSource dataSource;
+
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
     private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
 
+    @Autowired
     private UserJdbcDAO userDAO;
 
     @BeforeAll
@@ -38,7 +48,6 @@ public class UserJdbcDAOIntegrationTest {
     @BeforeEach
     public void setUp() throws SQLException {
         clearTableUsers();
-        userDAO = new UserJdbcDAO(DATA_SOURCE);
     }
 
     // Test saveUser---------------------------------------------------
@@ -109,7 +118,7 @@ public class UserJdbcDAOIntegrationTest {
     }
 
     private static void executeScript(String script) throws SQLException {
-        try (Connection conn = DATA_SOURCE.getConnection()) {
+        try (Connection conn = dataSource.getConnection()) {
             try (Statement statement = conn.createStatement()) {
                 statement.execute(script);
             }

@@ -5,6 +5,7 @@ import com.ra.course.janus.traintickets.exception.DAOException;
 import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
+@Component
 public class UserJdbcDAO implements IJdbcDao<User> {
     private final transient DataSource dataSource;
 
