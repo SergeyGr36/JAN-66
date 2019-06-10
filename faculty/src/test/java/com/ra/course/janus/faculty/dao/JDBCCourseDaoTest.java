@@ -107,7 +107,7 @@ public class JDBCCourseDaoTest {
     public void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertTrue(!courseDao.delete(ID));
+        assertFalse(courseDao.delete(ID));
 
     }
 
@@ -131,7 +131,7 @@ public class JDBCCourseDaoTest {
     }
 
     @Test
-    void findByTidWhenNotFound() throws SQLException {
+    public void findByTidWhenNotFound() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
