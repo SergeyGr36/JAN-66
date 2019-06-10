@@ -9,16 +9,13 @@ import java.util.Objects;
 import java.util.Properties;
 
 final public class DataSourceUtils {
-
     final private static String CONFIG_FILE = "config.properties";
     final private static Properties DB_PROPERTIES = new Properties();
     final private static HikariConfig CONFIG = new HikariConfig();
 
-    private DataSourceUtils() {
+    private DataSourceUtils() {}
 
-    }
-
-    private static void loadProperties(){
+    private static void loadProperties() {
         try {
             DB_PROPERTIES.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream(CONFIG_FILE)));
         }
@@ -41,9 +38,4 @@ final public class DataSourceUtils {
         initConfig();
         return new HikariDataSource(CONFIG);
     }
-
-
-
-
 }
-

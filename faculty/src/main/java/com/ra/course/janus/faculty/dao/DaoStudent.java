@@ -6,12 +6,13 @@ import java.util.List;
 
 public interface DaoStudent {
     Student insert(Student student);
+
     boolean update(Student student);
 
     boolean delete(Student student);
 
-    Student findByStudentId(long id);
+    Student selectById(long id);
 
-    List<Student> findAll();
+    List<Student> select();
 
 }

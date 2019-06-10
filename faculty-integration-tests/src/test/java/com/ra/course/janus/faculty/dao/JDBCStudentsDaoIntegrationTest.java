@@ -1,6 +1,5 @@
 package com.ra.course.janus.faculty.dao;
 
-import com.ra.course.janus.faculty.dao.DataSourceUtils;
 import com.ra.course.janus.faculty.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 
-public class StudentDaoIntegrationTests {
+public class JDBCStudentsDaoIntegrationTest {
     public static  Connection conn ;
     public static JDBCDaoStudent studentDao;
 
@@ -39,21 +38,21 @@ public class StudentDaoIntegrationTests {
 
     @Test
     void findAllWhenNotExists() {
-        List<Student> students = studentDao.findAll();
+        List<Student> students = studentDao.select();
         for (Student s : students){
             studentDao.delete(s);
         }
-        assertEquals(0,studentDao.findAll().size());
+        assertEquals(0,studentDao.select().size());
     }
 
 
     @Test
     void findAllWhenExists() {
-        int n0 = studentDao.findAll().size();
+        int n0 = studentDao.select().size();
         insert();
         insert();
         insert();
-        assertEquals(n0+3,studentDao.findAll().size());
+        assertEquals(n0+3,studentDao.select().size());
     }
 
 
@@ -64,12 +63,12 @@ public class StudentDaoIntegrationTests {
         s.setDescription("Java web development course");
 
         s = studentDao.insert(s);
-        assertNotNull(studentDao.findByStudentId(s.getId()));
+        assertNotNull(studentDao.selectById(s.getId()));
     }
 
     @Test
     void findByIdWhenNotExists() {
-        assertNull(studentDao.findByStudentId((-1)));
+        assertNull(studentDao.selectById((-1)));
     }
 
     @Test
@@ -81,10 +80,10 @@ public class StudentDaoIntegrationTests {
         s.setDescription("Test update when exists - updated");
         studentDao.update(s);
 
-        Student sToCheck =  studentDao.findByStudentId(s.getId());
+        Student sToCheck =  studentDao.selectById(s.getId());
         assertTrue("Test update when exists - updated".equals(sToCheck.getDescription()));
 
-        assertNull(studentDao.findByStudentId((-1)));
+        assertNull(studentDao.selectById((-1)));
     }
 
     @Test

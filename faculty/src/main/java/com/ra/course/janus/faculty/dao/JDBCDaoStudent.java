@@ -81,7 +81,7 @@ public class JDBCDaoStudent implements DaoStudent {
     }
     @Override
     @SuppressWarnings("PMD.CloseResource")
-    public Student findByStudentId(final long id) {
+    public Student selectById(final long id) {
         try{
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -103,7 +103,7 @@ public class JDBCDaoStudent implements DaoStudent {
     }
 
     @Override
-    public List<Student> findAll() {
+    public List<Student> select() {
         try{
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);

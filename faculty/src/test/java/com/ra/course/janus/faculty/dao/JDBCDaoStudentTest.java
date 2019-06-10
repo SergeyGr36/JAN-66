@@ -145,7 +145,7 @@ public class JDBCDaoStudentTest {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         when(mockResultSet.getLong("ID")).thenReturn(1L);
-        assertEquals(1, daoStudent.findByStudentId(1).getId());
+        assertEquals(1, daoStudent.selectById(1).getId());
     }
 
 
@@ -154,7 +154,7 @@ public class JDBCDaoStudentTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        assertNull(daoStudent.findByStudentId(1));
+        assertNull(daoStudent.selectById(1));
     }
 
 
@@ -163,7 +163,7 @@ public class JDBCDaoStudentTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
-            daoStudent.findByStudentId((1)) ;
+            daoStudent.selectById((1)) ;
         });
     }
     @Test
@@ -173,7 +173,7 @@ public class JDBCDaoStudentTest {
         List<Student> mockList = Mockito.mock(ArrayList.class);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         when(mockList.add(new Student())).thenReturn(true);
-        assertNotNull(daoStudent.findAll());
+        assertNotNull(daoStudent.select());
     }
 
     @Test

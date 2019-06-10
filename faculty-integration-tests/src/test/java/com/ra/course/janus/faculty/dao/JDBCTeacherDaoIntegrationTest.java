@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlainJDBCTeacherDaoIntegrationTest {
-    private static final String FILE = "src/test/resources/scripts/create_teacher_table.sql";
+class JDBCTeacherDaoIntegrationTest {
+    private static final String FILE = "src/test/resources/scripts/create_faculty.sql";
     private static final DataSource DATA_SOURCE = ConnectionUtil.getDataSource();
-    private static final TeacherDao<Teacher> TEACHER_DAO = new PlainJDBCTeacherDao(DATA_SOURCE);
+    private static final GenericDao<Teacher> TEACHER_DAO = new JDBCTeacherDao(DATA_SOURCE);
     private static final Teacher TEACHER_INSERT = new Teacher(1L,"Roma", "Java");
 
     @BeforeEach

@@ -13,12 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("Duplicates")
-public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
-    private final static Logger LOGGER = Logger.getLogger(PlainJDBCTeacherDao.class);
+public class JDBCTeacherDao implements GenericDao<Teacher> {
+    private final static Logger LOGGER = Logger.getLogger(JDBCTeacherDao.class);
 
     private static final String INSERT_TEACHER = "INSERT INTO TEACHER (ID, NAME, COURSE) VALUES (?, ?, ?)";
     private static final String UPDATE_TEACHER = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT_TEACHER = "SELECT * FROM TEACHER";
+    private static final String SELECT_BY_ID = "SELECT FROM TEACHER WHERE ID = ?";
     private static final String DELETE_TEACHER = "DELETE FROM TEACHER WHERE ID = ?";
 
     private static final String INSERT_ERR = "Error inserting Teacher";
@@ -28,7 +29,7 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
 
     transient private final DataSource dataSource;
 
-    public PlainJDBCTeacherDao(final DataSource dataSource) {
+    public JDBCTeacherDao(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -85,6 +86,28 @@ public class PlainJDBCTeacherDao implements TeacherDao<Teacher> {
         } catch (SQLException e) {
             LOGGER.error(e);
             throw new DaoException(FIND_ERR, e);
+        }
+    }
+
+    @Override
+    public Teacher selectById(final long id) {
+        try (Connection connection = dataSource.getConnection()){
+            final PreparedStatement preparedStatement = connection.prepareStatement(SELECT_BY_ID);
+            preparedStatement.setLong(1, id);
+            final ResultSet resultSet = preparedStatement.executeQuery();
+            try {
+                if (resultSet.next()) {
+                    return new Teacher(toTeacher(resultSet));
+                } else {
+                    return null;
+                }
+            } finally {
+                preparedStatement.close();
+                resultSet.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e);
+            throw new DaoException(e);
         }
     }
 

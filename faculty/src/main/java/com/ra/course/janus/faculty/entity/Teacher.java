@@ -7,8 +7,7 @@ public class Teacher {
     private String name;
     private String course;
 
-    public Teacher() {
-    }
+    public Teacher() {}
 
     public Teacher(long id, String name, String course) {
         this.id = id;
@@ -21,7 +20,6 @@ public class Teacher {
         this.name = teacher.getName();
         this.course = teacher.getCourse();
     }
-
 
     public long getId() {
         return id;

@@ -2,9 +2,7 @@ package com.ra.course.janus.faculty.dao;
 
 import com.ra.course.janus.faculty.entity.Course;
 import com.ra.course.janus.faculty.exception.DaoException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -22,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CourseDaoJdbcTest {
+public class JDBCCourseDaoTest {
 
     private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE COURSE SET CODE=?,DESCRIPTION=? WHERE COURSE_TID=?";
@@ -38,7 +36,7 @@ public class CourseDaoJdbcTest {
     private static PreparedStatement mockPreparedStatement;
     private static ResultSet mockResultSet;
     private static ResultSet mockGeneratedKeys;
-    private static CourseDaoJdbc courseDao;
+    private static JDBCCourseDao courseDao;
 
 
     @BeforeEach
@@ -46,7 +44,7 @@ public class CourseDaoJdbcTest {
         mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
         mockGeneratedKeys =  mock(ResultSet.class);
-        courseDao = new CourseDaoJdbc(mockDataSource);
+        courseDao = new JDBCCourseDao(mockDataSource);
 
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
    }
@@ -141,7 +139,7 @@ public class CourseDaoJdbcTest {
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(true);
         when(mockResultSet.getLong("COURSE_TID")).thenReturn(1L);
-        assertEquals(1, courseDao.findByTid(1).getTid());
+        assertEquals(1, courseDao.selectById(1).getTid());
     }
 
 
@@ -150,7 +148,7 @@ public class CourseDaoJdbcTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
         when(mockResultSet.next()).thenReturn(false);
-        assertNull(courseDao.findByTid(1));
+        assertNull(courseDao.selectById(1));
     }
 
 
@@ -159,7 +157,7 @@ public class CourseDaoJdbcTest {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
-            courseDao.findByTid(1) ;
+            courseDao.selectById(1) ;
         });
     }
 
@@ -171,6 +169,6 @@ public class CourseDaoJdbcTest {
         List<Course> mockList = Mockito.mock(ArrayList.class);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         when(mockList.add(new Course())).thenReturn(true);
-        assertNotNull(courseDao.findAll());
+        assertNotNull(courseDao.select());
     }
 }

@@ -6,13 +6,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CourseDaoJdbcIntegrationTest {
+public class JDBCCourseDaoIntegrationTest {
 
-    public static  CourseDaoJdbc courseDao;
+    public static JDBCCourseDao courseDao;
 
     @BeforeEach
     public void beforeEach () throws Exception{
-            courseDao = new CourseDaoJdbc(DataSourceUtils.getDataSource());
+            courseDao = new JDBCCourseDao(DataSourceUtils.getDataSource());
     }
 
     @Test
@@ -29,26 +29,26 @@ public class CourseDaoJdbcIntegrationTest {
     @Test
     void findAllWhenNotExists() {
         //when
-        List<Course> cources = courseDao.findAll();
+        List<Course> cources = courseDao.select();
         for (Course c : cources){
             courseDao.delete(c);
         }
 
         //then
-        assertEquals(0,courseDao.findAll().size());
+        assertEquals(0,courseDao.select().size());
     }
 
 
     @Test
     void findAllWhenExists() {
         //given
-        int n0 = courseDao.findAll().size();
+        int n0 = courseDao.select().size();
 
         //when
         insert();
 
         //then
-        assertEquals(n0+1,courseDao.findAll().size());
+        assertEquals(n0+1,courseDao.select().size());
     }
 
     @Test
@@ -57,12 +57,12 @@ public class CourseDaoJdbcIntegrationTest {
         Course c = courseDao.insert( new Course("J2EE","Java web development course"));
 
         //then
-        assertNotNull(courseDao.findByTid(c.getTid()));
+        assertNotNull(courseDao.selectById(c.getTid()));
     }
 
     @Test
     void findByIdWhenNotExists() {
-        assertNull(courseDao.findByTid(-1));
+        assertNull(courseDao.selectById(-1));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class CourseDaoJdbcIntegrationTest {
         courseDao.update(c);
 
         //then
-        Course cToCheck = courseDao.findByTid(c.getTid());
+        Course cToCheck = courseDao.selectById(c.getTid());
         assertTrue("Test update when exists - updated".equals(cToCheck.getDescription()));
     }
 

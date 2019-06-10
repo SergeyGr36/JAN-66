@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 
-public class CourseDaoJdbc implements CourseDao {
+public class JDBCCourseDao implements CourseDao {
 
     private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE COURSE SET CODE=?,DESCRIPTION=? WHERE COURSE_TID=?";
@@ -30,7 +30,7 @@ public class CourseDaoJdbc implements CourseDao {
 
     transient private final DataSource dataSource;
 
-    public CourseDaoJdbc(final DataSource dataSource) {
+    public JDBCCourseDao(final DataSource dataSource) {
 
         this.dataSource = dataSource;
     }
@@ -92,7 +92,7 @@ public class CourseDaoJdbc implements CourseDao {
 
     @Override
     @SuppressWarnings("PMD.CloseResource")
-    public Course findByTid(final long tid) {
+    public Course selectById(final long tid) {
         try {
             final Connection conn = dataSource.getConnection();
             final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
@@ -114,7 +114,7 @@ public class CourseDaoJdbc implements CourseDao {
     }
 
     @Override
-    public List<Course> findAll() {
+    public List<Course> select() {
         try {
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);

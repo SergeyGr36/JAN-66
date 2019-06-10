@@ -5,14 +5,13 @@ import com.ra.course.janus.faculty.entity.Course;
 import java.util.List;
 
 public interface CourseDao {
-
     Course insert(Course course);
 
     boolean update(Course course);
 
     boolean delete(Course course);
 
-    Course findByTid(long tid);
+    Course selectById(long tid);
 
-    List<Course> findAll();
+    List<Course> select();
 }

@@ -34,7 +34,7 @@ public final class ConnectionUtil {
             loadProperties();
         } catch (IOException e) {
             LOGGER.error(e);
-            throw new DaoException("Error loading DB properties",e);
+            throw new DaoException(e);
         }
 
         initDataSource();
