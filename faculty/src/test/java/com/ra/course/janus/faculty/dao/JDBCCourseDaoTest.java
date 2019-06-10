@@ -10,13 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
 
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class JDBCCourseDaoTest {
-
     private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE COURSE SET CODE=?,DESCRIPTION=? WHERE COURSE_TID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM COURSE";
@@ -41,7 +39,7 @@ public class JDBCCourseDaoTest {
         courseDao = new JDBCCourseDao(mockDataSource);
 
         when(mockDataSource.getConnection()).thenReturn(mockConnection);
-   }
+    }
 
     @Test
     public void insertWhenKeysWereNotGenerated () throws SQLException {
@@ -109,7 +107,7 @@ public class JDBCCourseDaoTest {
     public void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertTrue(courseDao.delete(ID));
+        assertTrue(!courseDao.delete(ID));
 
     }
 
@@ -123,8 +121,6 @@ public class JDBCCourseDaoTest {
 
     }
 
-
-
     @Test
     public void findByTidWhenFound() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -134,7 +130,6 @@ public class JDBCCourseDaoTest {
         assertEquals(1, courseDao.selectById(1).getTid());
     }
 
-
     @Test
     void findByTidWhenNotFound() throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
@@ -142,7 +137,6 @@ public class JDBCCourseDaoTest {
         when(mockResultSet.next()).thenReturn(false);
         assertNull(courseDao.selectById(1));
     }
-
 
     @Test
     public void findByTidWhenException() throws SQLException {
@@ -152,7 +146,6 @@ public class JDBCCourseDaoTest {
             courseDao.selectById(1) ;
         });
     }
-
 
     @Test
     public void findAll()throws SQLException {
