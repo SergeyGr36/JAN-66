@@ -3,7 +3,7 @@ package com.ra.janus.developersteam.entity;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class Work {
+public class Work implements BaseEntity {
     private long id;
     private String name;
     private BigDecimal price;

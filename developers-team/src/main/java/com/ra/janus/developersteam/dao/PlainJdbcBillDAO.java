@@ -1,6 +1,7 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Bill;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,6 +26,7 @@ public class PlainJdbcBillDAO implements BaseDao<Bill> {
 
     transient private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public PlainJdbcBillDAO(final JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

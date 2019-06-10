@@ -3,7 +3,7 @@ package com.ra.janus.developersteam.entity;
 import java.sql.Date;
 import java.util.Objects;
 
-public class Project {
+public class Project implements BaseEntity {
 
     private long id;
     private String name;

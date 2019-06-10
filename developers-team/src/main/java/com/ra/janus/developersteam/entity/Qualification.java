@@ -2,7 +2,7 @@ package com.ra.janus.developersteam.entity;
 
 import java.util.Objects;
 
-public class Qualification {
+public class Qualification implements BaseEntity {
 
     private long id;
     private String name;

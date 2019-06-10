@@ -4,12 +4,14 @@ import com.ra.janus.developersteam.entity.Project;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class PlainJdbcProjectDAO implements BaseDao<Project> {
 
     private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?, ?)";

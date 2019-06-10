@@ -4,13 +4,14 @@ import com.ra.janus.developersteam.entity.Work;
 import com.ra.janus.developersteam.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class PlainJdbcWorkDAO implements BaseDao<Work> {
     private static final String INSERT_SQL = "INSERT INTO works (name, price) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE works SET name=?,price=? WHERE id=?";

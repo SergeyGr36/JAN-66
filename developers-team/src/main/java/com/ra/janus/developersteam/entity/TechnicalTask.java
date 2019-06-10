@@ -2,7 +2,7 @@ package com.ra.janus.developersteam.entity;
 
 import java.util.Objects;
 
-public class TechnicalTask {
+public class TechnicalTask implements BaseEntity {
     private long id;
     private String title;
     private String description;
