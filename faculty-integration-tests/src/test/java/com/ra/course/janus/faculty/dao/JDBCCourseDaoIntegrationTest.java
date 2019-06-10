@@ -21,8 +21,7 @@ public class JDBCCourseDaoIntegrationTest {
     @Test
     void insert(){
         //given
-        Course c = new Course("J2EE","Java web developmnt course");
-
+        Course c = new Course("J2EE","Java web development course");
         //when
         c = courseDao.insert(c);
         //then
@@ -97,7 +96,7 @@ public class JDBCCourseDaoIntegrationTest {
     @Test
     void deleteWhenExists() {
         //when
-        Course c= courseDao.insert(new Course("DEL_E","Test delete when exists"));
+        Course c = courseDao.insert(new Course("DEL_E","Test delete when exists"));
 
         //then
         assertTrue(courseDao.delete(ID));

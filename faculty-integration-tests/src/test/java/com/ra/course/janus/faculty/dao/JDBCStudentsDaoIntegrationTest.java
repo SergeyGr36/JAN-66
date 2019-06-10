@@ -33,7 +33,6 @@ public class JDBCStudentsDaoIntegrationTest {
         assertNotNull(s.getId());
     }
 
-
     @Test
     void findAllWhenNotExists() {
         List<Student> students = studentDao.select();
@@ -43,7 +42,6 @@ public class JDBCStudentsDaoIntegrationTest {
         studentDao.delete(4);
         assertEquals(0,studentDao.select().size());
     }
-
 
     @Test
     void findAllWhenExists() {
@@ -116,7 +114,4 @@ public class JDBCStudentsDaoIntegrationTest {
         assertFalse(studentDao.delete(ID));
 
     }
-
-
 }
-
