@@ -1,130 +1,89 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Developer;
-import com.ra.janus.developersteam.exception.DAOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class PlainJdbcDeveloperDAO implements BaseDao<Developer> {
-    private static final String EXCEPTION_WARN = "An exception occurred!";
     private static final String INSERT_SQL = "INSERT INTO developers (name) VALUES (?)";
     private static final String UPDATE_SQL = "UPDATE developers SET name=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM developers";
     private static final String SELECT_ONE_SQL = "SELECT * FROM developers WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM developers WHERE id=?";
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcDeveloperDAO.class);
-    transient private final DataSource dataSource;
 
+    transient private final JdbcTemplate jdbcTemplate;
 
-    public PlainJdbcDeveloperDAO(final DataSource dataSource) {
-        this.dataSource = dataSource;
+    @Autowired
+    public PlainJdbcDeveloperDAO(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
-
 
     @Override
     public Developer create(final Developer developer) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            prepareStatement(ps, developer);
-            ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
-                if (generatedKeys.next()) {
-                    final long id = generatedKeys.getLong(1);
-                    return new Developer(id, developer);
-                } else {
-                    final DAOException e = new DAOException("Could not create a Developer");
-                    LOGGER.error(EXCEPTION_WARN, e);
-                    throw e;
-                }
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(final Connection connection) throws SQLException {
+                final PreparedStatement ps = connection
+                        .prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, developer.getName());
+                return ps;
             }
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        }, keyHolder);
+        final long id = keyHolder.getKey().longValue();
+        return new Developer(id, developer);
     }
 
     @Override
-    @SuppressWarnings("PMD.CloseResource")
     public Developer get(final long id) {
         try {
-            final Connection conn = dataSource.getConnection();
-            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
-            ps.setLong(1, id);
-            final ResultSet rs = ps.executeQuery();
-            try {
-                if (rs.next()) {
-                    return toDeveloper(rs);
-                } else {
-                    return null;
-                }
-            } finally {
-                rs.close();
-                conn.close();
-            }
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
+            return jdbcTemplate.queryForObject(SELECT_ONE_SQL,
+                    BeanPropertyRowMapper.newInstance(Developer.class), id);}
+        catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
     @Override
     public List<Developer> getAll() {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
-             ResultSet rs = ps.executeQuery()) {
-
-            final List<Developer> developers = new ArrayList<>();
-            while (rs.next()) {
-                developers.add(toDeveloper(rs));
-            }
-            return developers;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(SELECT_ALL_SQL);
+        return rows.stream().map(row -> {
+            final Developer developer = new Developer();
+            developer.setId((long) row.get("id"));
+            developer.setName((String) row.get("name"));
+            return developer;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public boolean update(final Developer developer) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            prepareStatement(ps, developer);
-            ps.setLong(2, developer.getId());
-            final int rowCount = ps.executeUpdate();
-            return rowCount != 0;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        final int rowCount = jdbcTemplate.update(UPDATE_SQL, new PreparedStatementSetter() {
+            @Override
+            public void setValues(final PreparedStatement ps) throws SQLException {
+                ps.setString(1, developer.getName());
+                ps.setLong(2, developer.getId());
+
+            }
+        });
+        return rowCount != 0;
     }
 
     @Override
     public boolean delete(final long id) {
-        try (
-                Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-            ps.setLong(1, id);
-            final int rowCount = ps.executeUpdate();
-            return rowCount != 0;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
-    }
-
-    private Developer toDeveloper(final ResultSet rs) throws SQLException {
-        return new Developer(rs.getLong("id"),
-                rs.getString("name"));
-    }
-
-    private void prepareStatement(final PreparedStatement ps, final Developer developer) throws SQLException {
-        ps.setString(1, developer.getName());
+        final int rowCount = jdbcTemplate.update(DELETE_SQL, id);
+        return rowCount != 0;
     }
 }

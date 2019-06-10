@@ -25,7 +25,6 @@ public abstract class BaseDAOIntegrationTest {
     @Autowired
     protected DataSource dataSource;
 
-
     protected String getTableName() {return "";}
     protected BaseDao<BaseEntity> getDAO() {
         return null;
