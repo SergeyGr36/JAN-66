@@ -1,86 +1,39 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.Project;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Date;
-import java.util.Arrays;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+public class PlainJdbcProjectDAOIntegrationTest extends BaseDAOIntegrationTest {
 
-public class PlainJdbcProjectDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Project> projectDAO = new PlainJdbcProjectDAO(dataSource);
+    @Autowired
+    private BaseDao<Project> projectDAO;
 
-    private static Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
+    Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "PROJECTS");
-        }
+    @Override
+    protected String getTableName() {return "PROJECTS";}
+
+    @Override
+    protected BaseDao getDAO() {
+        return projectDAO;
     }
 
-    @Test
-    void createProjectTest() throws Exception {
-        //when
-        Project project = projectDAO.create(projectToCreate);
-
-        //then
-        assertEquals(project, projectDAO.get(project.getId()));
+    @Override
+    protected BaseEntity getEntityToCreate() {
+        return projectToCreate;
     }
 
-    @Test
-    void getProjectByIdTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        Project gottenProject = projectDAO.get(createdProject.getId());
+    @Override
+    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
 
-        //then
-        assertEquals(createdProject, gottenProject);
-    }
+        Project updatedProject = (Project) entity;
+        updatedProject.setName("Developers Team");
+        updatedProject.setDescription("first project");
+        updatedProject.setStatus("WIP");
+        updatedProject.setEta(Date.valueOf("2019-08-01"));
 
-    @Test
-    void getAllProjectsTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        List<Project> expected = Arrays.asList(createdProject);
-        List<Project> actual = projectDAO.getAll();
-
-        //then
-        assertIterableEquals(expected, actual);
-    }
-
-    @Test
-    void updateProjectTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        createdProject.setName("Developers Team");
-        createdProject.setDescription("first project");
-        createdProject.setStatus("WIP");
-        createdProject.setEta(Date.valueOf("2019-08-01"));
-        projectDAO.update(createdProject);
-        Project updated = projectDAO.get(createdProject.getId());
-
-        //then
-        assertEquals(updated, createdProject);
-    }
-
-    @Test
-    void deleteProjectTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        projectDAO.delete(createdProject.getId());
-        Project actual = projectDAO.get(createdProject.getId());
-
-        //then
-        assertEquals(null, actual);
+        return updatedProject;
     }
 }

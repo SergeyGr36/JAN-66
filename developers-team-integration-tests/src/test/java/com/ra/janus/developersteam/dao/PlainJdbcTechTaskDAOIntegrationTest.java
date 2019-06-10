@@ -1,83 +1,36 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.TechnicalTask;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.List;
+public class PlainJdbcTechTaskDAOIntegrationTest extends BaseDAOIntegrationTest {
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+    @Autowired
+    private BaseDao<TechnicalTask> taskDAO;
 
-public class PlainJdbcTechTaskDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<TechnicalTask> technicalTaskDAO = new PlainJdbcTechnicalTaskDAO(dataSource);
+    TechnicalTask taskToCreate = new TechnicalTask(1L, "Jan 40", "Integration tests for Dev Team");
 
-    private static TechnicalTask technicalTaskToCreate = new TechnicalTask(1L, "Jan 40", "Integration tests for Dev Team");
+    @Override
+    protected String getTableName() {return "TASKS";}
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "TASKS");
-        }
+    @Override
+    protected BaseDao getDAO() {
+        return taskDAO;
     }
 
-    @Test
-    void createTechnicalTaskTest() throws Exception {
-        //when
-        TechnicalTask technicalTask = technicalTaskDAO.create(technicalTaskToCreate);
-
-        //then
-        assertEquals(technicalTask, technicalTaskDAO.get(technicalTask.getId()));
+    @Override
+    protected BaseEntity getEntityToCreate() {
+        return taskToCreate;
     }
 
-    @Test
-    void getTechnicalTaskByIdTest() throws Exception {
-        //when
-        TechnicalTask createdTechnicalTask = technicalTaskDAO.create(technicalTaskToCreate);
-        TechnicalTask gottenTechnicalTask = technicalTaskDAO.get(createdTechnicalTask.getId());
+    @Override
+    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
 
-        //then
-        assertEquals(createdTechnicalTask, gottenTechnicalTask);
-    }
+        TechnicalTask updatedTask = (TechnicalTask) entity;
+        updatedTask.setTitle("Jan 6");
+        updatedTask.setDescription("Project for Dev Team");
 
-    @Test
-    void getAllTechnicalTasksTest() throws Exception {
-        //when
-        TechnicalTask createdTechnicalTask = technicalTaskDAO.create(technicalTaskToCreate);
-        List<TechnicalTask> expected = Arrays.asList(createdTechnicalTask);
-        List<TechnicalTask> actual = technicalTaskDAO.getAll();
-
-        //then
-        assertIterableEquals(expected, actual);
-    }
-
-    @Test
-    void updateTechnicalTaskTest() throws Exception {
-        //when
-        TechnicalTask createdTechnicalTask = technicalTaskDAO.create(technicalTaskToCreate);
-        createdTechnicalTask.setTitle("Jan 6");
-        createdTechnicalTask.setDescription("Project for Dev Team");
-        technicalTaskDAO.update(createdTechnicalTask);
-        TechnicalTask updated = technicalTaskDAO.get(createdTechnicalTask.getId());
-
-        //then
-        assertEquals(updated, createdTechnicalTask);
-    }
-
-    @Test
-    void deleteTechnicalTaskTest() throws Exception {
-        //when
-        TechnicalTask createdTechnicalTask = technicalTaskDAO.create(technicalTaskToCreate);
-        technicalTaskDAO.delete(createdTechnicalTask.getId());
-        TechnicalTask actual = technicalTaskDAO.get(createdTechnicalTask.getId());
-
-        //then
-        assertEquals(null, actual);
+        return updatedTask;
     }
 }
