@@ -1,7 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.MainSpringConfig;
-import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.User;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.sql.Statement;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,23 +28,22 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @ContextConfiguration(classes = MainSpringConfig.class)
 public class UserJdbcDAOIntegrationTest {
 
-    @Autowired
-    private static DataSource dataSource;
+
+
 
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
     private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
 
     @Autowired
+    private DataSource dataSource;
+
+    @Autowired
     private UserJdbcDAO userDAO;
 
-    @BeforeAll
-    public static void createUsersTable() throws IOException, SQLException {
-        createTableUsers();
-    }
-
     @BeforeEach
-    public void setUp() throws SQLException {
+    public void setUp() throws SQLException, IOException {
+        createTableUsers();
         clearTableUsers();
     }
 
@@ -113,11 +110,11 @@ public class UserJdbcDAOIntegrationTest {
 
     //-----------------------------------------------------------------
 
-    private static String readScriptFile() throws IOException {
+    private String readScriptFile() throws IOException {
         return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));
     }
 
-    private static void executeScript(String script) throws SQLException {
+    private void executeScript(String script) throws SQLException {
         try (Connection conn = dataSource.getConnection()) {
             try (Statement statement = conn.createStatement()) {
                 statement.execute(script);
@@ -125,11 +122,11 @@ public class UserJdbcDAOIntegrationTest {
         }
     }
 
-    private static void createTableUsers() throws IOException, SQLException {
+    private void createTableUsers() throws IOException, SQLException {
         executeScript(readScriptFile());
     }
 
-    private static void clearTableUsers() throws SQLException {
+    private void clearTableUsers() throws SQLException {
         executeScript("TRUNCATE TABLE users;");
     }
 }
