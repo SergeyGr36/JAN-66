@@ -1,5 +1,6 @@
 package com.ra.course.janus.faculty.dao;
 
+import com.ra.course.janus.faculty.connect.ConnectionUtil;
 import com.ra.course.janus.faculty.entity.Course;
 import org.junit.jupiter.api.*;
 import java.util.List;
@@ -10,9 +11,11 @@ public class JDBCCourseDaoIntegrationTest {
 
     public static JDBCCourseDao courseDao;
 
+    private static final long ID = 1;
+
     @BeforeEach
-    public void beforeEach () throws Exception{
-            courseDao = new JDBCCourseDao(DataSourceUtils.getDataSource());
+    public void beforeEach () {
+        courseDao = new JDBCCourseDao(ConnectionUtil.getDataSource());
     }
 
     @Test
@@ -30,9 +33,11 @@ public class JDBCCourseDaoIntegrationTest {
     void findAllWhenNotExists() {
         //when
         List<Course> cources = courseDao.select();
-        for (Course c : cources){
-            courseDao.delete(c);
-        }
+
+        courseDao.delete(1);
+        courseDao.delete(2);
+        courseDao.delete(3);
+        courseDao.delete(4);
 
         //then
         assertEquals(0,courseDao.select().size());
@@ -95,7 +100,7 @@ public class JDBCCourseDaoIntegrationTest {
         Course c= courseDao.insert(new Course("DEL_E","Test delete when exists"));
 
         //then
-        assertTrue(courseDao.delete(c));
+        assertTrue(courseDao.delete(ID));
     }
 
     @Test
@@ -105,7 +110,7 @@ public class JDBCCourseDaoIntegrationTest {
         c.setTid(c.getTid()+1);
 
         //then
-        assertFalse(courseDao.delete(c));
+        assertFalse(courseDao.delete(ID));
 
     }
 }

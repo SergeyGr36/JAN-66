@@ -1,12 +1,9 @@
 package com.ra.course.janus.faculty.dao;
 
+import com.ra.course.janus.faculty.connect.ConnectionUtil;
 import com.ra.course.janus.faculty.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-/*import org.junit.jupiter.api.*;
-//import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Test;
-import static org.junit.Assert.*;*/
 
 import java.sql.Connection;
 import java.util.List;
@@ -19,10 +16,11 @@ public class JDBCStudentsDaoIntegrationTest {
     public static  Connection conn ;
     public static JDBCDaoStudent studentDao;
 
+    private static final long ID = 1;
 
     @BeforeEach
     public void beforeEach () throws Exception{
-        studentDao = new JDBCDaoStudent( DataSourceUtils.getDataSource());
+        studentDao = new JDBCDaoStudent( ConnectionUtil.getDataSource());
     }
 
     @Test
@@ -39,9 +37,10 @@ public class JDBCStudentsDaoIntegrationTest {
     @Test
     void findAllWhenNotExists() {
         List<Student> students = studentDao.select();
-        for (Student s : students){
-            studentDao.delete(s);
-        }
+        studentDao.delete(1);
+        studentDao.delete(2);
+        studentDao.delete(3);
+        studentDao.delete(4);
         assertEquals(0,studentDao.select().size());
     }
 
@@ -54,7 +53,6 @@ public class JDBCStudentsDaoIntegrationTest {
         insert();
         assertEquals(n0+3,studentDao.select().size());
     }
-
 
     @Test
     void findByIdWhenExists() {
@@ -104,7 +102,7 @@ public class JDBCStudentsDaoIntegrationTest {
         s.setCode("DEL_E");
         s.setDescription("Test delete when exists");
         s = studentDao.insert(s);
-        assertTrue(studentDao.delete(s));
+        assertTrue(studentDao.delete(ID));
 
     }
 
@@ -115,7 +113,7 @@ public class JDBCStudentsDaoIntegrationTest {
         s.setDescription("Test delete when not exists");
         s = studentDao.insert(s);
         s.setId(s.getId()+1);
-        assertFalse(studentDao.delete(s));
+        assertFalse(studentDao.delete(ID));
 
     }
 

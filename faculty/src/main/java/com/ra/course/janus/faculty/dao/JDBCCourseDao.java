@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import javax.sql.DataSource;
 
-public class JDBCCourseDao implements CourseDao {
+public class JDBCCourseDao implements GenericDao<Course> {
 
     private static final String INSERT_SQL = "INSERT INTO COURSE ( CODE, DESCRIPTION) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE COURSE SET CODE=?,DESCRIPTION=? WHERE COURSE_TID=?";
@@ -26,7 +26,7 @@ public class JDBCCourseDao implements CourseDao {
     private static final String DELETE_ERR = "Error deleting Course";
     private static final String FIND_ERR = "Error finding Course";
 
-    private final static Logger LOGGER = Logger.getLogger(CourseDao.class);
+    private final static Logger LOGGER = Logger.getLogger(JDBCCourseDao.class);
 
     transient private final DataSource dataSource;
 
@@ -77,11 +77,11 @@ public class JDBCCourseDao implements CourseDao {
     }
 
     @Override
-    public boolean delete(final Course course) {
+    public boolean delete(final long id) {
         try {
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-                ps.setLong(1, course.getTid());
+                ps.setLong(1, id);
                 return ps.executeUpdate() > 0 ? true : false;
             }
         } catch (SQLException e) {

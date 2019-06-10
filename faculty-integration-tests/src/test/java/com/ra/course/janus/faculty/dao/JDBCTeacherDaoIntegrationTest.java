@@ -46,7 +46,7 @@ class JDBCTeacherDaoIntegrationTest {
     void selectTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
         List list = TEACHER_DAO.select();
-        assertTrue(list.size()>0);
+        assertTrue(list.size() > 0);
     }
 
     @Test

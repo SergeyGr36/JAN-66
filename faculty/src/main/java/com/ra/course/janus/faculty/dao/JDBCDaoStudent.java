@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-public class JDBCDaoStudent implements DaoStudent {
+public class JDBCDaoStudent implements GenericDao<Student> {
     private static final String INSERT_SQL = "INSERT INTO STUDENT (CODE,DESCRIPTION) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE STUDENT SET CODE=?,DESCRIPTION=? WHERE ID=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM STUDENT";
@@ -21,7 +21,7 @@ public class JDBCDaoStudent implements DaoStudent {
     private static final String FIND_ERR = "Error finding Student";
 
 
-    private final static Logger LOGGER = Logger.getLogger(DaoStudent.class);
+    private final static Logger LOGGER = Logger.getLogger(JDBCDaoStudent.class);
     transient private final DataSource dataSource;
     public JDBCDaoStudent(final DataSource dataSource) {
         this.dataSource = dataSource;
@@ -66,11 +66,11 @@ public class JDBCDaoStudent implements DaoStudent {
         }
     }
     @Override
-    public boolean delete(final Student student) {
+    public boolean delete(final long id) {
         try{
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-                ps.setLong(1, student.getId());
+                ps.setLong(1, id);
                 return ps.executeUpdate() > 0 ? true : false;
             }
 
@@ -79,6 +79,7 @@ public class JDBCDaoStudent implements DaoStudent {
             throw new DaoException(DELETE_ERR, e);
         }
     }
+
     @Override
     @SuppressWarnings("PMD.CloseResource")
     public Student selectById(final long id) {

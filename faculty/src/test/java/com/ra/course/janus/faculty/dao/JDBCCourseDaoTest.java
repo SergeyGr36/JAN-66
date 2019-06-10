@@ -28,6 +28,7 @@ public class JDBCCourseDaoTest {
     private static final String SELECT_ONE_SQL = "SELECT * FROM COURSE WHERE COURSE_TID = ?";
     private static final String DELETE_SQL = "DELETE FROM COURSE WHERE COURSE_TID=?";
 
+    private static final long ID = 1;
 
     //private static Course mockCourse;
 
@@ -108,16 +109,14 @@ public class JDBCCourseDaoTest {
     public void deleteWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        Course m = new Course();
-        assertEquals(true, courseDao.delete(m));
+        assertEquals(true, courseDao.delete(ID));
     }
 
     @Test
     public void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        Course m = new Course();
-        assertEquals(false, courseDao.delete(m));
+        assertEquals(false, courseDao.delete(ID));
 
     }
 
@@ -126,7 +125,7 @@ public class JDBCCourseDaoTest {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
-            courseDao.delete(new Course()) ;
+            courseDao.delete(ID) ;
         });
 
     }

@@ -59,13 +59,4 @@ public class Teacher {
                 Objects.equals(name, teacher.name) &&
                 Objects.equals(course, teacher.course);
     }
-
-    @Override
-    public String toString() {
-        return "Teacher {" +
-                "id = '" + id + '\'' +
-                ", name = '" + name + '\'' +
-                ", course = '" + course + '\'' +
-                '}';
-    }
 }

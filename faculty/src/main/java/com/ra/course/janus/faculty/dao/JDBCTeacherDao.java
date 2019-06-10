@@ -22,14 +22,9 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
     private static final String SELECT_BY_ID = "SELECT FROM TEACHER WHERE ID = ?";
     private static final String DELETE_TEACHER = "DELETE FROM TEACHER WHERE ID = ?";
 
-    private static final String INSERT_ERR = "Error inserting Teacher";
-    private static final String UPDATE_ERR = "Error updating Teacher";
-    private static final String DELETE_ERR = "Error deleting Teacher";
-    private static final String FIND_ERR = "Error finding Teacher";
-
     transient private final DataSource dataSource;
 
-    public JDBCTeacherDao(final DataSource dataSource) {
+    JDBCTeacherDao(final DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -53,7 +48,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             return new Teacher(teacher);
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DaoException(INSERT_ERR, e);
+            throw new DaoException(e);
         }
     }
 
@@ -68,7 +63,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             return rowsCount != 0;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DaoException(UPDATE_ERR, e);
+            throw new DaoException(e);
         }
     }
 
@@ -85,7 +80,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             return list;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DaoException(FIND_ERR, e);
+            throw new DaoException(e);
         }
     }
 
@@ -120,7 +115,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             return rowsCount != 0;
         } catch (SQLException e) {
             LOGGER.error(e);
-            throw new DaoException(DELETE_ERR, e);
+            throw new DaoException(e);
         }
     }
 }

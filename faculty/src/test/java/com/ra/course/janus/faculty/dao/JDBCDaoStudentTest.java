@@ -22,6 +22,8 @@ public class JDBCDaoStudentTest {
     private static final String SELECT_ONE_SQL = "SELECT * FROM STUDENT WHERE ID= ?";
     private static final String DELETE_SQL = "DELETE FROM STUDENT WHERE ID=?";
 
+    private static final long ID = 1;
+
  /*   private static final String INSERT_ERR = "Error inserting Student";
     private static final String UPDATE_ERR = "Error updating student";
     private static final String DELETE_ERR = "Error deleting Student";
@@ -34,8 +36,6 @@ public class JDBCDaoStudentTest {
     private static ResultSet mockGeneratedKeys;
     private static Student student;
     private static JDBCDaoStudent daoStudent;
-
-
 
 
     @BeforeEach
@@ -114,16 +114,14 @@ public class JDBCDaoStudentTest {
     void deleteWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        Student p = new Student();
-        assertEquals(true, daoStudent.delete(p));
+        assertEquals(true, daoStudent.delete(ID));
     }
 
     @Test
     void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        Student p= new Student();
-        assertEquals(false, daoStudent.delete(p));
+        assertEquals(false, daoStudent.delete(ID));
 
     }
 
@@ -132,7 +130,7 @@ public class JDBCDaoStudentTest {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException ("Test"));
         assertThrows(DaoException.class, () -> {
-            daoStudent.delete(new Student()) ;
+            daoStudent.delete(ID) ;
         });
 
     }
