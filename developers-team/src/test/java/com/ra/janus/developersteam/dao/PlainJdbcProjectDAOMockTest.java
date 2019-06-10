@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +21,7 @@ class PlainJdbcProjectDAOMockTest {
     private static final String SELECT_ONE_SQL = "SELECT * FROM projects WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM projects WHERE id=?";
     private static final long TEST_ID = 1L;
-    private static final Project TEST_PROJECT = new Project(TEST_ID);
+    private static final Project TEST_PROJECT = new Project(TEST_ID, "Mock Tests", "Test project with h2 DB", "WIP",Date.valueOf("2019-05-30"));
 
     private DataSource mockDataSource = mock(DataSource.class);
 

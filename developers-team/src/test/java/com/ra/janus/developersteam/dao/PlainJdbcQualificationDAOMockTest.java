@@ -25,7 +25,7 @@ class PlainJdbcQualificationDAOMockTest {
     private static final String SELECT_ONE_SQL = "SELECT * FROM qualifications WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM qualifications WHERE id=?";
     private static final long TEST_ID = 1L;
-    private static final Qualification TEST_QUALIFICATION = new Qualification(TEST_ID);
+    private static final Qualification TEST_QUALIFICATION = new Qualification(TEST_ID, "Web Developer", "Front End");
 
     private DataSource mockDataSource = mock(DataSource.class);
 
