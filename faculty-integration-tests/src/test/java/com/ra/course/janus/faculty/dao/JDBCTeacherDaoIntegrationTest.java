@@ -24,18 +24,18 @@ class JDBCTeacherDaoIntegrationTest {
     private static final Teacher TEACHER_INSERT = new Teacher(1L,"Roma", "Java");
 
     @BeforeEach
-    void before() throws Exception {
+    public void before() throws Exception {
         createTable();
     }
 
     @Test
-    void insertTest() {
+    public void insertTest() {
         Teacher teacher = TEACHER_DAO.insert(TEACHER_INSERT);
         assertEquals(teacher, TEACHER_INSERT);
     }
 
     @Test
-    void updateTest() {
+    public void updateTest() {
         Teacher teacher = new Teacher(1L, "Oleg", "PHP");
         TEACHER_DAO.insert(TEACHER_INSERT);
         boolean isUpdated = TEACHER_DAO.update(teacher);
@@ -43,14 +43,14 @@ class JDBCTeacherDaoIntegrationTest {
     }
 
     @Test
-    void selectTest() {
+    public void selectTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
         List list = TEACHER_DAO.select();
         assertTrue(list.size() > 0);
     }
 
     @Test
-    void deleteTest() {
+    public void deleteTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
         boolean isDeleted = TEACHER_DAO.delete(1L);
         assertTrue(isDeleted);

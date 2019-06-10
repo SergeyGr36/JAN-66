@@ -10,10 +10,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
-//import java.sql.Connection;
-//import java.sql.PreparedStatement;
-//import java.sql.ResultSet;
-//import java.sql.SQLException;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,8 +25,6 @@ public class JDBCCourseDaoTest {
     private static final String DELETE_SQL = "DELETE FROM COURSE WHERE COURSE_TID=?";
 
     private static final long ID = 1;
-
-    //private static Course mockCourse;
 
     private static DataSource mockDataSource =  mock(DataSource.class);
     private static Connection mockConnection =  mock(Connection.class);
@@ -102,7 +96,7 @@ public class JDBCCourseDaoTest {
         when(mockResultSet.getLong(1)).thenReturn(1L);
         Course m = new Course();
         m.setTid(-1);
-        assertTrue(!courseDao.update(m));
+        assertFalse(courseDao.update(m));
     }
 
     @Test
@@ -165,7 +159,7 @@ public class JDBCCourseDaoTest {
     public void findAll()throws SQLException {
         when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        List<Course> mockList = Mockito.mock(ArrayList.class);
+        List<Course> mockList = mock(ArrayList.class);
         when(mockResultSet.next()).thenReturn(true).thenReturn(false);
         when(mockList.add(new Course())).thenReturn(true);
         assertNotNull(courseDao.select());
