@@ -4,7 +4,6 @@ import com.ra.course.janus.faculty.entity.Student;
 import com.ra.course.janus.faculty.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -33,7 +32,7 @@ public class JDBCDaoStudentTest {
 
 
     @BeforeEach
-    public void before()throws SQLException {
+    public void before() throws SQLException {
         mockPreparedStatement = mock(PreparedStatement.class);
         mockResultSet = mock(ResultSet.class);
         mockGeneratedKeys =  mock(ResultSet.class);

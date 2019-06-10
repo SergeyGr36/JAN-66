@@ -4,7 +4,6 @@ import com.ra.course.janus.faculty.entity.Course;
 import com.ra.course.janus.faculty.exception.DaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -103,14 +102,14 @@ public class JDBCCourseDaoTest {
     public void deleteWhenExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-        assertEquals(true, courseDao.delete(ID));
+        assertTrue(courseDao.delete(ID));
     }
 
     @Test
     public void deleteWhenNotExists() throws SQLException {
         when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
         when(mockPreparedStatement.executeUpdate()).thenReturn(0);
-        assertEquals(false, courseDao.delete(ID));
+        assertTrue(courseDao.delete(ID));
 
     }
 

@@ -65,7 +65,7 @@ public class JDBCCourseDaoIntegrationTest {
     }
 
     @Test
-    void updateWhenExists() {
+    public void updateWhenExists() {
         //when
         Course c = courseDao.insert(new Course("UPD_E","Test update when exists"));
         c.setDescription("Test update when exists - updated");

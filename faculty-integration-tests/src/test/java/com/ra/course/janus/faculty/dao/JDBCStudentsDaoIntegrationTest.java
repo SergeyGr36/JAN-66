@@ -5,37 +5,32 @@ import com.ra.course.janus.faculty.entity.Student;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
 
 public class JDBCStudentsDaoIntegrationTest {
-    public static  Connection conn ;
     public static JDBCDaoStudent studentDao;
 
     private static final long ID = 1;
 
     @BeforeEach
-    public void beforeEach () throws Exception{
+    public void beforeEach () {
         studentDao = new JDBCDaoStudent( ConnectionUtil.getDataSource());
     }
 
     @Test
 
-    void insert(){
+    public void insert(){
         Student s = new Student();
         s.setCode("J2EE");
-        s.setDescription("Java web developmnt course");
-        s = (Student) studentDao.insert(s);
+        s.setDescription("Java web development course");
+        s = studentDao.insert(s);
         assertNotNull(s.getId());
     }
 
     @Test
-    void findAllWhenNotExists() {
-        List<Student> students = studentDao.select();
+    public void findAllWhenNotExists() {
         studentDao.delete(1);
         studentDao.delete(2);
         studentDao.delete(3);
@@ -44,7 +39,7 @@ public class JDBCStudentsDaoIntegrationTest {
     }
 
     @Test
-    void findAllWhenExists() {
+    public void findAllWhenExists() {
         int n0 = studentDao.select().size();
         insert();
         insert();
@@ -53,7 +48,7 @@ public class JDBCStudentsDaoIntegrationTest {
     }
 
     @Test
-    void findByIdWhenExists() {
+    public void findByIdWhenExists() {
         Student s = new Student();
         s.setCode("J2EE");
         s.setDescription("Java web development course");
@@ -63,12 +58,12 @@ public class JDBCStudentsDaoIntegrationTest {
     }
 
     @Test
-    void findByIdWhenNotExists() {
+    public void findByIdWhenNotExists() {
         assertNull(studentDao.selectById((-1)));
     }
 
     @Test
-    void updateWhenExists() {
+    public void updateWhenExists() {
         Student s = new Student();
         s.setCode("UPD_E");
         s.setDescription("Test update when exists");
@@ -83,7 +78,7 @@ public class JDBCStudentsDaoIntegrationTest {
     }
 
     @Test
-    void updateWhenNotExists() {
+    public void updateWhenNotExists() {
         Student s = new Student();
         s.setCode("UPD_NE");
         s.setDescription("Test update when not exists");
@@ -95,17 +90,17 @@ public class JDBCStudentsDaoIntegrationTest {
     }
 
     @Test
-    void deleteWhenExists() {
+    public void deleteWhenExists() {
         Student s = new Student();
         s.setCode("DEL_E");
         s.setDescription("Test delete when exists");
-        s = studentDao.insert(s);
+        studentDao.insert(s);
         assertTrue(studentDao.delete(ID));
 
     }
 
     @Test
-    void deleteWhenNotExists() {
+    public void deleteWhenNotExists() {
         Student s = new Student();
         s.setCode("DEL_NE");
         s.setDescription("Test delete when not exists");
