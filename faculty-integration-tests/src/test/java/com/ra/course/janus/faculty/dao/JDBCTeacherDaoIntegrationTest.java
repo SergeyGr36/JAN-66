@@ -30,8 +30,8 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void insertTest() {
-        Teacher teacher = TEACHER_DAO.insert(TEACHER_INSERT);
-        assertEquals(teacher, TEACHER_INSERT);
+        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
+        assertEquals(testTeacher, TEACHER_INSERT);
     }
 
     @Test
@@ -58,7 +58,7 @@ class JDBCTeacherDaoIntegrationTest {
     @Test
     public void deleteTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
-        boolean isDeleted = TEACHER_DAO.delete(1L);
+        boolean isDeleted = TEACHER_DAO.delete(TEACHER_INSERT.getId());
         assertTrue(isDeleted);
     }
 
