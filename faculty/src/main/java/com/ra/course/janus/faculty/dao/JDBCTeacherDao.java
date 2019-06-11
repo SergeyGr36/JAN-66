@@ -19,7 +19,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
     private static final String INSERT_TEACHER = "INSERT INTO TEACHER (ID, NAME, COURSE) VALUES (?, ?, ?)";
     private static final String UPDATE_TEACHER = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT_TEACHER = "SELECT * FROM TEACHER";
-    private static final String SELECT_BY_ID = "SELECT FROM TEACHER WHERE ID = ?";
+    private static final String SELECT_BY_ID = "SELECT * FROM TEACHER WHERE ID = ?";
     private static final String DELETE_TEACHER = "DELETE FROM TEACHER WHERE ID = ?";
 
     transient private final DataSource dataSource;

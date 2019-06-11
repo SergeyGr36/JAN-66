@@ -45,8 +45,15 @@ class JDBCTeacherDaoIntegrationTest {
     @Test
     public void selectTest() {
         TEACHER_DAO.insert(TEACHER_INSERT);
-        List list = TEACHER_DAO.select();
+        List<Teacher> list = TEACHER_DAO.select();
         assertTrue(list.size() > 0);
+    }
+
+    @Test
+    public void selectById() {
+        TEACHER_DAO.insert(TEACHER_INSERT);
+        Teacher teacher = TEACHER_DAO.selectById(1);
+        assertEquals(teacher, TEACHER_INSERT);
     }
 
     @Test
