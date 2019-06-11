@@ -9,7 +9,7 @@ public class PlainJdbcManagerDAOIntegrationTest extends BaseDAOIntegrationTest {
     @Autowired
     private BaseDao<Manager> managerDAO;
 
-    Manager managerToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
+    protected Manager managerToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
 
     @Override
     protected String getTableName() {return "MANAGERS";}

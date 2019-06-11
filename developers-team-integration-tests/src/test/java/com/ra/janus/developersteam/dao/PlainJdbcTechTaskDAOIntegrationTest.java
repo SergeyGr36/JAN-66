@@ -9,7 +9,7 @@ public class PlainJdbcTechTaskDAOIntegrationTest extends BaseDAOIntegrationTest 
     @Autowired
     private BaseDao<TechnicalTask> taskDAO;
 
-    TechnicalTask taskToCreate = new TechnicalTask(1L, "Jan 40", "Integration tests for Dev Team");
+    protected TechnicalTask taskToCreate = new TechnicalTask(1L, "Jan 40", "Integration tests for Dev Team");
 
     @Override
     protected String getTableName() {return "TASKS";}

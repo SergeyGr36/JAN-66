@@ -1,17 +1,11 @@
 package com.ra.janus.developersteam.datasources;
 
 import com.ra.janus.developersteam.configuration.DBProperties;
-import com.ra.janus.developersteam.utils.PropertyReaderUtils;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import javax.sql.DataSource;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class DataSourceFactoryMockTest {

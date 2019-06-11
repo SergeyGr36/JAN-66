@@ -10,7 +10,7 @@ public class PlainJdbcWorkDAOIntegrationTest extends BaseDAOIntegrationTest {
     @Autowired
     private BaseDao<Work> workDAO;
 
-    Work workToCreate = new Work(1L, "Developer", new BigDecimal(4000.00));
+    protected Work workToCreate = new Work(1L, "Developer", new BigDecimal("4000.00"));
 
     @Override
     protected String getTableName() {return "WORKS";}
@@ -30,7 +30,7 @@ public class PlainJdbcWorkDAOIntegrationTest extends BaseDAOIntegrationTest {
 
         Work updatedWork = (Work) entity;
         updatedWork.setName("Tester");
-        updatedWork.setPrice(new BigDecimal(2000.00));
+        updatedWork.setPrice(new BigDecimal("2000.00"));
 
         return updatedWork;
     }

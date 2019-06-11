@@ -7,7 +7,6 @@ import java.util.Map;
 
 class PlainJdbcManagerDAOMockTest extends BaseDAOMockTest {
 
-    private BaseDao<Manager> managerDAO;
     private Manager manager;
 
     @Override
@@ -18,7 +17,7 @@ class PlainJdbcManagerDAOMockTest extends BaseDAOMockTest {
     }
     @Override
     protected BaseDao getDAO() {
-        managerDAO = new PlainJdbcManagerDAO(mockTemplate);
+        BaseDao<Manager> managerDAO = new PlainJdbcManagerDAO(mockTemplate);
         return managerDAO;
     }
     @Override

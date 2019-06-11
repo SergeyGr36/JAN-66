@@ -44,7 +44,7 @@ public abstract class BaseDAOIntegrationTest {
     }
 
     @Test
-    void createEntityTest() throws Exception {
+    public void createEntityTest() throws Exception {
         //when
         BaseEntity entity = getDAO().create(getEntityToCreate());
 
@@ -53,7 +53,7 @@ public abstract class BaseDAOIntegrationTest {
     }
 
     @Test
-    void getEntityByIdTest() throws Exception {
+    public void getEntityByIdTest() throws Exception {
         //when
         BaseEntity createdEntity = getDAO().create(getEntityToCreate());
         BaseEntity gottenBill = getDAO().get(createdEntity.getId());
@@ -63,7 +63,7 @@ public abstract class BaseDAOIntegrationTest {
     }
 
     @Test
-    void getAllEntitiesTest() throws Exception {
+    public void getAllEntitiesTest() throws Exception {
         //when
         BaseEntity createdEntity = getDAO().create(getEntityToCreate());
         List<BaseEntity> expected = Arrays.asList(createdEntity);
@@ -74,7 +74,7 @@ public abstract class BaseDAOIntegrationTest {
     }
 
     @Test
-    void updateEntityTest() throws Exception {
+    public void updateEntityTest() throws Exception {
         //when
         BaseEntity createdEntity = getDAO().create(getEntityToCreate());
         getDAO().update(getUpdatedEntity(createdEntity));
@@ -85,7 +85,7 @@ public abstract class BaseDAOIntegrationTest {
     }
 
     @Test
-    void deleteEntityTest() throws Exception {
+    public void deleteEntityTest() throws Exception {
         //when
         BaseEntity createdEntity = getDAO().create(getEntityToCreate());
         getDAO().delete(createdEntity.getId());

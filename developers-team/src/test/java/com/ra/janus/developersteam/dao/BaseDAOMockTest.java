@@ -57,7 +57,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenCreateEntityShouldReturnIt() throws Exception {
+    public void whenCreateEntityShouldReturnIt() throws Exception {
         //given
         when(mockConnection.prepareStatement(getInsertSql(), Statement.RETURN_GENERATED_KEYS))
                 .thenReturn(mockPreparedStatement);
@@ -86,7 +86,7 @@ public abstract class BaseDAOMockTest {
     //==============================
 
     @Test
-    void whenReadEntityFromDbByIdThenReturnIt() throws Exception {
+    public void whenReadEntityFromDbByIdThenReturnIt() throws Exception {
         //given
         when(mockTemplate.queryForObject(eq(getSelectOneSql()), any(BeanPropertyRowMapper.class), eq(testId)))
                 .thenReturn(getTestEntity());
@@ -99,7 +99,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenReadAbsentEntityFromDbByIdThenReturnNull() throws Exception {
+    public void whenReadAbsentEntityFromDbByIdThenReturnNull() throws Exception {
         //given
         when(mockTemplate.queryForObject(eq(getSelectOneSql()), any(BeanPropertyRowMapper.class), eq(testId)))
                 .thenThrow(new EmptyResultDataAccessException(1));
@@ -112,7 +112,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenReadAllEntitiesFromDbThenReturnNonEmptyList() throws Exception {
+    public void whenReadAllEntitiesFromDbThenReturnNonEmptyList() throws Exception {
         //given
         List<Map<String, Object>> rows = new ArrayList<>();
         rows.add(getTestEntityMap());
@@ -126,7 +126,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenUpdateEntityInDbThenReturnTrue() throws Exception {
+    public void whenUpdateEntityInDbThenReturnTrue() throws Exception {
         //given
         when(mockTemplate.update(eq(getUpdateSql()), any(PreparedStatementSetter.class))).thenAnswer(new Answer() {
             @Override
@@ -146,7 +146,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenUpdateEntityInDbThenReturnFalse() throws Exception {
+    public void whenUpdateEntityInDbThenReturnFalse() throws Exception {
         //given
         when(mockTemplate.update(eq(getUpdateSql()), any(PreparedStatementSetter.class))).thenReturn(0);
 
@@ -158,7 +158,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenDeleteEntityFromDbThenReturnTrue() throws Exception {
+    public void whenDeleteEntityFromDbThenReturnTrue() throws Exception {
         //given
         when(mockTemplate.update(getDeleteSql(), testId)).thenReturn(1);
 
@@ -170,7 +170,7 @@ public abstract class BaseDAOMockTest {
     }
 
     @Test
-    void whenDeleteEntityFromDbThenReturnFalse() throws Exception {
+    public void whenDeleteEntityFromDbThenReturnFalse() throws Exception {
         //given
         when(mockTemplate.update(getDeleteSql(), testId)).thenReturn(0);
 

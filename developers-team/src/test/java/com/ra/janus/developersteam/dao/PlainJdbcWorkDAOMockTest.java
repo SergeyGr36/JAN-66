@@ -8,7 +8,6 @@ import java.util.Map;
 
 class PlainJdbcWorkDAOMockTest extends BaseDAOMockTest {
 
-    private BaseDao<Work> workDAO;
     private Work work;
 
     @Override
@@ -19,7 +18,7 @@ class PlainJdbcWorkDAOMockTest extends BaseDAOMockTest {
     }
     @Override
     protected BaseDao getDAO() {
-        workDAO = new PlainJdbcWorkDAO(mockTemplate);
+        BaseDao<Work> workDAO = new PlainJdbcWorkDAO(mockTemplate);
         return workDAO;
     }
     @Override

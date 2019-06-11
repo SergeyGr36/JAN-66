@@ -9,7 +9,7 @@ public class PlainJdbcQualificationDAOIntegrationTest extends BaseDAOIntegration
     @Autowired
     private BaseDao<Qualification> qualificationDAO;
 
-    Qualification qualificationToCreate = new Qualification(1L, "Web Developer", "Front End");
+    protected Qualification qualificationToCreate = new Qualification(1L, "Web Developer", "Front End");
 
     @Override
     protected String getTableName() {return "QUALIFICATIONS";}

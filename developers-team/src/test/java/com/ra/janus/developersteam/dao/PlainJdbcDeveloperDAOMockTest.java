@@ -7,7 +7,6 @@ import java.util.Map;
 
 class PlainJdbcDeveloperDAOMockTest extends BaseDAOMockTest {
 
-    private BaseDao<Developer> developerDAO;
     private Developer developer;
 
     @Override
@@ -18,7 +17,7 @@ class PlainJdbcDeveloperDAOMockTest extends BaseDAOMockTest {
     }
     @Override
     protected BaseDao getDAO() {
-        developerDAO = new PlainJdbcDeveloperDAO(mockTemplate);
+        BaseDao<Developer> developerDAO = new PlainJdbcDeveloperDAO(mockTemplate);
         return developerDAO;
     }
     @Override

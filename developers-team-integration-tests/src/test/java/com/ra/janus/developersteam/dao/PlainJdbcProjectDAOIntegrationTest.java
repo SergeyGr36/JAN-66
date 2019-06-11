@@ -10,7 +10,7 @@ public class PlainJdbcProjectDAOIntegrationTest extends BaseDAOIntegrationTest {
     @Autowired
     private BaseDao<Project> projectDAO;
 
-    Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
+    protected Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
 
     @Override
     protected String getTableName() {return "PROJECTS";}

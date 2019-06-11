@@ -7,7 +7,6 @@ import java.util.*;
 
 class PlainJdbcBillDAOMockTest extends BaseDAOMockTest {
 
-    private BaseDao<Bill> billDAO;
     private Bill bill;
 
     @Override
@@ -18,7 +17,7 @@ class PlainJdbcBillDAOMockTest extends BaseDAOMockTest {
     }
     @Override
     protected BaseDao getDAO() {
-        billDAO = new PlainJdbcBillDAO(mockTemplate);
+        BaseDao<Bill> billDAO = new PlainJdbcBillDAO(mockTemplate);
         return billDAO;
     }
     @Override
