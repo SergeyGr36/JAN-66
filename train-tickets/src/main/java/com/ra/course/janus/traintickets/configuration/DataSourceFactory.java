@@ -1,17 +1,15 @@
 package com.ra.course.janus.traintickets.configuration;
 
-import com.ra.course.janus.traintickets.dao.UserJdbcDAO;
+
 import com.ra.course.janus.traintickets.exception.ConfigException;
 import com.zaxxer.hikari.HikariDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Properties;
 
-import static com.ra.course.janus.traintickets.exception.ErrorMessages.CONFIG_FAILED;
+
 
 public enum DataSourceFactory {
 
@@ -26,7 +24,7 @@ public enum DataSourceFactory {
         }
     };
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserJdbcDAO.class);
+
 
     static final Properties DB_PROPS;
     static {
@@ -34,7 +32,7 @@ public enum DataSourceFactory {
         try {
             DB_PROPS.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties")));
         } catch (IOException e) {
-            LOGGER.error(CONFIG_FAILED.getMessage(), e);
+
             throw new ConfigException(e);
         }
     }
