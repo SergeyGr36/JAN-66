@@ -1,132 +1,83 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.User;
-import com.ra.course.janus.traintickets.exception.DAOException;
-import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.sql.Statement;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class UserJdbcDAO implements IJdbcDao<User> {
-    private final transient DataSource dataSource;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserJdbcDAO.class);
-
     private static final String SAVE_USER = "insert into USERS (name,email,password) values (?,?,?)";
     private static final String UPDATE_USER = "update USERS set name=?, email=?, password=? WHERE id=?";
     private static final String DELETE_USER = "delete from USERS where id=?";
     private static final String FIND_BY_ID = "select * from USERS where id=?";
     private static final String FIND_ALL = "select * from USERS";
 
-    private static final int COL_IND_ID = 1;
-    private static final int COL_IND_NAME = 2;
-    private static final int COL_IND_EMAIL = 3;
-    private static final int COL_IND_PASSWD = 4;
+    private final transient JdbcTemplate jdbcTemplate;
 
-    public UserJdbcDAO(final DataSource dataSource) {
-        this.dataSource = dataSource;
+    public UserJdbcDAO(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public User save(final User user) {
-        try (Connection conn = dataSource.getConnection()) {
-             try(PreparedStatement saveStmt = conn.prepareStatement(SAVE_USER)) {
-                 prepareStatementWithUser(saveStmt, user);
-                 saveStmt.executeUpdate();
-                 try (ResultSet generatedKeys = saveStmt.getGeneratedKeys()) {
-                     if (generatedKeys.next()) {
-                         final long id = generatedKeys.getLong(COL_IND_ID);
-                         return new User(
-                                 id,
-                                 user.getName(),
-                                 user.getEmail(),
-                                 user.getPassword()
-                         );
-                     } else {
-                         final DAOException e = new DAOException();
-                         LOGGER.error(SAVE_FAILED.getMessage(), e);
-                         throw e;
-                     }
-                 }
-             }
-        } catch (SQLException e) {
-            LOGGER.error(SAVE_FAILED.getMessage(), e);
-            throw new DAOException(e);
-        }
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(
+                conn -> {
+                    final PreparedStatement ps = conn.prepareStatement(SAVE_USER, Statement.RETURN_GENERATED_KEYS);
+                    prepareStatementWithUser(ps, user);
+                    return ps;
+                },
+                keyHolder
+        );
+
+        final long id = keyHolder.getKey().longValue();
+
+        return new User(
+                id,
+                user.getName(),
+                user.getEmail(),
+                user.getPassword()
+        );
     }
 
     @Override
     public boolean update(final User user) {
-        try (Connection conn = dataSource.getConnection()) {
-             try (PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER)) {
-                 prepareStatementWithUser(updateStmt, user);
-                 updateStmt.setLong(4, user.getId());
-                 return updateStmt.executeUpdate() > 0;
-             }
-        } catch (SQLException e) {
-            LOGGER.error(UPDATE_FAILED.getMessage(), e);
-            throw new DAOException(e);
-        }
+        final int rowCount = jdbcTemplate.update(UPDATE_USER, findStmt -> {
+            prepareStatementWithUser(findStmt, user);
+            findStmt.setLong(4, user.getId());
+        });
+        return rowCount > 0;
     }
+
 
     @Override
     public boolean delete(final Long id) {
-        try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement deleteStmt = conn.prepareStatement(DELETE_USER)) {
-                deleteStmt.setLong(1, id);
-                return deleteStmt.executeUpdate() > 0;
-            }
-        } catch (SQLException e) {
-            LOGGER.error(DELETE_FAILED.getMessage(), e);
-            throw new DAOException(e);
-        }
+        final int rowCount = jdbcTemplate.update(DELETE_USER, id);
+        return rowCount > 0;
     }
 
     @Override
     public User findById(final Long id) {
-        final User user;
-        try (Connection conn = dataSource.getConnection()) {
-            try (PreparedStatement findStmt = conn.prepareStatement(FIND_BY_ID)) {
-                findStmt.setLong(1, id);
-                try (ResultSet rs = findStmt.executeQuery()) {
-                    if (rs.next()) {
-                        user = toUser(rs);
-                    } else {
-                        user = null;
-                    }
-                }
-            }
-            return user;
-        } catch (SQLException e) {
-            LOGGER.error(FIND_FAILED.getMessage(), e);
-            throw new DAOException(e);
-        }
+        return jdbcTemplate.queryForObject(FIND_BY_ID,
+                BeanPropertyRowMapper.newInstance(User.class), id);
     }
 
     @Override
     public List<User> findAll() {
-        try (Connection conn = dataSource.getConnection();
-            PreparedStatement userStatement = conn.prepareStatement(FIND_ALL);
-            ResultSet rs = userStatement.executeQuery()) {
-            final List<User> users = new ArrayList();
-            if (rs.next()) {
-                users.add(toUser(rs));
-            }
-            return users;
-        } catch (SQLException e) {
-            LOGGER.error(FINDALL_FAILED.getMessage(), e);
-            throw new DAOException(e);
-        }
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(FIND_ALL);
+        return rows.stream()
+                .map(this::mapToUser)
+                .collect(Collectors.toList());
     }
 
     private void prepareStatementWithUser(final PreparedStatement ps, final User user) throws SQLException {
@@ -135,12 +86,12 @@ public class UserJdbcDAO implements IJdbcDao<User> {
         ps.setString(3, user.getPassword());
     }
 
-    private User toUser(final ResultSet rs) throws SQLException {
+    private User mapToUser(final Map<String, Object>  userMap)  {
         return new User(
-                rs.getLong(COL_IND_ID),
-                rs.getString(COL_IND_NAME),
-                rs.getString(COL_IND_EMAIL),
-                rs.getString(COL_IND_PASSWD)
+                (Long)   userMap.get("id"),
+                (String) userMap.get("name"),
+                (String) userMap.get("email"),
+                (String) userMap.get("password")
         );
     }
 }
