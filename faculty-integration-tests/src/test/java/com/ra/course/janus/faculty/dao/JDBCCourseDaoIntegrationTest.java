@@ -29,14 +29,12 @@ public class JDBCCourseDaoIntegrationTest {
 
     @Test
     public void findAllWhenNotExists() {
-        courseDao.delete(1);
-        courseDao.delete(2);
-        courseDao.delete(3);
-        courseDao.delete(4);
+        for (int a = 1; a <= courseDao.select().size(); a++) {
+            courseDao.delete(a);
+        }
 
-        assertEquals(0,courseDao.select().size());
+        assertEquals(0, courseDao.select().size());
     }
-
 
     @Test
     public void findAllWhenExists() {
@@ -90,7 +88,8 @@ public class JDBCCourseDaoIntegrationTest {
 
     @Test
     public void deleteWhenExists() {
-        assertTrue(courseDao.delete(ID));
+        Course course = courseDao.insert(new Course("UPD_NE", "Test delete when exists"));
+        assertTrue(courseDao.delete(course.getTid()));
     }
 
     @Test

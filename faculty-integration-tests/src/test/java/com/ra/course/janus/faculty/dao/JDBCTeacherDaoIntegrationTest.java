@@ -23,8 +23,6 @@ class JDBCTeacherDaoIntegrationTest {
     private static final GenericDao<Teacher> TEACHER_DAO = new JDBCTeacherDao(DATA_SOURCE);
     private static final Teacher TEACHER_INSERT = new Teacher(1, "Roma", "Java");
 
-    private static Teacher TEST_TEACHER;
-
     @BeforeEach
     public void before() throws Exception {
         createTable();
@@ -32,17 +30,15 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void insertTest() {
-        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
-        assertEquals(TEST_TEACHER, TEACHER_INSERT);
+        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
+        assertEquals(testTeacher, TEACHER_INSERT);
     }
 
     @Test
     public void updateTest() {
+        TEACHER_DAO.insert(TEACHER_INSERT);
         Teacher teacher = new Teacher(1, "Max", "PHP");
-        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
-        TEACHER_DAO.update(teacher);
-        List<Teacher> list = TEACHER_DAO.select();
-        assertNotEquals(TEST_TEACHER, list);
+        assertTrue(TEACHER_DAO.update(teacher));
     }
 
     @Test
@@ -54,9 +50,9 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void selectByIdTest() {
-        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
-        Teacher teacher = TEACHER_DAO.selectById(TEST_TEACHER.getId());
-        assertEquals(TEST_TEACHER, teacher);
+        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
+        Teacher teacher = TEACHER_DAO.selectById(testTeacher.getId());
+        assertEquals(testTeacher, teacher);
     }
 
     @Test
