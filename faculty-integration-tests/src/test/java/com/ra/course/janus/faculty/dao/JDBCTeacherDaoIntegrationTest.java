@@ -21,7 +21,7 @@ class JDBCTeacherDaoIntegrationTest {
     private static final String FILE = "src/test/resources/scripts/create_faculty.sql";
     private static final DataSource DATA_SOURCE = ConnectionUtil.getDataSource();
     private static final GenericDao<Teacher> TEACHER_DAO = new JDBCTeacherDao(DATA_SOURCE);
-    private static final Teacher TEACHER_INSERT = new Teacher(1L,"Roma", "Java");
+    private static final Teacher TEACHER_INSERT = new Teacher("Roma", "Java");
 
     @BeforeEach
     public void before() throws Exception {
@@ -36,9 +36,12 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void updateTest() {
-        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
-        boolean isUpdated = TEACHER_DAO.update(testTeacher);
-        assertTrue(isUpdated);
+        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
+        TEACHER_INSERT.setName("Oleg");
+        TEACHER_INSERT.setCourse("PHP");
+        TEACHER_DAO.update(TEACHER_INSERT);
+        List<Teacher> list = TEACHER_DAO.select();
+        assertNotEquals(teacherTest, list);
     }
 
     @Test
@@ -50,9 +53,9 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void selectById() {
-        TEACHER_DAO.insert(TEACHER_INSERT);
-        Teacher teacher = TEACHER_DAO.selectById(1);
-        assertEquals(teacher, TEACHER_INSERT);
+        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
+        Teacher teacher = TEACHER_DAO.selectById(teacherTest.getId());
+        assertEquals(teacher, teacherTest);
     }
 
     @Test

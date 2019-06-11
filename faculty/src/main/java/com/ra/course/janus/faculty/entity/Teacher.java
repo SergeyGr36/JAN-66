@@ -9,6 +9,11 @@ public class Teacher {
 
     public Teacher() {}
 
+    public Teacher(String name, String course) {
+        this.name = name;
+        this.course = course;
+    }
+
     public Teacher(long id, String name, String course) {
         this.id = id;
         this.name = name;
@@ -58,5 +63,14 @@ public class Teacher {
         return id == teacher.id &&
                 Objects.equals(name, teacher.name) &&
                 Objects.equals(course, teacher.course);
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher { " +
+                "id = " + id +
+                ", name = '" + name + '\'' +
+                ", course = '" + course + '\'' +
+                '}';
     }
 }
