@@ -31,30 +31,14 @@ public abstract class BaseDAOMockTest {
     protected PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
     protected long testId = 1L;
 
-    protected BaseEntity getTestEntity() {
-        return null;
-    }
-    protected BaseDao<BaseEntity> getDAO() {
-        return null;
-    }
-    protected String getInsertSql() {
-        return null;
-    }
-    protected String getUpdateSql() {
-        return null;
-    }
-    protected String getSelectAllSql() {
-        return null;
-    }
-    protected String getSelectOneSql() {
-        return null;
-    }
-    protected String getDeleteSql() {
-        return null;
-    }
-    protected Map<String, Object> getTestEntityMap() {
-        return null;
-    }
+    protected abstract BaseEntity getTestEntity();
+    protected abstract BaseDao<BaseEntity> getDAO();
+    protected abstract String getInsertSql();
+    protected abstract String getUpdateSql();
+    protected abstract String getSelectAllSql();
+    protected abstract String getSelectOneSql();
+    protected abstract String getDeleteSql();
+    protected abstract Map<String, Object> getTestEntityMap();
 
     @Test
     public void whenCreateEntityShouldReturnIt() throws Exception {
