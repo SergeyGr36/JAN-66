@@ -36,9 +36,8 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void updateTest() {
-        Teacher teacher = new Teacher(1L, "Oleg", "PHP");
-        TEACHER_DAO.insert(TEACHER_INSERT);
-        boolean isUpdated = TEACHER_DAO.update(teacher);
+        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
+        boolean isUpdated = TEACHER_DAO.update(testTeacher);
         assertTrue(isUpdated);
     }
 

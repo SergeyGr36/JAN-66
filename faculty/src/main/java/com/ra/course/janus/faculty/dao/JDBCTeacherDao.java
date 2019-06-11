@@ -60,7 +60,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             preparedStatement.setString(2, teacher.getCourse());
             preparedStatement.setLong(3, teacher.getId());
             final int rowsCount = preparedStatement.executeUpdate();
-            return rowsCount != 0;
+            return rowsCount > 0;
         } catch (SQLException e) {
             LOGGER.error(e);
             throw new DaoException(e);
