@@ -92,3 +92,18 @@ project(':train-tickets-integration-tests') {
         compile project(':train-tickets')
     }
 }
+
+project(':faculty') {
+    dependencies {
+        compile db.h2
+        compile spring.context
+        compile log.log4jDependency
+        compile hibernate.hikari
+    }
+}
+
+project(':faculty-integration-tests') {
+    dependencies {
+        compile project(':faculty')
+    }
+}
