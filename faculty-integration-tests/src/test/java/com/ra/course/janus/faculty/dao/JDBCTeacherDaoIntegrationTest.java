@@ -21,7 +21,9 @@ class JDBCTeacherDaoIntegrationTest {
     private static final String FILE = "src/test/resources/scripts/create_faculty.sql";
     private static final DataSource DATA_SOURCE = ConnectionUtil.getDataSource();
     private static final GenericDao<Teacher> TEACHER_DAO = new JDBCTeacherDao(DATA_SOURCE);
-    private static final Teacher TEACHER_INSERT = new Teacher("Roma", "Java");
+    private static final Teacher TEACHER_INSERT = new Teacher(1, "Roma", "Java");
+
+    private static Teacher TEST_TEACHER;
 
     @BeforeEach
     public void before() throws Exception {
@@ -30,18 +32,17 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void insertTest() {
-        Teacher testTeacher = TEACHER_DAO.insert(TEACHER_INSERT);
-        assertEquals(testTeacher, TEACHER_INSERT);
+        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
+        assertEquals(TEST_TEACHER, TEACHER_INSERT);
     }
 
     @Test
     public void updateTest() {
-        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
-        TEACHER_INSERT.setName("Oleg");
-        TEACHER_INSERT.setCourse("PHP");
-        TEACHER_DAO.update(TEACHER_INSERT);
+        Teacher teacher = new Teacher(1, "Max", "PHP");
+        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
+        TEACHER_DAO.update(teacher);
         List<Teacher> list = TEACHER_DAO.select();
-        assertNotEquals(teacherTest, list);
+        assertNotEquals(TEST_TEACHER, list);
     }
 
     @Test
@@ -52,16 +53,16 @@ class JDBCTeacherDaoIntegrationTest {
     }
 
     @Test
-    public void selectById() {
-        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
-        Teacher teacher = TEACHER_DAO.selectById(teacherTest.getId());
-        assertEquals(teacher, teacherTest);
+    public void selectByIdTest() {
+        TEST_TEACHER = TEACHER_DAO.insert(TEACHER_INSERT);
+        Teacher teacher = TEACHER_DAO.selectById(TEST_TEACHER.getId());
+        assertEquals(TEST_TEACHER, teacher);
     }
 
     @Test
     public void deleteTest() {
-        TEACHER_DAO.insert(TEACHER_INSERT);
-        boolean isDeleted = TEACHER_DAO.delete(TEACHER_INSERT.getId());
+        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
+        boolean isDeleted = TEACHER_DAO.delete(teacherTest.getId());
         assertTrue(isDeleted);
     }
 

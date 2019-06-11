@@ -92,7 +92,7 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
             final ResultSet resultSet = preparedStatement.executeQuery();
             try {
                 if (resultSet.next()) {
-                    return new Teacher(toTeacher(resultSet));
+                    return toTeacher(resultSet);
                 } else {
                     return null;
                 }
