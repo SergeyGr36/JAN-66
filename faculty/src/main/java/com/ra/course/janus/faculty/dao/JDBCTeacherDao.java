@@ -16,7 +16,7 @@ import java.util.List;
 public class JDBCTeacherDao implements GenericDao<Teacher> {
     private final static Logger LOGGER = Logger.getLogger(JDBCTeacherDao.class);
 
-    private static final String INSERT_TEACHER = "INSERT INTO TEACHER (ID, NAME, COURSE) VALUES (?, ?, ?)";
+    private static final String INSERT_TEACHER = "INSERT INTO TEACHER (NAME, COURSE) VALUES (?, ?)";
     private static final String UPDATE_TEACHER = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT_TEACHER = "SELECT * FROM TEACHER";
     private static final String SELECT_BY_ID = "SELECT * FROM TEACHER WHERE ID = ?";
@@ -34,9 +34,8 @@ public class JDBCTeacherDao implements GenericDao<Teacher> {
     }
 
     private void objectStatement(final PreparedStatement preparedStatement, final Teacher teacher) throws SQLException {
-        preparedStatement.setLong(1, teacher.getId());
-        preparedStatement.setString(2, teacher.getName());
-        preparedStatement.setString(3, teacher.getCourse());
+        preparedStatement.setString(1, teacher.getName());
+        preparedStatement.setString(2, teacher.getCourse());
     }
 
     @Override

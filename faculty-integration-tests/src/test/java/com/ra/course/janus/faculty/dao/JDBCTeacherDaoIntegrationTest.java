@@ -61,9 +61,8 @@ class JDBCTeacherDaoIntegrationTest {
 
     @Test
     public void deleteTest() {
-        Teacher teacherTest = TEACHER_DAO.insert(TEACHER_INSERT);
-        boolean isDeleted = TEACHER_DAO.delete(teacherTest.getId());
-        assertTrue(isDeleted);
+        TEACHER_DAO.insert(TEACHER_INSERT);
+        assertTrue(TEACHER_DAO.delete(TEACHER_INSERT.getId()));
     }
 
     private static void createTable() throws SQLException, IOException {

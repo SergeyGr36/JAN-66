@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JDBCTeacherDaoTest {
-    private static final String INSERT_TEACHER = "INSERT INTO TEACHER (ID, NAME, COURSE) VALUES (?, ?, ?)";
+    private static final String INSERT_TEACHER = "INSERT INTO TEACHER (NAME, COURSE) VALUES (?, ?)";
     private static final String UPDATE_TEACHER = "UPDATE TEACHER SET NAME = ?, COURSE = ? WHERE ID = ?";
     private static final String SELECT_TEACHER = "SELECT * FROM TEACHER";
     private static final String SELECT_BY_ID = "SELECT * FROM TEACHER WHERE ID = ?";
