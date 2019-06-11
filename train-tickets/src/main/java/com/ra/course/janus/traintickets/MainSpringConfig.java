@@ -4,6 +4,7 @@ import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -16,4 +17,8 @@ public class MainSpringConfig {
         return DataSourceFactory.DATA_SOURCE.getInstance();
     }
 
+    @Bean
+    public JdbcTemplate jdbcTemplate(final DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
 }
