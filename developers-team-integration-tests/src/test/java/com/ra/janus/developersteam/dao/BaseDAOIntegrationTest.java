@@ -28,9 +28,7 @@ public abstract class BaseDAOIntegrationTest {
     protected abstract String getTableName();
     protected abstract BaseDao<BaseEntity> getDAO();
     protected abstract BaseEntity getEntityToCreate();
-    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
-        return null;
-    }
+    protected abstract BaseEntity getUpdatedEntity(BaseEntity entity);
 
     @BeforeEach
     public void beforeEach() throws Exception {
