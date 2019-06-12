@@ -1,7 +1,7 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.Developer;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class PlainJdbcDeveloperDAOIntegrationTest extends BaseDAOIntegrationTest {
@@ -9,24 +9,40 @@ public class PlainJdbcDeveloperDAOIntegrationTest extends BaseDAOIntegrationTest
     @Autowired
     private BaseDao<Developer> developerDAO;
 
-    protected Developer developerToCreate = new Developer(1L, "Nick");
+    private Developer developerToCreate = new Developer(1L, "Nick");
 
-    @Override
-    protected BaseDao getDAO() {
-        return developerDAO;
+    private Delegate updatedEntity() {
+
+        return  (entity) -> {
+            Developer updatedDeveloper = (Developer) entity;
+            updatedDeveloper.setName("Jamshut");
+
+            return updatedDeveloper;
+        };
     }
 
-    @Override
-    protected BaseEntity getEntityToCreate() {
-        return developerToCreate;
+    @Test
+    public void createDeveloperTest() throws Exception {
+        createEntityTest(developerDAO, developerToCreate);
     }
 
-    @Override
-    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
+    @Test
+    public void getDeveloperByIdTest() throws Exception {
+        getEntityByIdTest(developerDAO, developerToCreate);
+    }
 
-        Developer updatedDeveloper = (Developer) entity;
-        updatedDeveloper.setName("Jamshut");
+    @Test
+    public void getAllDevelopersTest() throws Exception {
+        getAllEntitiesTest(developerDAO, developerToCreate);
+    }
 
-        return updatedDeveloper;
+    @Test
+    public void updateDeveloperTest() throws Exception {
+        updateEntityTest(developerDAO, developerToCreate, updatedEntity());
+    }
+
+    @Test
+    public void deleteDeveloperTest() throws Exception {
+        deleteEntityTest(developerDAO, developerToCreate);
     }
 }

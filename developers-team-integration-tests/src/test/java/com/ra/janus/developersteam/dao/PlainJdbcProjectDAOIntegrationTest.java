@@ -1,7 +1,7 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.Project;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.sql.Date;
 
@@ -10,27 +10,43 @@ public class PlainJdbcProjectDAOIntegrationTest extends BaseDAOIntegrationTest {
     @Autowired
     private BaseDao<Project> projectDAO;
 
-    protected Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
+    private Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
 
-    @Override
-    protected BaseDao getDAO() {
-        return projectDAO;
+    private Delegate updatedEntity() {
+
+        return  (entity) -> {
+            Project updatedProject = (Project) entity;
+            updatedProject.setName("Developers Team");
+            updatedProject.setDescription("first project");
+            updatedProject.setStatus("WIP");
+            updatedProject.setEta(Date.valueOf("2019-08-01"));
+
+            return updatedProject;
+        };
     }
 
-    @Override
-    protected BaseEntity getEntityToCreate() {
-        return projectToCreate;
+    @Test
+    public void createProjectTest() throws Exception {
+        createEntityTest(projectDAO, projectToCreate);
     }
 
-    @Override
-    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
+    @Test
+    public void getProjectByIdTest() throws Exception {
+        getEntityByIdTest(projectDAO, projectToCreate);
+    }
 
-        Project updatedProject = (Project) entity;
-        updatedProject.setName("Developers Team");
-        updatedProject.setDescription("first project");
-        updatedProject.setStatus("WIP");
-        updatedProject.setEta(Date.valueOf("2019-08-01"));
+    @Test
+    public void getAllProjectsTest() throws Exception {
+        getAllEntitiesTest(projectDAO, projectToCreate);
+    }
 
-        return updatedProject;
+    @Test
+    public void updateProjectTest() throws Exception {
+        updateEntityTest(projectDAO, projectToCreate, updatedEntity());
+    }
+
+    @Test
+    public void deleteProjectTest() throws Exception {
+        deleteEntityTest(projectDAO, projectToCreate);
     }
 }

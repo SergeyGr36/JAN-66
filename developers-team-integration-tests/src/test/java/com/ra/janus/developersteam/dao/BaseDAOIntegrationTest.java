@@ -2,7 +2,6 @@ package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.BaseEntity;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,57 +16,58 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 @ContextConfiguration(classes = {AppConfig.class})
 public abstract class BaseDAOIntegrationTest {
 
-    protected abstract BaseDao<BaseEntity> getDAO();
-    protected abstract BaseEntity getEntityToCreate();
-    protected abstract BaseEntity getUpdatedEntity(BaseEntity entity);
-
-    @Test
-    public void createEntityTest() throws Exception {
+    public void createEntityTest(BaseDao baseDao, BaseEntity entityToCreate) throws Exception {
         //when
-        BaseEntity entity = getDAO().create(getEntityToCreate());
+        BaseDao<BaseEntity> dao = baseDao;
+        BaseEntity entity = dao.create(entityToCreate);
 
         //then
-        assertEquals(entity, getDAO().get(entity.getId()));
+        assertEquals(entity, dao.get(entity.getId()));
     }
 
-    @Test
-    public void getEntityByIdTest() throws Exception {
+    public void getEntityByIdTest(BaseDao baseDao, BaseEntity entityToCreate) throws Exception {
         //when
-        BaseEntity createdEntity = getDAO().create(getEntityToCreate());
-        BaseEntity gottenBill = getDAO().get(createdEntity.getId());
+        BaseDao<BaseEntity> dao = baseDao;
+        BaseEntity createdEntity = dao.create(entityToCreate);
+        BaseEntity gottenBill = dao.get(createdEntity.getId());
 
         //then
         assertEquals(createdEntity, gottenBill);
     }
 
-    @Test
-    public void getAllEntitiesTest() throws Exception {
+    public void getAllEntitiesTest(BaseDao baseDao, BaseEntity entityToCreate) throws Exception {
+        //given
+        BaseDao<BaseEntity> dao = baseDao;
+        for (BaseEntity entity : dao.getAll()) {
+            dao.delete(entity.getId());
+        }
+
         //when
-        BaseEntity createdEntity = getDAO().create(getEntityToCreate());
+        BaseEntity createdEntity = dao.create(entityToCreate);
         List<BaseEntity> expected = Arrays.asList(createdEntity);
-        List<BaseEntity> actual = getDAO().getAll();
+        List<BaseEntity> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
-    @Test
-    public void updateEntityTest() throws Exception {
+    public void updateEntityTest(BaseDao baseDao, BaseEntity entityToCreate, Delegate getUpdatedEntity) throws Exception {
         //when
-        BaseEntity createdEntity = getDAO().create(getEntityToCreate());
-        getDAO().update(getUpdatedEntity(createdEntity));
-        BaseEntity updated = getDAO().get(createdEntity.getId());
+        BaseDao<BaseEntity> dao = baseDao;
+        BaseEntity createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity.execute(createdEntity));
+        BaseEntity updated = dao.get(createdEntity.getId());
 
         //then
         assertEquals(updated, createdEntity);
     }
 
-    @Test
-    public void deleteEntityTest() throws Exception {
+    public void deleteEntityTest(BaseDao baseDao, BaseEntity entityToCreate) throws Exception {
         //when
-        BaseEntity createdEntity = getDAO().create(getEntityToCreate());
-        getDAO().delete(createdEntity.getId());
-        BaseEntity actual = getDAO().get(createdEntity.getId());
+        BaseDao<BaseEntity> dao = baseDao;
+        BaseEntity createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        BaseEntity actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

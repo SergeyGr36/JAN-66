@@ -1,35 +1,52 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.Work;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+
 public class PlainJdbcWorkDAOIntegrationTest extends BaseDAOIntegrationTest {
 
     @Autowired
     private BaseDao<Work> workDAO;
 
-    protected Work workToCreate = new Work(1L, "Developer", new BigDecimal("4000.00"));
+    private Work workToCreate = new Work(1L, "Developer", new BigDecimal("4000.00"));
 
-    @Override
-    protected BaseDao getDAO() {
-        return workDAO;
+    private Delegate updatedEntity() {
+
+        return  (entity) -> {
+            Work updatedWork = (Work) entity;
+            updatedWork.setName("Tester");
+            updatedWork.setPrice(new BigDecimal("2000.00"));
+
+            return updatedWork;
+        };
     }
 
-    @Override
-    protected BaseEntity getEntityToCreate() {
-        return workToCreate;
+    @Test
+    public void createWorkTest() throws Exception {
+        createEntityTest(workDAO, workToCreate);
     }
 
-    @Override
-    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
+    @Test
+    public void getWorkByIdTest() throws Exception {
+        getEntityByIdTest(workDAO, workToCreate);
+    }
 
-        Work updatedWork = (Work) entity;
-        updatedWork.setName("Tester");
-        updatedWork.setPrice(new BigDecimal("2000.00"));
+    @Test
+    public void getAllWorksTest() throws Exception {
+        getAllEntitiesTest(workDAO, workToCreate);
+    }
 
-        return updatedWork;
+    @Test
+    public void updateWorkTest() throws Exception {
+        updateEntityTest(workDAO, workToCreate, updatedEntity());
+    }
+
+    @Test
+    public void deleteWorkTest() throws Exception {
+        deleteEntityTest(workDAO, workToCreate);
     }
 
 }

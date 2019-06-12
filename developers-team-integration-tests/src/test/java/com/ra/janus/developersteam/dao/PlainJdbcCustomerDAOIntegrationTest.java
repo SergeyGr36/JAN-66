@@ -1,33 +1,49 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.BaseEntity;
 import com.ra.janus.developersteam.entity.Customer;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class PlainJdbcCustomerDAOIntegrationTest extends BaseDAOIntegrationTest {
     @Autowired
     private BaseDao<Customer> customerDAO;
 
-    protected Customer customerToCreate = new Customer(1L, "John", "Home", "12345");
+    private Customer customerToCreate = new Customer(1L, "John", "Home", "12345");
 
-    @Override
-    protected BaseDao getDAO() {
-        return customerDAO;
+    private Delegate updatedEntity() {
+
+        return  (entity) -> {
+            Customer updatedCustomer = (Customer) entity;
+            updatedCustomer.setName("Jack");
+            updatedCustomer.setAddress("Somewhere");
+            updatedCustomer.setPhone("54321");
+
+            return updatedCustomer;
+        };
     }
 
-    @Override
-    protected BaseEntity getEntityToCreate() {
-        return customerToCreate;
+    @Test
+    public void createCustomerTest() throws Exception {
+        createEntityTest(customerDAO, customerToCreate);
     }
 
-    @Override
-    protected BaseEntity getUpdatedEntity(BaseEntity entity) {
+    @Test
+    public void getCustomerByIdTest() throws Exception {
+        getEntityByIdTest(customerDAO, customerToCreate);
+    }
 
-        Customer updatedCustomer = (Customer) entity;
-        updatedCustomer.setName("Jack");
-        updatedCustomer.setAddress("Somewhere");
-        updatedCustomer.setPhone("54321");
+    @Test
+    public void getAllCustomersTest() throws Exception {
+        getAllEntitiesTest(customerDAO, customerToCreate);
+    }
 
-        return updatedCustomer;
+    @Test
+    public void updateCustomerTest() throws Exception {
+        updateEntityTest(customerDAO, customerToCreate, updatedEntity());
+    }
+
+    @Test
+    public void deleteCustomerTest() throws Exception {
+        deleteEntityTest(customerDAO, customerToCreate);
     }
 }
