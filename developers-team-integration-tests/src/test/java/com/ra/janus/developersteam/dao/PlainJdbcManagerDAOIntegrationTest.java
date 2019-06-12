@@ -12,9 +12,6 @@ public class PlainJdbcManagerDAOIntegrationTest extends BaseDAOIntegrationTest {
     protected Manager managerToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
 
     @Override
-    protected String getTableName() {return "MANAGERS";}
-
-    @Override
     protected BaseDao getDAO() {
         return managerDAO;
     }

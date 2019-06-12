@@ -12,9 +12,6 @@ public class PlainJdbcTechTaskDAOIntegrationTest extends BaseDAOIntegrationTest 
     protected TechnicalTask taskToCreate = new TechnicalTask(1L, "Jan 40", "Integration tests for Dev Team");
 
     @Override
-    protected String getTableName() {return "TASKS";}
-
-    @Override
     protected BaseDao getDAO() {
         return taskDAO;
     }

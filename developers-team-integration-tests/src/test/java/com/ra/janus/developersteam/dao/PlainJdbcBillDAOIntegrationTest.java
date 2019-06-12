@@ -13,9 +13,6 @@ public class PlainJdbcBillDAOIntegrationTest extends BaseDAOIntegrationTest {
     protected Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
 
     @Override
-    protected String getTableName() {return "BILLS";}
-
-    @Override
     protected BaseDao getDAO() {
         return billDAO;
     }

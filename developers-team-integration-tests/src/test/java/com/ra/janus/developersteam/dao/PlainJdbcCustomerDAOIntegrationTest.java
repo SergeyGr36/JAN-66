@@ -11,9 +11,6 @@ public class PlainJdbcCustomerDAOIntegrationTest extends BaseDAOIntegrationTest 
     protected Customer customerToCreate = new Customer(1L, "John", "Home", "12345");
 
     @Override
-    protected String getTableName() {return "CUSTOMERS";}
-
-    @Override
     protected BaseDao getDAO() {
         return customerDAO;
     }

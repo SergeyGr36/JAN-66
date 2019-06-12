@@ -12,9 +12,6 @@ public class PlainJdbcDeveloperDAOIntegrationTest extends BaseDAOIntegrationTest
     protected Developer developerToCreate = new Developer(1L, "Nick");
 
     @Override
-    protected String getTableName() {return "DEVELOPERS";}
-
-    @Override
     protected BaseDao getDAO() {
         return developerDAO;
     }
