@@ -1,7 +1,5 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.entity.BaseEntity;
-import com.ra.janus.developersteam.entity.Project;
 import com.ra.janus.developersteam.entity.Project;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
