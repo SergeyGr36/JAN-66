@@ -1,9 +1,14 @@
 package com.ra.course.janus.traintickets.dao;
+import com.ra.course.janus.traintickets.MainSpringConfig;
 import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Train;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,9 +18,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = MainSpringConfig.class)
 public class TrainJdbcDaoIntegrationTest {
     private static final DataSource dataSource =
             DataSourceFactory.DATA_SOURCE.getInstance();
