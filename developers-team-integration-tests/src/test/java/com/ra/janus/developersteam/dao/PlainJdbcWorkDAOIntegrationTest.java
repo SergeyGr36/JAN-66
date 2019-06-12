@@ -12,7 +12,7 @@ public class PlainJdbcWorkDAOIntegrationTest extends BaseDAOIntegrationTest {
 
     protected Work workToCreate = new Work(1L, "Developer", new BigDecimal("4000.00"));
 
-    @Override
+   @Override
     protected BaseDao getDAO() {
         return workDAO;
     }
