@@ -1,50 +1,92 @@
 package com.ra.janus.developersteam.dao;
 
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Qualification;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public class PlainJdbcQualificationDAOIntegrationTest extends BaseDAOIntegrationTest {
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
+public class PlainJdbcQualificationDAOIntegrationTest {
 
     @Autowired
-    private BaseDao<Qualification> qualificationDAO;
+    private BaseDao<Qualification> dao;
 
-    private Qualification qualificationToCreate = new Qualification(1L, "Web Developer", "Front End");
+    private Qualification entityToCreate = new Qualification(1L, "Web Developer", "Front End");
 
-    private Delegate updatedEntity() {
+    private Qualification getUpdatedEntity(Qualification entity) {
 
-        return  (entity) -> {
-            Qualification updatedQualification = (Qualification) entity;
+        Qualification updatedQualification = entity;
 
-            updatedQualification.setName("Java Developer");
-            updatedQualification.setResponsibility("Back End");
+        updatedQualification.setName("Java Developer");
+        updatedQualification.setResponsibility("Back End");
 
-            return updatedQualification;
-        };
+        return updatedQualification;
     }
 
     @Test
     public void createQualificationTest() throws Exception {
-        createEntityTest(qualificationDAO, qualificationToCreate);
+        //when
+        Qualification entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
     }
 
     @Test
     public void getQualificationByIdTest() throws Exception {
-        getEntityByIdTest(qualificationDAO, qualificationToCreate);
+        //when
+        Qualification createdEntity = dao.create(entityToCreate);
+        Qualification gottenQualification = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenQualification);
     }
 
     @Test
     public void getAllQualificationsTest() throws Exception {
-        getAllEntitiesTest(qualificationDAO, qualificationToCreate);
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
+        }
+
+        //when
+        Qualification createdEntity = dao.create(entityToCreate);
+        List<Qualification> expected = Arrays.asList(createdEntity);
+        List<Qualification> actual = dao.getAll();
+
+        //then
+        assertIterableEquals(expected, actual);
     }
 
     @Test
     public void updateQualificationTest() throws Exception {
-        updateEntityTest(qualificationDAO, qualificationToCreate, updatedEntity());
+        //when
+        Qualification createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Qualification updated = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(updated, createdEntity);
     }
 
     @Test
     public void deleteQualificationTest() throws Exception {
-        deleteEntityTest(qualificationDAO, qualificationToCreate);
+        //when
+        Qualification createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Qualification actual = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(null, actual);
     }
 }
