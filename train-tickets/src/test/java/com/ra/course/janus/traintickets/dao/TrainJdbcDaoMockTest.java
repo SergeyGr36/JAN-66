@@ -4,6 +4,8 @@ import com.ra.course.janus.traintickets.entity.Train;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
