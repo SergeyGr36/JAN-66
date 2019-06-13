@@ -1,6 +1,5 @@
 package com.ra.janus.developersteam.configuration;
 
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import com.ra.janus.developersteam.utils.PropertyReaderUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -9,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
@@ -16,7 +16,12 @@ import java.util.Properties;
 public class AppConfig {
 
     @Bean
-    public JdbcTemplate jdbcTemplate() {
+    public JdbcTemplate jdbcTemplate(final DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
+
+    @Bean
+    public DataSource dataSource() {
         final HikariConfig config = new HikariConfig();
 
         final Properties properties = PropertyReaderUtils.getProperties();
@@ -28,8 +33,6 @@ public class AppConfig {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-        final HikariDataSource dataSource = new HikariDataSource(config);
-        DBSchemaCreator.createSchema(dataSource);
-        return new JdbcTemplate(dataSource);
+        return new HikariDataSource(config);
     }
 }
