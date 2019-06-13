@@ -4,8 +4,10 @@ import com.ra.course.janus.traintickets.entity.Train;
 import com.ra.course.janus.traintickets.exception.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -27,9 +29,9 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
 
     private static final String UPDATE_TRAIN =
             "update TRAINS set name = :name, seating = :seating, freeSeats = :freeSeats where id = :id";
-    private static final String SELECT_WHEN_ID = "select * from TRAINS where id = :id";
+    private static final String FIND_BY_ID = "select * from TRAINS where id = :id";
     private static final String DELETE_TRAIN = "delete from TRAINS where id = :id";
-    private static final String SELECT_TRAIN_ALL = "select * from TRAINS";
+    private static final String FIND_TRAINS_ALL = "select * from TRAINS";
 
     private final transient SimpleJdbcInsert jdbcInsert;
     private final transient NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -56,17 +58,22 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
 
     @Override
     public boolean delete(Long id) {
-        return false;
+        return namedJdbcTemplate.update
+                (DELETE_TRAIN,paramSourceFromId(id)) > 0;
     }
 
     @Override
     public Train findById(Long id) {
-        return null;
+        return namedJdbcTemplate
+                .queryForObject(FIND_BY_ID,paramSourceFromId(id),
+                        BeanPropertyRowMapper.newInstance(Train.class));
     }
 
     @Override
     public List<Train> findAll() {
-        return null;
+        return namedJdbcTemplate.query(FIND_TRAINS_ALL,
+                new MapSqlParameterSource(),
+                BeanPropertyRowMapper.newInstance(Train.class));
     }
 
    private SqlParameterSource paramSourceFromTrain(final Train train){
