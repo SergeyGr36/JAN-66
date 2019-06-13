@@ -1,82 +1,90 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Qualification;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcQualificationDAOIntegrationTest {
 
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Qualification> qualificationDAO = new PlainJdbcQualificationDAO(dataSource);
+    @Autowired
+    private BaseDao<Qualification> dao;
 
-    private static Qualification qualificationToCreate = new Qualification(1L, "Web Developer", "Front End");
+    private Qualification entityToCreate = new Qualification(1L, "Web Developer", "Front End");
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "QUALIFICATIONS");
+    private Qualification getUpdatedEntity(Qualification entity) {
+
+        Qualification updatedQualification = entity;
+
+        updatedQualification.setName("Java Developer");
+        updatedQualification.setResponsibility("Back End");
+
+        return updatedQualification;
+    }
+
+    @Test
+    public void createQualificationTest() throws Exception {
+        //when
+        Qualification entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getQualificationByIdTest() throws Exception {
+        //when
+        Qualification createdEntity = dao.create(entityToCreate);
+        Qualification gottenQualification = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenQualification);
+    }
+
+    @Test
+    public void getAllQualificationsTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createQualificationTest() throws Exception {
         //when
-        Qualification qualification = qualificationDAO.create(qualificationToCreate);
-
-        //then
-        assertEquals(qualification, qualificationDAO.get(qualification.getId()));
-    }
-
-    @Test
-    void getQualificationByIdTest() throws Exception {
-        //when
-        Qualification createdQualification = qualificationDAO.create(qualificationToCreate);
-        Qualification gottenQualification = qualificationDAO.get(createdQualification.getId());
-
-        //then
-        assertEquals(createdQualification, gottenQualification);
-    }
-
-    @Test
-    void getAllQualificationsTest() throws Exception {
-        //when
-        Qualification createdQualification = qualificationDAO.create(qualificationToCreate);
-        List<Qualification> expected = Arrays.asList(createdQualification);
-        List<Qualification> actual = qualificationDAO.getAll();
+        Qualification createdEntity = dao.create(entityToCreate);
+        List<Qualification> expected = Arrays.asList(createdEntity);
+        List<Qualification> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateQualificationTest() throws Exception {
+    public void updateQualificationTest() throws Exception {
         //when
-        Qualification createdQualification = qualificationDAO.create(qualificationToCreate);
-        createdQualification.setName("Java Developer");
-        createdQualification.setResponsibility("Back End");
-        qualificationDAO.update(createdQualification);
-        Qualification updated = qualificationDAO.get(createdQualification.getId());
+        Qualification createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Qualification updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdQualification);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteQualificationTest() throws Exception {
+    public void deleteQualificationTest() throws Exception {
         //when
-        Qualification createdQualification = qualificationDAO.create(qualificationToCreate);
-        qualificationDAO.delete(createdQualification.getId());
-        Qualification actual = qualificationDAO.get(createdQualification.getId());
+        Qualification createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Qualification actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

@@ -1,13 +1,13 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Project;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
@@ -15,70 +15,78 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcProjectDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Project> projectDAO = new PlainJdbcProjectDAO(dataSource);
 
-    private static Project projectToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
+    @Autowired
+    private BaseDao<Project> dao;
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "PROJECTS");
+    private Project entityToCreate = new Project(1L, "Integration Tests", "Test project with h2 DB", "WIP", Date.valueOf("2019-05-30"));
+
+    private Project getUpdatedEntity(Project entity) {
+
+        Project updatedProject = (Project) entity;
+        updatedProject.setName("Developers Team");
+        updatedProject.setDescription("first project");
+        updatedProject.setStatus("WIP");
+        updatedProject.setEta(Date.valueOf("2019-08-01"));
+
+        return updatedProject;
+    }
+
+    @Test
+    public void createProjectTest() throws Exception {
+        //when
+        Project entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getProjectByIdTest() throws Exception {
+        //when
+        Project createdEntity = dao.create(entityToCreate);
+        Project gottenProject = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenProject);
+    }
+
+    @Test
+    public void getAllProjectsTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createProjectTest() throws Exception {
         //when
-        Project project = projectDAO.create(projectToCreate);
-
-        //then
-        assertEquals(project, projectDAO.get(project.getId()));
-    }
-
-    @Test
-    void getProjectByIdTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        Project gottenProject = projectDAO.get(createdProject.getId());
-
-        //then
-        assertEquals(createdProject, gottenProject);
-    }
-
-    @Test
-    void getAllProjectsTest() throws Exception {
-        //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        List<Project> expected = Arrays.asList(createdProject);
-        List<Project> actual = projectDAO.getAll();
+        Project createdEntity = dao.create(entityToCreate);
+        List<Project> expected = Arrays.asList(createdEntity);
+        List<Project> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateProjectTest() throws Exception {
+    public void updateProjectTest() throws Exception {
         //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        createdProject.setName("Developers Team");
-        createdProject.setDescription("first project");
-        createdProject.setStatus("WIP");
-        createdProject.setEta(Date.valueOf("2019-08-01"));
-        projectDAO.update(createdProject);
-        Project updated = projectDAO.get(createdProject.getId());
+        Project createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Project updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdProject);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteProjectTest() throws Exception {
+    public void deleteProjectTest() throws Exception {
         //when
-        Project createdProject = projectDAO.create(projectToCreate);
-        projectDAO.delete(createdProject.getId());
-        Project actual = projectDAO.get(createdProject.getId());
+        Project createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Project actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

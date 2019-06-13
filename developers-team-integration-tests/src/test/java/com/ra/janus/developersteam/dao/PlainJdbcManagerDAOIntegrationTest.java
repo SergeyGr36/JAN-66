@@ -1,83 +1,90 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Manager;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcManagerDAOIntegrationTest {
 
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Manager> managerDAO = new PlainJdbcManagerDAO(dataSource);
+    @Autowired
+    private BaseDao<Manager> dao;
 
-    private static Manager managerToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
+    private Manager entityToCreate = new Manager(1L, "John", "manager@gmail.com", "050-000-11-22");
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "MANAGERS");
+    private Manager getUpdatedEntity(Manager entity) {
+
+        Manager updatedManager = entity;
+        updatedManager.setName("Jack");
+        updatedManager.setEmail("jach@gmail.com");
+        updatedManager.setPhone("050-222-33-44");
+
+        return updatedManager;
+    }
+
+    @Test
+    public void createManagerTest() throws Exception {
+        //when
+        Manager entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getManagerByIdTest() throws Exception {
+        //when
+        Manager createdEntity = dao.create(entityToCreate);
+        Manager gottenManager = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenManager);
+    }
+
+    @Test
+    public void getAllManagersTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createManagerTest() throws Exception {
         //when
-        Manager manager = managerDAO.create(managerToCreate);
-
-        //then
-        assertEquals(manager, managerDAO.get(manager.getId()));
-    }
-
-    @Test
-    void getManagerByIdTest() throws Exception {
-        //when
-        Manager createdManager = managerDAO.create(managerToCreate);
-        Manager gottenManager = managerDAO.get(createdManager.getId());
-
-        //then
-        assertEquals(createdManager, gottenManager);
-    }
-
-    @Test
-    void getAllManagersTest() throws Exception {
-        //when
-        Manager createdManager = managerDAO.create(managerToCreate);
-        List<Manager> expected = Arrays.asList(createdManager);
-        List<Manager> actual = managerDAO.getAll();
+        Manager createdEntity = dao.create(entityToCreate);
+        List<Manager> expected = Arrays.asList(createdEntity);
+        List<Manager> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateManagerTest() throws Exception {
+    public void updateManagerTest() throws Exception {
         //when
-        Manager createdManager = managerDAO.create(managerToCreate);
-        createdManager.setName("Jack");
-        createdManager.setEmail("jach@gmail.com");
-        createdManager.setPhone("050-222-33-44");
-        managerDAO.update(createdManager);
-        Manager updated = managerDAO.get(createdManager.getId());
+        Manager createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Manager updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdManager);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteManagerTest() throws Exception {
+    public void deleteManagerTest() throws Exception {
         //when
-        Manager createdManager = managerDAO.create(managerToCreate);
-        managerDAO.delete(createdManager.getId());
-        Manager actual = managerDAO.get(createdManager.getId());
+        Manager createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Manager actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

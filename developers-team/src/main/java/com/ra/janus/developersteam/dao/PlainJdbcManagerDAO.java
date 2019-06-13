@@ -1,15 +1,22 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Manager;
-import com.ra.janus.developersteam.exception.DAOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Component
 public class PlainJdbcManagerDAO implements BaseDao<Manager> {
 
     private static final String INSERT_SQL = "INSERT INTO managers (name, email, phone) VALUES (?, ?, ?)";
@@ -18,117 +25,72 @@ public class PlainJdbcManagerDAO implements BaseDao<Manager> {
     private static final String SELECT_ONE_SQL = "SELECT * FROM managers WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM managers WHERE id=?";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlainJdbcManagerDAO.class);
-    public static final String EXCEPTION_WARN = "An exception occurred!";
+    transient private final JdbcTemplate jdbcTemplate;
 
-    transient private final DataSource dataSource;
-
-    public PlainJdbcManagerDAO(final DataSource dataSource) {
-
-        this.dataSource = dataSource;
+    @Autowired
+    public PlainJdbcManagerDAO(final JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public Manager create(final Manager manager) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            prepareStatement(ps, manager);
-            ps.executeUpdate();
-            try (ResultSet generatedKeys = ps.getGeneratedKeys();) {
-                if (generatedKeys.next()) {
-                    final long id = generatedKeys.getLong(1);
-                    return new Manager(id, manager);
-                } else {
-                    final DAOException e = new DAOException("Could not create a Manager");
-                    LOGGER.error(EXCEPTION_WARN, e);
-                    throw e;
-                }
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(final Connection connection) throws SQLException {
+                final PreparedStatement ps = connection
+                        .prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, manager.getName());
+                ps.setString(2, manager.getEmail());
+                ps.setString(3, manager.getPhone());
+                return ps;
             }
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        }, keyHolder);
+        final long id = keyHolder.getKey().longValue();
+        return new Manager(id, manager);
     }
 
     @Override
-    @SuppressWarnings("PMD.CloseResource")
     public Manager get(final long id) {
-        try  {
-            final Connection conn = dataSource.getConnection();
-            final PreparedStatement ps = conn.prepareStatement(SELECT_ONE_SQL);
-            ps.setLong(1, id);
-            final ResultSet rs = ps.executeQuery();
-            try {
-                if (rs.next()) {
-                    return toManager(rs);
-                } else {
-                    return null;
-                }
-            } finally {
-                rs.close();
-                conn.close();
-            }
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
+        try {
+            return jdbcTemplate.queryForObject(SELECT_ONE_SQL,
+                    BeanPropertyRowMapper.newInstance(Manager.class), id);}
+        catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 
     @Override
     public List<Manager> getAll() {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_ALL_SQL);
-             ResultSet rs = ps.executeQuery()) {
-
-            final List<Manager> managers = new ArrayList<>();
-            while (rs.next()) {
-                managers.add(toManager(rs));
-            }
-            return managers;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        final List<Map<String, Object>> rows = jdbcTemplate.queryForList(SELECT_ALL_SQL);
+        return rows.stream().map(row -> {
+            final Manager manager = new Manager();
+            manager.setId((long) row.get("id"));
+            manager.setName((String) row.get("name"));
+            manager.setEmail((String) row.get("email"));
+            manager.setPhone((String) row.get("phone"));
+            return manager;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public boolean update(final Manager manager) {
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL)) {
-            prepareStatement(ps, manager);
-            ps.setLong(4, manager.getId());
-            final int rowCount = ps.executeUpdate();
-            return rowCount != 0;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
+        final int rowCount = jdbcTemplate.update(UPDATE_SQL, new PreparedStatementSetter() {
+            @Override
+            public void setValues(final PreparedStatement ps) throws SQLException {
+                ps.setString(1, manager.getName());
+                ps.setString(2, manager.getEmail());
+                ps.setString(3, manager.getPhone());
+                ps.setLong(4, manager.getId());
+
+            }
+        });
+        return rowCount != 0;
     }
 
     @Override
     public boolean delete(final long id) {
-        try (
-                Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
-            ps.setLong(1, id);
-            final int rowCount = ps.executeUpdate();
-            return rowCount != 0;
-        } catch (SQLException e) {
-            LOGGER.error(EXCEPTION_WARN, e);
-            throw new DAOException(e);
-        }
-    }
-
-    private Manager toManager(final ResultSet rs) throws SQLException {
-        return new Manager(rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("email"),
-                rs.getString("phone"));
-    }
-
-    private void prepareStatement(final PreparedStatement ps, final Manager manager) throws SQLException {
-        ps.setString(1, manager.getName());
-        ps.setString(2, manager.getEmail());
-        ps.setString(3, manager.getPhone());
+        final int rowCount = jdbcTemplate.update(DELETE_SQL, id);
+        return rowCount != 0;
     }
 }

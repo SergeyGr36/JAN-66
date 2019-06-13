@@ -1,81 +1,89 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Bill;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcBillDAOIntegrationTest {
 
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Bill> billDAO = new PlainJdbcBillDAO(dataSource);
+    @Autowired
+    private BaseDao<Bill> dao;
 
-    private static Bill billToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
+    private Bill entityToCreate = new Bill(1L, Date.valueOf("2020-11-03"));
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "BILLS");
+    private Bill getUpdatedEntity(Bill entity) {
+
+        Bill updatedBill = (Bill)entity;
+        updatedBill.setDocDate(Date.valueOf("2019-05-05"));
+
+        return updatedBill;
+    }
+
+    @Test
+    public void createBillTest() throws Exception {
+        //when
+        Bill entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getBillByIdTest() throws Exception {
+        //when
+        Bill createdEntity = dao.create(entityToCreate);
+        Bill gottenBill = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenBill);
+    }
+
+    @Test
+    public void getAllBillsTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createBillTest() throws Exception {
         //when
-        Bill bill = billDAO.create(billToCreate);
-
-        //then
-        assertEquals(bill, billDAO.get(bill.getId()));
-    }
-
-    @Test
-    void getBillByIdTest() throws Exception {
-        //when
-        Bill createdBill = billDAO.create(billToCreate);
-        Bill gottenBill = billDAO.get(createdBill.getId());
-
-        //then
-        assertEquals(createdBill, gottenBill);
-    }
-
-    @Test
-    void getAllBillsTest() throws Exception {
-        //when
-        Bill createdBill = billDAO.create(billToCreate);
-        List<Bill> expected = Arrays.asList(createdBill);
-        List<Bill> actual = billDAO.getAll();
+        Bill createdEntity = dao.create(entityToCreate);
+        List<Bill> expected = Arrays.asList(createdEntity);
+        List<Bill> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateBillTest() throws Exception {
+    public void updateBillTest() throws Exception {
         //when
-        Bill createdBill = billDAO.create(billToCreate);
-        createdBill.setDocDate(Date.valueOf("2019-05-05"));
-        billDAO.update(createdBill);
-        Bill updated = billDAO.get(createdBill.getId());
+        Bill createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Bill updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdBill);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteBillTest() throws Exception {
+    public void deleteBillTest() throws Exception {
         //when
-        Bill createdBill = billDAO.create(billToCreate);
-        billDAO.delete(createdBill.getId());
-        Bill actual = billDAO.get(createdBill.getId());
+        Bill createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Bill actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

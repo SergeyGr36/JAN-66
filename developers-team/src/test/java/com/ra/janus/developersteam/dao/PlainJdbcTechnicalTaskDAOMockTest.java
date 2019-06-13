@@ -1,24 +1,34 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.TechnicalTask;
-import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class PlainJdbcTechnicalTaskDAOMockTest {
+
     private static final String INSERT_SQL = "INSERT INTO tasks (title, description) VALUES (?, ?)";
     private static final String UPDATE_SQL = "UPDATE tasks SET title=?,description=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM tasks";
@@ -27,28 +37,39 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     private static final long TEST_ID = 1L;
     private static final TechnicalTask TEST_TASK = new TechnicalTask(TEST_ID, "title", "description");
 
-    private DataSource mockDataSource = mock(DataSource.class);
-
-    private PlainJdbcTechnicalTaskDAO taskDAO;
+    private JdbcTemplate mockTemplate = mock(JdbcTemplate.class);
     private Connection mockConnection = mock(Connection.class);
     private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
-    private ResultSet mockResultSet = mock(ResultSet.class);
 
-    @BeforeEach
-    void before() throws Exception {
-        taskDAO = new PlainJdbcTechnicalTaskDAO(mockDataSource);
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        when(mockResultSet.next()).thenReturn(false);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+    private BaseDao<TechnicalTask> taskDAO = new PlainJdbcTechnicalTaskDAO(mockTemplate);
+
+    protected Map<String, Object> getTestEntityMap() {
+        Map<String, Object> testMap = new HashMap<>(1);
+        testMap.put("id", TEST_TASK.getId());
+        testMap.put("title", TEST_TASK.getTitle());
+        testMap.put("description", TEST_TASK.getDescription());
+        return testMap;
     }
 
     @Test
     void whenCreateTechnicalTaskShouldReturnTechnicalTask() throws Exception {
         //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong(1)).thenReturn(TEST_ID);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS))
+                .thenReturn(mockPreparedStatement);
+        when(mockTemplate.update(any(PreparedStatementCreator.class), any(KeyHolder.class))).thenAnswer(
+                new Answer() {
+                    public Object answer(InvocationOnMock invocation) throws SQLException {
+                        Object[] args = invocation.getArguments();
+                        PreparedStatementCreator creator = (PreparedStatementCreator) args[0];
+                        creator.createPreparedStatement(mockConnection);
+
+                        KeyHolder holder = (KeyHolder) args[1];
+                        Map<String, Object> map = new HashMap<>(1);
+                        map.put("Something like a generated key", Long.valueOf(1L));
+                        holder.getKeyList().add(map);
+                        return 1;
+                    }
+                });
 
         //when
         TechnicalTask task = taskDAO.create(TEST_TASK);
@@ -57,39 +78,13 @@ class PlainJdbcTechnicalTaskDAOMockTest {
         assertEquals(TEST_TASK, task);
     }
 
-    @Test
-    void whenCreateTechnicalTaskShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-
-        //when
-        final Executable executable = () -> taskDAO.create(TEST_TASK);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    void whenCreateTechnicalTaskShouldThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> taskDAO.create(TEST_TASK);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
     //==============================
 
     @Test
     void whenReadTechnicalTaskFromDbByIdThenReturnIt() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getLong("id")).thenReturn(TEST_ID);
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenReturn(TEST_TASK);
 
         //when
         TechnicalTask task = taskDAO.get(TEST_ID);
@@ -101,33 +96,22 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     @Test
     void whenReadAbsentTechnicalTaskFromDbByIdThenReturnNull() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(false);
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenThrow(new EmptyResultDataAccessException(1));
 
         //when
         TechnicalTask task = taskDAO.get(TEST_ID);
 
         //then
-        assertNull(task);
-    }
-
-    @Test
-    void whenReadTechnicalTaskFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> taskDAO.get(TEST_ID);
-
-        //then
-        assertThrows(DAOException.class, executable);
+        assertEquals(null, task);
     }
 
     @Test
     void whenReadAllTechnicalTasksFromDbThenReturnNonEmptyList() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        List<Map<String, Object>> rows = new ArrayList<>();
+        rows.add(getTestEntityMap());
+        when(mockTemplate.queryForList(SELECT_ALL_SQL)).thenReturn(rows);
 
         //when
         List<TechnicalTask> list = taskDAO.getAll();
@@ -137,22 +121,17 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     }
 
     @Test
-    void whenReadAllTechnicalTasksFromDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> taskDAO.getAll();
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
     void whenUpdateTechnicalTaskInDbThenReturnTrue() throws Exception {
         //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                PreparedStatementSetter setter = (PreparedStatementSetter) args[1];
+                setter.setValues(mockPreparedStatement);
+                return 1;
+            }
+        });
 
         //when
         boolean updated = taskDAO.update(TEST_TASK);
@@ -164,8 +143,7 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     @Test
     void whenUpdateTechnicalTaskInDbThenReturnFalse() throws Exception {
         //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenReturn(0);
 
         //when
         boolean updated = taskDAO.update(TEST_TASK);
@@ -175,22 +153,9 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     }
 
     @Test
-    void whenUpdateTechnicalTaskInDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> taskDAO.update(TEST_TASK);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
     void whenDeleteTechnicalTaskFromDbThenReturnTrue() throws Exception {
         //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(1);
 
         //when
         boolean deleted = taskDAO.delete(TEST_ID);
@@ -202,25 +167,12 @@ class PlainJdbcTechnicalTaskDAOMockTest {
     @Test
     void whenDeleteTechnicalTaskFromDbThenReturnFalse() throws Exception {
         //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(0);
 
         //when
         boolean deleted = taskDAO.delete(TEST_ID);
 
         //then
         assertFalse(deleted);
-    }
-
-    @Test
-    void whenDeleteTechnicalTaskFromDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> taskDAO.delete(TEST_ID);
-
-        //then
-        assertThrows(DAOException.class, executable);
     }
 }

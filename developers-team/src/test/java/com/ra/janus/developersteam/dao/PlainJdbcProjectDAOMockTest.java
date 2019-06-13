@@ -1,54 +1,74 @@
 package com.ra.janus.developersteam.dao;
 
 import com.ra.janus.developersteam.entity.Project;
-import com.ra.janus.developersteam.exception.DAOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class PlainJdbcProjectDAOMockTest {
+
     private static final String INSERT_SQL = "INSERT INTO projects (name, description, status, eta) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_SQL = "UPDATE projects SET name=?,description=?,status=?,eta=? WHERE id=?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM projects";
     private static final String SELECT_ONE_SQL = "SELECT * FROM projects WHERE id = ?";
     private static final String DELETE_SQL = "DELETE FROM projects WHERE id=?";
     private static final long TEST_ID = 1L;
-    private static final Project TEST_PROJECT = new Project(TEST_ID);
+    private static final Project TEST_PROJECT = new Project(TEST_ID, "Mock Tests", "Test project with h2 DB", "WIP",Date.valueOf("2019-05-30"));
 
-    private DataSource mockDataSource = mock(DataSource.class);
-
-    private PlainJdbcProjectDAO projectDAO;
+    private JdbcTemplate mockTemplate = mock(JdbcTemplate.class);
     private Connection mockConnection = mock(Connection.class);
     private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
-    private ResultSet mockResultSet = mock(ResultSet.class);
 
-    @BeforeEach
-    void before() throws Exception {
-        projectDAO = new PlainJdbcProjectDAO(mockDataSource);
-        when(mockDataSource.getConnection()).thenReturn(mockConnection);
-        when(mockResultSet.next()).thenReturn(false);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockPreparedStatement.getGeneratedKeys()).thenReturn(mockResultSet);
+    private BaseDao<Project> projectDAO = new PlainJdbcProjectDAO(mockTemplate);
+
+    protected Map<String, Object> getTestEntityMap() {
+        Map<String, Object> testMap = new HashMap<>(1);
+        testMap.put("id", TEST_PROJECT.getId());
+        testMap.put("name", TEST_PROJECT.getName());
+        testMap.put("description", TEST_PROJECT.getDescription());
+        testMap.put("status", TEST_PROJECT.getStatus());
+        testMap.put("eta", TEST_PROJECT.getEta());
+        return testMap;
     }
 
     @Test
     void whenCreateProjectShouldReturnProject() throws Exception {
         //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getLong(1)).thenReturn(TEST_ID);
+        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS))
+                .thenReturn(mockPreparedStatement);
+        when(mockTemplate.update(any(PreparedStatementCreator.class), any(KeyHolder.class))).thenAnswer(
+                new Answer() {
+                    public Object answer(InvocationOnMock invocation) throws SQLException {
+                        Object[] args = invocation.getArguments();
+                        PreparedStatementCreator creator = (PreparedStatementCreator) args[0];
+                        creator.createPreparedStatement(mockConnection);
+
+                        KeyHolder holder = (KeyHolder) args[1];
+                        Map<String, Object> map = new HashMap<>(1);
+                        map.put("Something like a generated key", Long.valueOf(1L));
+                        holder.getKeyList().add(map);
+                        return 1;
+                    }
+                });
 
         //when
         Project project = projectDAO.create(TEST_PROJECT);
@@ -57,39 +77,13 @@ class PlainJdbcProjectDAOMockTest {
         assertEquals(TEST_PROJECT, project);
     }
 
-    @Test
-    void whenCreateProjectShouldThrowExceptionIfIdWasNotGenerated() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-
-        //when
-        final Executable executable = () -> projectDAO.create(TEST_PROJECT);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
-    void whenCreateProjectShouldThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.create(TEST_PROJECT);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
     //==============================
 
     @Test
     void whenReadProjectFromDbByIdThenReturnIt() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getLong("id")).thenReturn(TEST_ID);
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenReturn(TEST_PROJECT);
 
         //when
         Project project = projectDAO.get(TEST_ID);
@@ -101,33 +95,22 @@ class PlainJdbcProjectDAOMockTest {
     @Test
     void whenReadAbsentProjectFromDbByIdThenReturnNull() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(false);
+        when(mockTemplate.queryForObject(eq(SELECT_ONE_SQL), any(BeanPropertyRowMapper.class), eq(TEST_ID)))
+                .thenThrow(new EmptyResultDataAccessException(1));
 
         //when
         Project project = projectDAO.get(TEST_ID);
 
         //then
-        assertNull(project);
-    }
-
-    @Test
-    void whenReadProjectFromDbByIdThenThrowExceptionOnPreparingStatement() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(SELECT_ONE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.get(TEST_ID);
-
-        //then
-        assertThrows(DAOException.class, executable);
+        assertEquals(null, project);
     }
 
     @Test
     void whenReadAllProjectsFromDbThenReturnNonEmptyList() throws Exception {
         //given
-        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenReturn(mockPreparedStatement);
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
+        List<Map<String, Object>> rows = new ArrayList<>();
+        rows.add(getTestEntityMap());
+        when(mockTemplate.queryForList(SELECT_ALL_SQL)).thenReturn(rows);
 
         //when
         List<Project> list = projectDAO.getAll();
@@ -137,22 +120,17 @@ class PlainJdbcProjectDAOMockTest {
     }
 
     @Test
-    void whenReadAllProjectsFromDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(SELECT_ALL_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.getAll();
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
     void whenUpdateProjectInDbThenReturnTrue() throws Exception {
         //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                PreparedStatementSetter setter = (PreparedStatementSetter) args[1];
+                setter.setValues(mockPreparedStatement);
+                return 1;
+            }
+        });
 
         //when
         boolean updated = projectDAO.update(TEST_PROJECT);
@@ -164,8 +142,7 @@ class PlainJdbcProjectDAOMockTest {
     @Test
     void whenUpdateProjectInDbThenReturnFalse() throws Exception {
         //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        when(mockTemplate.update(eq(UPDATE_SQL), any(PreparedStatementSetter.class))).thenReturn(0);
 
         //when
         boolean updated = projectDAO.update(TEST_PROJECT);
@@ -175,22 +152,9 @@ class PlainJdbcProjectDAOMockTest {
     }
 
     @Test
-    void whenUpdateProjectInDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(UPDATE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.update(TEST_PROJECT);
-
-        //then
-        assertThrows(DAOException.class, executable);
-    }
-
-    @Test
     void whenDeleteProjectFromDbThenReturnTrue() throws Exception {
         //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(1);
 
         //when
         boolean deleted = projectDAO.delete(TEST_ID);
@@ -202,25 +166,12 @@ class PlainJdbcProjectDAOMockTest {
     @Test
     void whenDeleteProjectFromDbThenReturnFalse() throws Exception {
         //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(0);
+        when(mockTemplate.update(DELETE_SQL, TEST_ID)).thenReturn(0);
 
         //when
         boolean deleted = projectDAO.delete(TEST_ID);
 
         //then
         assertFalse(deleted);
-    }
-
-    @Test
-    void whenDeleteProjectFromDbThenThrowException() throws Exception {
-        //given
-        when(mockConnection.prepareStatement(DELETE_SQL)).thenThrow(new SQLException());
-
-        //when
-        final Executable executable = () -> projectDAO.delete(TEST_ID);
-
-        //then
-        assertThrows(DAOException.class, executable);
     }
 }
