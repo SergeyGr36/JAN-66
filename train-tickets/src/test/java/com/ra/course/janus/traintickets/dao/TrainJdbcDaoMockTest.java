@@ -30,9 +30,7 @@ class TrainJdbcDaoMockTest {
     private TrainJdbcDao trainDAO;
 
     private DataSource mockDataSourse = mock(DataSource.class);
-    private Connection mockConn = mock(Connection.class);
-    private PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
-    private ResultSet mockResultSet = mock(ResultSet.class);
+
 
     @BeforeEach
     public void trainTestsInit() throws SQLException {

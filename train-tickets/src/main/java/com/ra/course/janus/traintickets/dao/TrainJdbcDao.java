@@ -1,28 +1,14 @@
 package com.ra.course.janus.traintickets.dao;
-import com.ra.course.janus.traintickets.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Train;
-import com.ra.course.janus.traintickets.exception.DAOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-
 import javax.sql.DataSource;
-import javax.swing.plaf.basic.BasicTreeUI;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
-import static com.ra.course.janus.traintickets.exception.ErrorMessages.*;
 
 @Component
 public class TrainJdbcDao implements IJdbcDao<Train> {
@@ -57,13 +43,13 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(final Long id) {
         return namedJdbcTemplate.update
                 (DELETE_TRAIN,paramSourceFromId(id)) > 0;
     }
 
     @Override
-    public Train findById(Long id) {
+    public Train findById(final Long id) {
         return namedJdbcTemplate
                 .queryForObject(FIND_BY_ID,paramSourceFromId(id),
                         BeanPropertyRowMapper.newInstance(Train.class));
