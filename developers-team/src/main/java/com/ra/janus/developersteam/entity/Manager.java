@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-public class Manager implements BaseEntity {
+public class Manager {
     private long id;
     private String name;
     private String email;

@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-public class Work implements BaseEntity {
+public class Work {
     private long id;
     private String name;
     private BigDecimal price;

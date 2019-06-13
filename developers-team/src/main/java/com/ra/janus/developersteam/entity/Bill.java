@@ -11,7 +11,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-public class Bill implements BaseEntity {
+public class Bill {
     private long id;
     private Date docDate;
 
