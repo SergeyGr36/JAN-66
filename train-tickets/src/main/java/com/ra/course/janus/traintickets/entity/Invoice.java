@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Invoice {
 	private long id;
 	private BigDecimal price;
