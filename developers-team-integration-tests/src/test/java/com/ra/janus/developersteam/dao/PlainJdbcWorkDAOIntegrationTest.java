@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppConfig.class})
-@Sql("classpath:schema.sql")
 public class PlainJdbcWorkDAOIntegrationTest {
 
     @Autowired

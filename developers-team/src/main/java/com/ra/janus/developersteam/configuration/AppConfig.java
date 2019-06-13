@@ -6,7 +6,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -33,6 +37,14 @@ public class AppConfig {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-        return new HikariDataSource(config);
+        final HikariDataSource dataSource = new HikariDataSource(config);
+        DatabasePopulatorUtils.execute(createDatabasePopulator(), dataSource);
+        return dataSource;
+    }
+
+    private DatabasePopulator createDatabasePopulator() {
+        final ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
+        databasePopulator.addScript(new ClassPathResource("schema.sql"));
+        return databasePopulator;
     }
 }
