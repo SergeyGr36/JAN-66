@@ -1,5 +1,6 @@
 package com.ra.janus.developersteam.configuration;
 
+import com.ra.janus.developersteam.schema.DBSchemaCreator;
 import com.ra.janus.developersteam.utils.PropertyReaderUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -27,7 +28,8 @@ public class AppConfig {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
-        final HikariDataSource db = new HikariDataSource(config);
-        return new JdbcTemplate(db);
+        final HikariDataSource dataSource = new HikariDataSource(config);
+        DBSchemaCreator.createSchema(dataSource);
+        return new JdbcTemplate(dataSource);
     }
 }
