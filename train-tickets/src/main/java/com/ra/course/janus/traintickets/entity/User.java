@@ -13,4 +13,7 @@ public class User {
     private String email;
     private String password;
 
+    public User (Long id, User user) {
+        this (id, user.getName(), user.getEmail(), user.getPassword());
+    }
 }
