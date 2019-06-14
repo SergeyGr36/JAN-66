@@ -17,8 +17,4 @@ public class MainSpringConfig {
         return DataSourceFactory.DATA_SOURCE.getInstance();
     }
 
-    @Bean
-    public JdbcTemplate jdbcTemplate(final DataSource dataSource) {
-        return new JdbcTemplate(dataSource);
-    }
 }
