@@ -1,10 +1,10 @@
 package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.entity.Train;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
@@ -22,6 +22,7 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
     private final transient SimpleJdbcInsert jdbcInsert;
     private final transient NamedParameterJdbcTemplate namedJdbcTemplate;
 
+    @Autowired()
     public TrainJdbcDao(final DataSource dataSource) {
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.jdbcInsert = new SimpleJdbcInsert(dataSource)
@@ -31,7 +32,8 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
 
     @Override
     public Train save(final Train train) {
-        Number id = jdbcInsert.executeAndReturnKey(paramSourceFromTrain(train));
+        final Number id = jdbcInsert.executeAndReturnKey(
+                new BeanPropertySqlParameterSource(train));
         return new Train(id.longValue(),train.getName(),
                 train.getSeating(),train.getFreeSeats());
     }
@@ -39,19 +41,20 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
     @Override
     public boolean update(final Train train) {
         return namedJdbcTemplate.update
-                (UPDATE_TRAIN,paramSourceFromTrain(train)) > 0;
+                (UPDATE_TRAIN,new BeanPropertySqlParameterSource(train)) > 0;
     }
 
     @Override
     public boolean delete(final Long id) {
         return namedJdbcTemplate.update
-                (DELETE_TRAIN,paramSourceFromId(id)) > 0;
+                (DELETE_TRAIN, new MapSqlParameterSource("id",id)) > 0;
     }
 
     @Override
     public Train findById(final Long id) {
         return namedJdbcTemplate
-                .queryForObject(FIND_BY_ID,paramSourceFromId(id),
+                .queryForObject(FIND_BY_ID,
+                        new MapSqlParameterSource("id",id),
                         BeanPropertyRowMapper.newInstance(Train.class));
     }
 
@@ -61,13 +64,5 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
                 new MapSqlParameterSource(),
                 BeanPropertyRowMapper.newInstance(Train.class));
     }
-
-   private SqlParameterSource paramSourceFromTrain(final Train train){
-        return new BeanPropertySqlParameterSource(train);
-   }
-
-   private SqlParameterSource paramSourceFromId(final Long id){
-        return new MapSqlParameterSource("id",id);
-   }
 }
 
