@@ -1,13 +1,13 @@
 package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.entity.Train;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import javax.sql.DataSource;
 import java.util.List;
 
 @Component
@@ -23,11 +23,11 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
     private final transient NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Autowired()
-    public TrainJdbcDao(final DataSource dataSource) {
-        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-        this.jdbcInsert = new SimpleJdbcInsert(dataSource)
-                .withTableName("TRAINS")
-                .usingGeneratedKeyColumns("id");
+    public TrainJdbcDao(
+            @Qualifier("trainJdbcInsert") final SimpleJdbcInsert jdbcInsert,
+            final NamedParameterJdbcTemplate namedJdbcTemplate) {
+                this.jdbcInsert = jdbcInsert;
+                this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
     @Override
