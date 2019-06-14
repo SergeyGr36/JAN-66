@@ -5,3 +5,4 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR (150),
     password VARCHAR(20),
 );
+TRUNCATE TABLE users;
