@@ -19,4 +19,7 @@ public class Train  {
 
     private transient int freeSeats;
 
+    public Train(Long id, Train train) {
+        this (id,train.getName(),train.getSeating(),train.getFreeSeats());
+    }
 }
