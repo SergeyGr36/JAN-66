@@ -1,24 +1,18 @@
 package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.MainSpringConfig;
-import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
 import com.ra.course.janus.traintickets.entity.Train;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,17 +51,22 @@ public class TrainJdbcDaoIntegrationTest {
     public void whenWeUpdateTrain()throws Exception{
         // given
         final Long id = trainJdbcDao.save(TEST_TRAIN).getId();
-        final Train newTrain = new Train(id, "new_name", 50, 44);
+        final Train newTrain = new Train(id, "new_name", 50, 20);
         // when
         trainJdbcDao.update(newTrain);
         final Train updatedTrain = trainJdbcDao.findById(id);
         // then
         assertEquals(newTrain, updatedTrain);
-
     }
 
     @Test
     public void whenWeDeleteTrain()throws Exception{
+        // given
+        final Long id = trainJdbcDao.save(TEST_TRAIN).getId();
+        // when
+        trainJdbcDao.delete(id);
+        // then
+        assertThrows(EmptyResultDataAccessException.class, () -> trainJdbcDao.findById(id));
 
     }
 
@@ -84,7 +83,13 @@ public class TrainJdbcDaoIntegrationTest {
 
     @Test
     public void whenWeUseFindAllTrains() throws Exception{
-
+        // given
+        final Train savedTrain = trainJdbcDao.save(TEST_TRAIN);
+        List<Train> savedTrains = Collections.singletonList(savedTrain);
+        // when
+        List<Train> foundTrains = trainJdbcDao.findAll();
+        // then
+        assertEquals(savedTrains, foundTrains);
     }
 
     ////////////////////////////////////////////////
