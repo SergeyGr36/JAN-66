@@ -6,7 +6,6 @@ import com.ra.course.janus.traintickets.entity.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class UserJdbcDAOIntegrationTest {
     private UserJdbcDAO userDAO;
 
     @BeforeEach
-    public void setUp() throws SQLException, IOException {
+    public void setUp() throws IOException {
         createTableUsers();
         clearTableUsers();
     }
