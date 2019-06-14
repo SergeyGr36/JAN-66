@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -23,70 +25,66 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MainSpringConfig.class)
 public class TrainJdbcDaoIntegrationTest {
-    private static final DataSource dataSource =
-            DataSourceFactory.DATA_SOURCE.getInstance();
 
     private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_trains_table.sql";
 
-    private TrainJdbcDao trainDAO;
-
-    private static final Train testIntegrTrain =
+    private static final Train TEST_TRAIN =
             new Train(1L,"Test Name Train",100,90);
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    @BeforeAll
-    public static void createUsersTable() throws IOException, SQLException {
-        createTableTrains();
-    }
+    @Autowired
+    private TrainJdbcDao trainJdbcDao;
+
+
+
     @BeforeEach
-    public void setUp() throws Exception{
+    public void setUp() throws IOException {
+        createTableTrains();
         clearTableTrains();
-        trainDAO = new TrainJdbcDao(dataSource);
     }
 
     @Test
     public void whenWeSaveTrain() throws Exception{
-        Train train = trainDAO.save(testIntegrTrain);
-        Train someTrain = trainDAO.save(train);
 
-        assertNotSame(train.getId(),someTrain.getId());
-        assertEquals(train.getName(),testIntegrTrain.getName());
+        final Train createdTrain = trainJdbcDao.save(TEST_TRAIN);
 
+        assertNotNull(createdTrain);
     }
 
     @Test
     public void whenWeUpdateTrain()throws Exception{
-        Train somethingTrain = trainDAO.save(testIntegrTrain);
+        // given
+        final Long id = trainJdbcDao.save(TEST_TRAIN).getId();
+        final Train newTrain = new Train(id, "new_name", 50, 44);
+        // when
+        trainJdbcDao.update(newTrain);
+        final Train updatedTrain = trainJdbcDao.findById(id);
+        // then
+        assertEquals(newTrain, updatedTrain);
 
-        somethingTrain.setName("Test Train");
-        somethingTrain.setFreeSeats(50);
-
-        trainDAO.update(somethingTrain);
-        assertNotSame(somethingTrain,testIntegrTrain);
     }
 
     @Test
     public void whenWeDeleteTrain()throws Exception{
-        Train someTrain = trainDAO.save(testIntegrTrain);
-        final long id = someTrain.getId();
-        assertTrue(trainDAO.delete(id));
+
     }
 
     @Test
     public void whenWeFindTrainByID()throws Exception{
-        Train someTrain = trainDAO.save(testIntegrTrain);
-        Train findTrain = trainDAO.findById(someTrain.getId());
+        // given
+        final Train savedTrain = trainJdbcDao.save(TEST_TRAIN);
+        // when
+        final Train foundTrain = trainJdbcDao.findById(savedTrain.getId());
+        // then
+        assertEquals(savedTrain, foundTrain);
 
-        assertEquals(someTrain,findTrain);
     }
 
     @Test
     public void whenWeUseFindAllTrains() throws Exception{
-        Train someTrain = trainDAO.save(testIntegrTrain);
-        List<Train> allTrains = Arrays.asList(someTrain);
-        List<Train> findTrains = trainDAO.findAll();
 
-        assertIterableEquals(allTrains,findTrains);
     }
 
     ////////////////////////////////////////////////
@@ -95,19 +93,15 @@ public class TrainJdbcDaoIntegrationTest {
         return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));
     }
 
-    private static void executeScript(String script) throws SQLException {
-        try(Connection connection = dataSource.getConnection()){
-            try (Statement statement = connection.createStatement()) {
-                statement.execute(script);
-            }
-        }
+    private void executeScript(String script){
+        jdbcTemplate.execute(script);
     }
 
-    private static void createTableTrains() throws IOException, SQLException {
+    private void createTableTrains() throws IOException {
         executeScript(readScriptFile());
     }
 
-    private static void clearTableTrains() throws SQLException {
+    private void clearTableTrains(){
         executeScript("TRUNCATE TABLE TRAINS;");
     }
 }
