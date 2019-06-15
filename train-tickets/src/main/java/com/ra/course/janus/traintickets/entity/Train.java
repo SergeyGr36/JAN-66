@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"id"})
+@EqualsAndHashCode//(of = {"id"})
 public class Train  {
 
     private long id;
@@ -17,9 +17,9 @@ public class Train  {
 
     private int seating;
 
-    private transient int freeSeats;
+    private transient int free;
 
     public Train(Long id, Train train) {
-        this (id,train.getName(),train.getSeating(),train.getFreeSeats());
+        this (id,train.getName(),train.getSeating(),train.getFree());
     }
 }

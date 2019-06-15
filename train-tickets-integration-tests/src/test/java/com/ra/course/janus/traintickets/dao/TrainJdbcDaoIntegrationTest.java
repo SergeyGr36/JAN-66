@@ -31,8 +31,6 @@ public class TrainJdbcDaoIntegrationTest {
     @Autowired
     private TrainJdbcDao trainJdbcDao;
 
-
-
     @BeforeEach
     public void setUp() throws IOException {
         createTableTrains();
@@ -40,7 +38,7 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    public void whenWeSaveTrain() throws Exception{
+    public void whenWeSaveTrain(){
 
         final Train createdTrain = trainJdbcDao.save(TEST_TRAIN);
 
@@ -48,41 +46,38 @@ public class TrainJdbcDaoIntegrationTest {
     }
 
     @Test
-    public void whenWeUpdateTrain()throws Exception{
-//        // given
-//        final Long id = trainJdbcDao.save(TEST_TRAIN).getId();
-//        final Train newTrain = new Train(id, "new_name", 50, 20);
-//        // when
-//        trainJdbcDao.update(newTrain);
-//        final Train updatedTrain = trainJdbcDao.findById(id);
-//        // then
-//        assertEquals(newTrain, updatedTrain);
+    public void whenWeUpdateTrain(){
+        // given
+        Train someTrain = trainJdbcDao.save(TEST_TRAIN);
+        Train updateTrain = someTrain;
+        // when
+        updateTrain.setName("update train");
+        // then
+        assertTrue(trainJdbcDao.update(updateTrain));
     }
 
     @Test
-    public void whenWeDeleteTrain()throws Exception{
+    public void whenWeDeleteTrain(){
         // given
         final Long id = trainJdbcDao.save(TEST_TRAIN).getId();
         // when
         trainJdbcDao.delete(id);
         // then
         assertThrows(EmptyResultDataAccessException.class, () -> trainJdbcDao.findById(id));
-
     }
 
     @Test
-    public void whenWeFindTrainByID()throws Exception{
+    public void whenWeFindTrainByID(){
         // given
         final Train savedTrain = trainJdbcDao.save(TEST_TRAIN);
         // when
         final Train foundTrain = trainJdbcDao.findById(savedTrain.getId());
         // then
         assertEquals(savedTrain, foundTrain);
-
     }
 
     @Test
-    public void whenWeUseFindAllTrains() throws Exception{
+    public void whenWeUseFindAllTrains(){
         // given
         final Train savedTrain = trainJdbcDao.save(TEST_TRAIN);
         List<Train> savedTrains = Collections.singletonList(savedTrain);
@@ -92,7 +87,7 @@ public class TrainJdbcDaoIntegrationTest {
         assertEquals(savedTrains, foundTrains);
     }
 
-    ////////////////////////////////////////////////
+    /////////////////////Methods of support///////////////////////////
 
     private static String readScriptFile() throws IOException {
         return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));

@@ -14,7 +14,7 @@ import java.util.List;
 public class TrainJdbcDao implements IJdbcDao<Train> {
 
     private static final String UPDATE_TRAIN =
-            "update TRAINS set name = :name, seating = :seating, freeSeats = :freeSeats where id = :id";
+            "update TRAINS set name = :name, seating = :seating, free = :free where id = :id";
     private static final String FIND_BY_ID = "select * from TRAINS where id = :id";
     private static final String DELETE_TRAIN = "delete from TRAINS where id = :id";
     private static final String FIND_TRAINS_ALL = "select * from TRAINS";
@@ -35,13 +35,13 @@ public class TrainJdbcDao implements IJdbcDao<Train> {
         final Number id = jdbcInsert.executeAndReturnKey(
                 new BeanPropertySqlParameterSource(train));
         return new Train(id.longValue(),train.getName(),
-                train.getSeating(),train.getFreeSeats());
+                train.getSeating(),train.getFree());
     }
 
     @Override
     public boolean update(final Train train) {
         return namedJdbcTemplate.update
-                (UPDATE_TRAIN,new BeanPropertySqlParameterSource(train)) > 0;
+                (UPDATE_TRAIN, new BeanPropertySqlParameterSource(train)) > 0;
     }
 
     @Override
