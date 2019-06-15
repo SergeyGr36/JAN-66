@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode//(of = {"id"})
+@EqualsAndHashCode(of = {"id"})
 public class Train  {
 
     private long id;
