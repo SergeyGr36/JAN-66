@@ -12,5 +12,4 @@ public class Invoice {
 	private long id;
 	private BigDecimal price;
 	private String attributes;
-
 	}
