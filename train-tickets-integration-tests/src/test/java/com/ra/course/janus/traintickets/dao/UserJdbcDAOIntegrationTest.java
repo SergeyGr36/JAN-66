@@ -9,8 +9,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -20,16 +22,22 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MainSpringConfig.class)
+@TestPropertySource("classpath:test_db.properties")
 @Sql("classpath:sql_scripts/create_users_table.sql")
 public class UserJdbcDAOIntegrationTest {
-
-    private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_users_table.sql";
 
     private static final User TEST_USER = new User(null, "testname", "mail", "passwd");
 
     @Autowired
     private UserJdbcDAO userDAO;
 
+    @Autowired
+    private Environment environment;
+
+    @Test
+    public void checkPropertySource() {
+        assertEquals("test_train_tickets", environment.getProperty("db.user"));
+    }
 
     // Test saveUser---------------------------------------------------
 
