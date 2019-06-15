@@ -53,6 +53,8 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
 
     @Override
     public List<Invoice> findAll() {
-        return namedJdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(Invoice.class));
+        final List<Invoice> invoices;
+        invoices = namedJdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(Invoice.class));
+        return invoices;
     }
 }

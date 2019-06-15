@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Invoice {
-	private long id;
+	private Long id;
 	private BigDecimal price;
 	private String attributes;
 	}
