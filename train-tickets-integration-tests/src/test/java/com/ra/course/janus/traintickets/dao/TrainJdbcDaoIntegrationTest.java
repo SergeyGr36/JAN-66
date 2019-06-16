@@ -1,41 +1,27 @@
 package com.ra.course.janus.traintickets.dao;
 import com.ra.course.janus.traintickets.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Train;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MainSpringConfig.class)
+@Sql("classpath:sql_scripts/create_trains_table.sql")
 public class TrainJdbcDaoIntegrationTest {
-
-    private static final String SQL_SCRIPT_FILE_NAME = "src/test/resources/sql_scripts/create_trains_table.sql";
 
     private static final Train TEST_TRAIN =
             new Train(1L,"Test Name Train",100,90);
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
     private TrainJdbcDao trainJdbcDao;
-
-    @BeforeEach
-    public void setUp() throws IOException {
-        createTableTrains();
-        clearTableTrains();
-    }
 
     @Test
     public void whenWeSaveTrain(){
@@ -81,29 +67,12 @@ public class TrainJdbcDaoIntegrationTest {
     @Test
     public void whenWeUseFindAllTrains(){
         // given
-        final Train savedTrain = trainJdbcDao.save(TEST_TRAIN);
-        List<Train> savedTrains = Collections.singletonList(savedTrain);
+        final Train savedTrain1 = trainJdbcDao.save(TEST_TRAIN);
+        final Train savedTrain2 = trainJdbcDao.save(TEST_TRAIN);
+        List<Train> expectedTrains = Arrays.asList(savedTrain1,savedTrain2);
         // when
-        List<Train> foundTrains = trainJdbcDao.findAll();
+        List<Train> actualTrains = trainJdbcDao.findAll();
         // then
-        assertEquals(savedTrains, foundTrains);
-    }
-
-    /////////////////////Methods of support///////////////////////////
-
-    private static String readScriptFile() throws IOException {
-        return String.join("", Files.readAllLines(Paths.get(SQL_SCRIPT_FILE_NAME)));
-    }
-
-    private void executeScript(String script){
-        jdbcTemplate.execute(script);
-    }
-
-    private void createTableTrains() throws IOException {
-        executeScript(readScriptFile());
-    }
-
-    private void clearTableTrains(){
-        executeScript("TRUNCATE TABLE TRAINS;");
+        assertEquals(expectedTrains,actualTrains);
     }
 }
