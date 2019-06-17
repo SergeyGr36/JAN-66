@@ -30,7 +30,7 @@ public enum DataSourceFactory {
     static {
         DB_PROPS = new Properties();
         try {
-            DB_PROPS.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("datasource.properties")));
+            DB_PROPS.load(Objects.requireNonNull(ClassLoader.getSystemResourceAsStream("config.properties")));
         } catch (IOException e) {
 
             throw new ConfigException(e);

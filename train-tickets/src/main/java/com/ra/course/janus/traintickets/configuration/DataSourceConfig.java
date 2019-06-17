@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource("classpath:datasource.properties")
+@PropertySource("classpath:config.properties")
 public class DataSourceConfig {
 
     @Autowired
