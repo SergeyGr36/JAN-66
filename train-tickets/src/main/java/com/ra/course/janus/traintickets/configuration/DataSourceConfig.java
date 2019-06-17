@@ -18,11 +18,11 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     @Autowired
-    private Environment env;
+    private transient Environment env;
 
     @Bean
     public DataSource getDataSource() {
-        HikariDataSource ds = new HikariDataSource();
+        final HikariDataSource ds = new HikariDataSource();
 
         ds.setJdbcUrl(env.getProperty("db.url"));
         ds.setUsername(env.getProperty("db.user"));
