@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MainSpringConfig.class)
-@TestPropertySource("classpath:test_db.properties")
+@TestPropertySource("classpath:test_config.properties")
 @Sql("classpath:sql_scripts/create_users_table.sql")
 public class UserJdbcDAOIntegrationTest {
 
