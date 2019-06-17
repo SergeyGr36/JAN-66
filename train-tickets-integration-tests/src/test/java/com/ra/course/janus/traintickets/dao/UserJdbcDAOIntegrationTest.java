@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -30,14 +29,6 @@ public class UserJdbcDAOIntegrationTest {
 
     @Autowired
     private UserJdbcDAO userDAO;
-
-    @Autowired
-    private Environment environment;
-
-    @Test
-    public void checkPropertySource() {
-        assertEquals("test_train_tickets", environment.getProperty("db.user"));
-    }
 
     // Test saveUser---------------------------------------------------
 
