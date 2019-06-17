@@ -37,12 +37,14 @@ public class InvoiceJdbcDao implements IJdbcDao<Invoice> {
 
     @Override
     public boolean update(final Invoice item) {
-        return namedJdbcTemplate.update(UPDATE_TABLE, new BeanPropertySqlParameterSource(item)) > 0;
+        final int result = namedJdbcTemplate.update(UPDATE_TABLE, new BeanPropertySqlParameterSource(item));
+        return result > 0;
     }
 
     @Override
     public boolean delete(final Long id) {
-        return namedJdbcTemplate.update(DELETE_BY_ID, new MapSqlParameterSource("id", id)) > 0;
+        final int result = namedJdbcTemplate.update(DELETE_BY_ID, new MapSqlParameterSource("id", id));
+        return  result > 0;
     }
 
     @Override

@@ -44,9 +44,9 @@ public class InvoiceJdbcDaoIntegrationTest {
 
     @Test
     public void findInvoiceByIdWhenOkThenReturnThatOne() {
-        final long id = invoiceDAO.save(INVOICE_TEST).getId();
-        Invoice temp = invoiceDAO.findById(id);
-        assertEquals(temp, invoiceDAO.findById(id));
+        final Invoice before = invoiceDAO.save(INVOICE_TEST);
+        final long id = before.getId();
+        assertEquals(before, invoiceDAO.findById(id));
     }
 
     @Test
