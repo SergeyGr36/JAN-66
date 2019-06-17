@@ -1,6 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
 
-import com.ra.course.janus.traintickets.MainSpringConfig;
+import com.ra.course.janus.traintickets.configuration.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Admin;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +10,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)

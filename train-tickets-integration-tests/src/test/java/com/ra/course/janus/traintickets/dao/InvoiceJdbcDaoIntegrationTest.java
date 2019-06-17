@@ -1,6 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
 
-import com.ra.course.janus.traintickets.MainSpringConfig;
+import com.ra.course.janus.traintickets.configuration.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Invoice;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
