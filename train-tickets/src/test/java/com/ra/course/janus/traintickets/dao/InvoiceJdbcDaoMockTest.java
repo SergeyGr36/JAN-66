@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 import com.ra.course.janus.traintickets.entity.Invoice;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -19,14 +18,13 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
-
 class InvoiceJdbcDaoMockTest {
 
     private final long ID = 1;
     private Invoice invoice;
     private InvoiceJdbcDao invoiceDao;
-    private final transient SimpleJdbcInsert mockJdbcInsert = mock(SimpleJdbcInsert.class) ;
-    private final transient NamedParameterJdbcTemplate mockNamedJdbcTemplate = mock(NamedParameterJdbcTemplate.class);
+    private final SimpleJdbcInsert mockJdbcInsert = mock(SimpleJdbcInsert.class) ;
+    private final NamedParameterJdbcTemplate mockNamedJdbcTemplate = mock(NamedParameterJdbcTemplate.class);
 
     @BeforeEach
     public void before() {

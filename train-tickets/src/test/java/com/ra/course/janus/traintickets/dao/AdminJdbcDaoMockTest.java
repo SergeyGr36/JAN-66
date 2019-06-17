@@ -105,6 +105,7 @@ class AdminJdbcDaoMockTest {
             // then
             assertFalse(adminDao.findAll().isEmpty());
     }
+
     @Test
     public void whenCallMethodFindAllInDbThenReturnEmptyList() {
         // when

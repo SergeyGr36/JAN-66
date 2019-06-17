@@ -23,12 +23,6 @@ import static org.mockito.Mockito.when;
 
 class UserJdbcDAOMockTest {
 
-    private static final String UPDATE_USER =
-            "update USERS set name = :name, email = :email, password = :password WHERE id = :id";
-    private static final String DELETE_USER = "delete from USERS where id = :id";
-    private static final String FIND_BY_ID = "select * from USERS where id = :id";
-    private static final String FIND_ALL = "select * from USERS";
-
     private static final Long   USER_ID = 100L;
     private static final String USER_NAME = "test_name";
     private static final String USER_EMAIL = "test_name123@gmail.com";
@@ -36,7 +30,6 @@ class UserJdbcDAOMockTest {
     private static final User TEST_USER = new User(USER_ID, USER_NAME, USER_EMAIL, USER_PASSWORD);
 
     private UserJdbcDAO userDAO;
-
     private SimpleJdbcInsert mockJdbcInsert;
     private NamedParameterJdbcTemplate mockNamedJdbcTemplate;
 
