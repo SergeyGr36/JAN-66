@@ -30,7 +30,6 @@ public class TrainJdbcDaoIntegrationTest {
         final Train someTrain = trainJdbcDao.save(TEST_TRAIN);
         // then
         assertNotSame(createdTrain.getId(),someTrain.getId());
-        assertNotNull(createdTrain);
     }
 
     @Test
