@@ -6,19 +6,20 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = MainSpringConfig.class)
+@TestPropertySource("classpath:test_config.properties")
 @Sql("classpath:sql_scripts/admins_table.sql")
 public class AdminJdbcDaoIntegrationTest {
 
-
-    private static final String FILE_PATH = "src/test/resources/sql_scripts/admins_table.sql";
     @Autowired
     private AdminJdbcDao adminDao;
 

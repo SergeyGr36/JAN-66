@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -17,10 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration (classes = MainSpringConfig.class)
+@TestPropertySource("classpath:test_config.properties")
 @Sql("classpath:sql_scripts/invoices_table.sql")
 public class InvoiceJdbcDaoIntegrationTest {
     private static final long ID = 1;
     private static final Invoice INVOICE_TEST = new Invoice(ID, new BigDecimal("10.00"), "Something");
+
     @Autowired
     private InvoiceJdbcDao invoiceDAO;
 
