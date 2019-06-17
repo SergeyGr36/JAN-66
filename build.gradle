@@ -38,12 +38,22 @@ configure(allprojects) { project ->
         testCompile testing.junit5Engine
         testCompile testing.junit5Api
         testCompile testing.junit5Params
+
         testCompile testing.mockito
+        
         compile log.log4j2Api
         compile log.log4jCore
+        
         compile log.logbackCore
         compile log.logbackClassic
         compile log.slf4jApi
+
+        compileOnly utils.lombok
+        annotationProcessor utils.lombok
+
+        compile spring.context
+        compile spring.jdbc
+        testCompile spring.test
     }
 }
 
