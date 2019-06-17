@@ -39,9 +39,10 @@ public class AdminJdbcDaoIntegrationTest {
     // Test update Admin------------------------------------------------------------------
     @Test
     public void whenCallUpdateObjectSuccessfullyCompleted(){
-        // when
+        // given
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final Long id = saveAdmin1.getId();
+        //when
         adminDao.update(TEST_ADMIN);
         Admin byId = adminDao.findById(id);
         // then
@@ -60,11 +61,13 @@ public class AdminJdbcDaoIntegrationTest {
     // Test findById Admin----------------------------------------------------------------
     @Test
     public void findByIdObjectInDb(){
-        // when
+        // given
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final long id = saveAdmin1.getId();
+        //when
+        final Admin adminById = adminDao.findById(id);
         // then
-        assertNotNull(adminDao.findById(id));
+        assertEquals(saveAdmin1, adminById);
     }
 
     // Test findAll Admins----------------------------------------------------------------
