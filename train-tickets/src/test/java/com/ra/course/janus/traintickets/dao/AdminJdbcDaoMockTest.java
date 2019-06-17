@@ -1,7 +1,6 @@
 package com.ra.course.janus.traintickets.dao;
 
 import com.ra.course.janus.traintickets.entity.Admin;
-import com.ra.course.janus.traintickets.exception.DAOException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -11,8 +10,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
-import javax.sql.DataSource;
-import java.sql.*;
 import java.util.Collections;
 import java.util.List;
 
