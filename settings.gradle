@@ -5,4 +5,5 @@ include 'developers-team'
 include 'developers-team-integration-tests'
 include 'train-tickets'
 include 'train-tickets-integration-tests'
-
+include 'faculty'
+include 'faculty-integration-tests'

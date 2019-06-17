@@ -1,80 +1,88 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Developer;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcDeveloperDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Developer> developerDAO = new PlainJdbcDeveloperDAO(dataSource);
 
-    private static Developer developerToCreate = new Developer(1L, "Nick");
+    @Autowired
+    private BaseDao<Developer> dao;
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "DEVELOPERS");
+    private Developer entityToCreate = new Developer(1L, "Nick");
+
+    private Developer getUpdatedEntity(Developer entity) {
+
+        Developer updatedDeveloper = entity;
+        updatedDeveloper.setName("Jamshut");
+
+        return updatedDeveloper;
+    }
+
+    @Test
+    public void createDeveloperTest() throws Exception {
+        //when
+        Developer entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getDeveloperByIdTest() throws Exception {
+        //when
+        Developer createdEntity = dao.create(entityToCreate);
+        Developer gottenDeveloper = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenDeveloper);
+    }
+
+    @Test
+    public void getAllDevelopersTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createDeveloperTest() throws Exception {
         //when
-        Developer developer = developerDAO.create(developerToCreate);
-
-        //then
-        assertEquals(developer, developerDAO.get(developer.getId()));
-    }
-
-    @Test
-    void getDeveloperByIdTest() throws Exception {
-        //when
-        Developer createdDeveloper = developerDAO.create(developerToCreate);
-        Developer gottenDeveloper = developerDAO.get(createdDeveloper.getId());
-
-        //then
-        assertEquals(createdDeveloper, gottenDeveloper);
-    }
-
-    @Test
-    void getAllDevelopersTest() throws Exception {
-        //when
-        Developer createdDeveloper = developerDAO.create(developerToCreate);
-        List<Developer> expected = Arrays.asList(createdDeveloper);
-        List<Developer> actual = developerDAO.getAll();
+        Developer createdEntity = dao.create(entityToCreate);
+        List<Developer> expected = Arrays.asList(createdEntity);
+        List<Developer> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateDeveloperTest() throws Exception {
+    public void updateDeveloperTest() throws Exception {
         //when
-        Developer createdDeveloper = developerDAO.create(developerToCreate);
-        createdDeveloper.setName("Jamshut");
-        developerDAO.update(createdDeveloper);
-        Developer updated = developerDAO.get(createdDeveloper.getId());
+        Developer createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Developer updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdDeveloper);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteDeveloperTest() throws Exception {
+    public void deleteDeveloperTest() throws Exception {
         //when
-        Developer createdDeveloper = developerDAO.create(developerToCreate);
-        developerDAO.delete(createdDeveloper.getId());
-        Developer actual = developerDAO.get(createdDeveloper.getId());
+        Developer createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Developer actual = dao.get(createdEntity.getId());
 
         //then
         assertEquals(null, actual);

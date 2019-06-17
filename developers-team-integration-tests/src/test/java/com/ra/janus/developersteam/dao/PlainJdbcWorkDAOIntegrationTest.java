@@ -1,83 +1,93 @@
 package com.ra.janus.developersteam.dao;
 
-import com.ra.janus.developersteam.datasources.DataSourceFactory;
+import com.ra.janus.developersteam.configuration.AppConfig;
 import com.ra.janus.developersteam.entity.Work;
-import com.ra.janus.developersteam.schema.DBSchemaCreator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AppConfig.class})
 public class PlainJdbcWorkDAOIntegrationTest {
-    private static final DataSource dataSource = DataSourceFactory.get();
-    private static final BaseDao<Work> workDAO = new PlainJdbcWorkDAO(dataSource);
 
-    private static Work workToCreate = new Work(1L, "Developer", new BigDecimal(4000.00));
+    @Autowired
+    private BaseDao<Work> dao;
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            DBSchemaCreator.createSchema(connection, "WORKS");
+    private Work entityToCreate = new Work(1L, "Developer", new BigDecimal("4000.00"));
+
+    private Work getUpdatedEntity(Work entity) {
+
+        Work updatedWork = entity;
+        updatedWork.setName("Tester");
+        updatedWork.setPrice(new BigDecimal("2000.00"));
+
+        return updatedWork;
+    }
+
+    @Test
+    public void createWorkTest() throws Exception {
+        //when
+        Work entity = dao.create(entityToCreate);
+
+        //then
+        assertEquals(entity, dao.get(entity.getId()));
+    }
+
+    @Test
+    public void getWorkByIdTest() throws Exception {
+        //when
+        Work createdEntity = dao.create(entityToCreate);
+        Work gottenWork = dao.get(createdEntity.getId());
+
+        //then
+        assertEquals(createdEntity, gottenWork);
+    }
+
+    @Test
+    public void getAllWorksTest() throws Exception {
+        //given
+        for (var entity : dao.getAll()) {
+            dao.delete(entity.getId());
         }
-    }
 
-    @Test
-    void createWorkTest() throws Exception {
         //when
-        Work work = workDAO.create(workToCreate);
-
-        //then
-        assertEquals(work, workDAO.get(work.getId()));
-    }
-
-    @Test
-    void getWorkByIdTest() throws Exception {
-        //when
-        Work createdWork = workDAO.create(workToCreate);
-        Work gottenWork = workDAO.get(createdWork.getId());
-
-        //then
-        assertEquals(createdWork, gottenWork);
-    }
-
-    @Test
-    void getAllWorksTest() throws Exception {
-        //when
-        Work createdWork = workDAO.create(workToCreate);
-        List<Work> expected = Arrays.asList(createdWork);
-        List<Work> actual = workDAO.getAll();
+        Work createdEntity = dao.create(entityToCreate);
+        List<Work> expected = Arrays.asList(createdEntity);
+        List<Work> actual = dao.getAll();
 
         //then
         assertIterableEquals(expected, actual);
     }
 
     @Test
-    void updateWorkTest() throws Exception {
+    public void updateWorkTest() throws Exception {
         //when
-        Work createdWork = workDAO.create(workToCreate);
-        createdWork.setName("Tester");
-        createdWork.setPrice(new BigDecimal(2000.00));
-        workDAO.update(createdWork);
-        Work updated = workDAO.get(createdWork.getId());
+        Work createdEntity = dao.create(entityToCreate);
+        dao.update(getUpdatedEntity(createdEntity));
+        Work updated = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(updated, createdWork);
+        assertEquals(updated, createdEntity);
     }
 
     @Test
-    void deleteWorkTest() throws Exception {
+    public void deleteWorkTest() throws Exception {
         //when
-        Work createdWork = workDAO.create(workToCreate);
-        workDAO.delete(createdWork.getId());
+        Work createdEntity = dao.create(entityToCreate);
+        dao.delete(createdEntity.getId());
+        Work actual = dao.get(createdEntity.getId());
 
         //then
-        assertEquals(null, workDAO.get(createdWork.getId()));
+        assertEquals(null, actual);
     }
+
 }
