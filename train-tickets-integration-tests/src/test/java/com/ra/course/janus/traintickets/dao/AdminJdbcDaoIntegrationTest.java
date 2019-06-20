@@ -1,37 +1,31 @@
 package com.ra.course.janus.traintickets.dao;
 
-import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
+import com.ra.course.janus.traintickets.configuration.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Admin;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = MainSpringConfig.class)
+@TestPropertySource("classpath:test_config.properties")
+@Sql("classpath:sql_scripts/admins_table.sql")
 public class AdminJdbcDaoIntegrationTest {
 
-    private static final DataSource DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
-    private static final String FILE_PATH = "src/test/resources/sql_scripts/admin_table.sql";
+    @Autowired
     private AdminJdbcDao adminDao;
-    private static final Admin TEST_ADMIN = new Admin(0, "Petya", "Volk", "12345");
-    private static final Admin ADMIN = new Admin(0,"Roman", "Hreits", "12345");
 
-    @BeforeAll
-    public static void init() throws IOException, SQLException {
-        createTable();
-    }
-    @BeforeEach
-    public void setUp() throws SQLException {
-        adminDao = new AdminJdbcDao(DATA_SOURCE);
-        clearAdminsTable();
-    }
+    private static final Admin TEST_ADMIN = new Admin(1L, "Petya", "Volk", "12345");
+    private static final Admin ADMIN = new Admin(null,"Roman", "Hreits", "12345");
+
 
     // Test save Admin--------------------------------------------------------------------
     @Test
@@ -45,10 +39,11 @@ public class AdminJdbcDaoIntegrationTest {
     // Test update Admin------------------------------------------------------------------
     @Test
     public void whenCallUpdateObjectSuccessfullyCompleted(){
-        // when
+        // given
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final Long id = saveAdmin1.getId();
-        adminDao.update(id, TEST_ADMIN);
+        //when
+        adminDao.update(TEST_ADMIN);
         Admin byId = adminDao.findById(id);
         // then
         assertNotEquals(byId, saveAdmin1);
@@ -66,11 +61,13 @@ public class AdminJdbcDaoIntegrationTest {
     // Test findById Admin----------------------------------------------------------------
     @Test
     public void findByIdObjectInDb(){
-        // when
+        // given
         Admin saveAdmin1 = adminDao.save(ADMIN);
         final long id = saveAdmin1.getId();
+        //when
+        final Admin adminById = adminDao.findById(id);
         // then
-        assertNotNull(adminDao.findById(id));
+        assertEquals(saveAdmin1, adminById);
     }
 
     // Test findAll Admins----------------------------------------------------------------
@@ -82,20 +79,6 @@ public class AdminJdbcDaoIntegrationTest {
         List<Admin> all = adminDao.findAll();
         // then
         assertEquals(all.size(), 2);
-    }
-
-    //------------------------------------------------------------------------------------
-    private static void createTable() throws SQLException, IOException {
-        try (Connection conn = DATA_SOURCE.getConnection()) {
-           conn.createStatement().execute(Files.readAllLines(Paths.get(FILE_PATH)).stream()
-                   .collect(Collectors.joining("")));
-        }
-    }
-
-    private static void clearAdminsTable() throws SQLException {
-        try (Connection conn = DATA_SOURCE.getConnection()) {
-            conn.createStatement().execute("TRUNCATE TABLE ADMIN");
-        }
     }
 }
 

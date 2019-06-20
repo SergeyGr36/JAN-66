@@ -1,45 +1,35 @@
 package com.ra.course.janus.traintickets.dao;
 
-import com.ra.course.janus.traintickets.configuration.DataSourceFactory;
+import com.ra.course.janus.traintickets.configuration.MainSpringConfig;
 import com.ra.course.janus.traintickets.entity.Invoice;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration (classes = MainSpringConfig.class)
+@TestPropertySource("classpath:test_config.properties")
+@Sql("classpath:sql_scripts/invoices_table.sql")
 public class InvoiceJdbcDaoIntegrationTest {
-    private static final DataSource IN_DATA_SOURCE = DataSourceFactory.DATA_SOURCE.getInstance();
-    private static final String PATH_TO_FILE = "src/test/resources/sql_scripts/invoices_table.sql";
-    private static final Invoice INVOICE_TEST = new Invoice(1, 10, "Something");
+    private static final long ID = 1;
+    private static final Invoice INVOICE_TEST = new Invoice(ID, new BigDecimal("10.00"), "Something");
+
+    @Autowired
     private InvoiceJdbcDao invoiceDAO;
-
-
-    @BeforeAll
-    public static void createTable() throws IOException, SQLException {
-        createInvoicesTable();
-    }
-
-    @BeforeEach
-    public void deleteAllFromTable() throws IOException, SQLException {
-        deleteTable();
-        invoiceDAO = new InvoiceJdbcDao(IN_DATA_SOURCE);
-
-    }
 
     @Test
     public void saveInvoiceThenReturnIt() {
-        final Invoice expected = invoiceDAO.save(INVOICE_TEST);
-        assertNotNull(expected.getId());
+        assertNotNull(invoiceDAO.save(INVOICE_TEST));
     }
 
     @Test
@@ -51,44 +41,22 @@ public class InvoiceJdbcDaoIntegrationTest {
     @Test
     public void updateInvoiceWhenOkThenReturnTrue() {
         final long id = invoiceDAO.save(INVOICE_TEST).getId();
-        final Invoice expect = new Invoice(id, 5, "sth");
-        assertTrue(invoiceDAO.update(id, expect));
+        Invoice temp =  new Invoice(id, new BigDecimal("15"), "fsf");
+        assertTrue(invoiceDAO.update(temp));
     }
 
     @Test
     public void findInvoiceByIdWhenOkThenReturnThatOne() {
-        final long id = invoiceDAO.save(INVOICE_TEST).getId();
-        assertEquals(invoiceDAO.findById(id).getAttributes(), INVOICE_TEST.getAttributes());
-        assertEquals(invoiceDAO.findById(id).getPrice(), INVOICE_TEST.getPrice());
+        final Invoice before = invoiceDAO.save(INVOICE_TEST);
+        final long id = before.getId();
+        assertEquals(before, invoiceDAO.findById(id));
     }
 
     @Test
     public void findAllInvoicesFromDataBaseWhenOkThenReturnListWithThem() {
-        invoiceDAO.save(INVOICE_TEST);
-        final List<Invoice> invoices = invoiceDAO.findAll();
-        assertEquals(invoices.get(0).getPrice(), invoiceDAO.findAll().get(0).getPrice());
-        assertEquals(invoices.get(0).getAttributes(), invoiceDAO.findAll().get(0).getAttributes());
-
-
+        final List<Invoice> expect = new ArrayList<>();
+        expect.add(invoiceDAO.save(INVOICE_TEST));
+        final List<Invoice> acttual = invoiceDAO.findAll();
+        assertEquals(expect, acttual);
     }
-
-    private static String scriptReader() throws IOException {
-        return String.join("", Files.readAllLines(Paths.get(PATH_TO_FILE)));
-    }
-
-    private static void runDataBase(String script) throws SQLException, IOException {
-        try (Connection con = IN_DATA_SOURCE.getConnection()) {
-            try (Statement statement = con.createStatement()) {
-                statement.execute(script);
-            }
-        }
-    }
-
-    private static void createInvoicesTable() throws IOException, SQLException {
-        runDataBase(scriptReader());
-    }
-
-    private static void deleteTable() throws SQLException, IOException {
-        runDataBase("TRUNCATE TABLE invoices;");
-    }
-}
+   }
